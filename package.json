@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "kuromoji": "^0.1.2"
+    "kuromoji": "^0.1.2",
+    "pg": "^7.11.0",
+    "ws": "^7.1.0"
   },
   "devDependencies": {},
   "scripts": {
