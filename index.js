@@ -1,5 +1,36 @@
 const kuromoji = require('kuromoji');
+const WebSocket = require('ws');
+const { Client } = require('pg');
+const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true
+});
 
+const ws = new WebSocket('wss://misskey.io/streaming');
+
+const data = {
+    type: "connect",
+    body: {
+        channel: "hybridTimeline",
+        id: "timeline"
+    }
+};
+
+ws.on('open', function() {
+    console.log('Connected!');
+
+    ws.send(JSON.stringify(data));
+});
+
+ws.addEventListener('close', function() {
+    console.log('Disconnected!');
+});
+
+ws.addEventListener('message', function(data){
+    console.log(JSON.parse(data.data).body.body.text);
+});
+
+/*
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
 
 builder.build(function(err, tokenizer) {
@@ -17,3 +48,4 @@ builder.build(function(err, tokenizer) {
     console.log(output);
     console.log(`random 1: ${output[Math.floor(Math.random() * output.length)]}`);
 });
+*/
