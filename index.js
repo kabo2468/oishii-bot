@@ -42,6 +42,7 @@ ws.addEventListener('message', function(data){
     console.dir(json);
 
     if (json.body.id === '1803ad27-a839-4eb6-ac74-97677ee0a055') { //Timeline
+        if (json.body.body.userId === process.env.USER_ID) return;
         let text = json.body.body.text;
         if (text === null) return;
 
@@ -90,7 +91,7 @@ ws.addEventListener('message', function(data){
             }).catch(e => console.log(e));
         });
     }
-
+    
     if (json.body.id === '69d71556-8747-4287-b849-d3957d33baa7') { //Main
         if (json.body.type === 'notification') return;
 
@@ -155,7 +156,7 @@ ws.addEventListener('message', function(data){
                     reply('それ食べれる？', note_id);
                 }
             } 
-            m = text.match(/(.+)[はも](おいしい|美味しい|まずい|不味い)よ?[！!]*/g);
+            m = text.match('(.+)[はも](おいしい|美味しい|まずい|不味い)よ?[！!]*', 'g');
             if (m) { // learn
                 if (is_noun(m[1])) {
                     const is_good = m[2].match(/(おいしい|美味しい)/) ? true : false;
@@ -186,18 +187,55 @@ ws.addEventListener('message', function(data){
                     reply('それ食べれる？', note_id);
                 }
             }
-            m = text.match(/(おいしい|美味しい|まずい|不味い)(もの|物|の)は[？?]*/g);
+            m = text.match('(おいしい|美味しい|まずい|不味い)(もの|物|の)は[？?]*', 'g');
             if (m) { // search
 
             }
         }
     }
+    
     console.log('----------End----------');
 });
 
 setInterval(() => {
-    // ws.send(JSON.stringify(aaaaa));
+    let text = '';
+    let name = '';
+    let good = '';
+
+    const query = {
+        text: 'SELECT (name, good) FROM oishii_table'
+    };
+    client.query(query)
+    .then(res => {
+        console.log(res);
+        const re = /\((.+),([tf])\)/;
+        const row = res.rows[Math.floor(Math.random() * res.rowCount)].row;
+        console.log(`row: ${row}`);
+        name = row.match(re)[1];
+        good = row.match(re)[2];
+    })
+    .then(() => {
+        text = name;
+        text += good === 't' ? 'おいしい' : 'まずい';
+        const data = {
+            type: 'api',
+            body: {
+                id: uuid(),
+                endpoint: 'notes/create',
+                data: {
+                    visibility: "public",
+                    text: `${text}`,
+                    localOnly: false,
+                    geo: null
+                }
+            }
+        };
+        ws.send(JSON.stringify(data));
+    })
+    .catch(e => console.error(e.stack));
 }, 1000 * 60 * process.env.INTERVAL_MIN);
+
+
 
 function reply(text, note_id) {
     const data = {
@@ -267,21 +305,3 @@ function is_noun(text) {
         }
     });
 }
-
-/*
-builder.build(function(err, tokenizer) {
-    if(err) { throw err; }
-
-    const tokens = tokenizer.tokenize("今日のメンテ明けが怖すぎて心拍数BPM222.2って感じで今にも心臓が止まりそう");
-    // console.dir(tokens);
-
-    const pos_arr = tokens.map(function(token){
-        // if(token.pos === '名詞') return token.surface_form;
-        return token.pos === '名詞' ? token.surface_form : null;
-    });
-
-    const output = pos_arr.filter(n => n !== null);
-    console.log(output);
-    console.log(`random 1: ${output[Math.floor(Math.random() * output.length)]}`);
-});
-*/
