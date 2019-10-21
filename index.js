@@ -139,73 +139,12 @@ ws.addEventListener('message', function(data){
 
             let m = text.match(/(.+)(は|って)(おいしい|美味しい|まずい|不味い)[？?]+/);
             if (m) { // check
-                new Promise((resolve, reject) => {
-                    console.log(is_noun(m[1]));
-                    resolve(is_noun(m[1]));
-                })
-                .then(res => {
-                    if (res) {
-                        let is_good = false;
-                        const query = {
-                            text: 'SELECT good FROM oishii_table WHERE name=$1',
-                            values: [ m[1] ]
-                        };
-                        client.query(query)
-                        .then(res => {
-                            if (res.rows[0].length < 1) {
-                                throw 'Not found';
-                            }
-                            is_good = res.rows[0].good;
-                            console.log(is_good);
-    
-                            const text = is_good ? 'おいしい' : 'まずい';
-                            reply(text, note_id);
-                        })
-                        .catch(e => {
-                            console.log(e);
-                            reply('わからない', note_id);
-                        });
-                    } else {
-                        reply('それ食べれる？', note_id);
-                    }
-                });
+                check(m, note_id);
                 return;
             }
             m = text.match('(.+)[はも](おいしい|美味しい|まずい|不味い)よ?[！!]*');
             if (m) { // learn
-                new Promise((resolve, reject) => {
-                    resolve(is_noun(m[1]));
-                })
-                .then(res => {
-                    if (res) {
-                        const is_good = m[2].match(/(おいしい|美味しい)/) ? true : false;
-    
-                        get_exists(m[1])
-                        .then(res => {
-                            if (res === true) {
-                                const update_query = {
-                                    text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
-                                    values: [ is_good, m[1] ]
-                                };
-                                client.query(update_query)
-                                .then(res => console.log(res))
-                                .catch(e => console.error(e.stack));
-                            } else {
-                                const add_query = {
-                                    text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, true )',
-                                    values: [ add_name, is_good ]
-                                };
-                                client.query(add_query)
-                                .then(res => console.log(res))
-                                .catch(e => console.error(e.stack));
-                            }
-                        }).then(() => {
-                            reply(`${m[1]}は${m[2]}\nおぼえた`, note_id);
-                        });
-                    } else {
-                        reply('それ食べれる？', note_id);
-                    }
-                });
+                learn(m, note_id);
                 return;
             }
             m = text.match('(おいしい|美味しい|まずい|不味い)(もの|物|の)は[？?]*');
@@ -258,6 +197,131 @@ setInterval(() => {
 
 
 
+async function learn(m, note_id) {
+    const isN = await is_noun(m[1]);
+    if (isN) {
+        const is_good = m[2].match(/(おいしい|美味しい)/) ? true : false;
+        const isExists = await get_exists(m[1]);
+        if (isExists) {
+            const update_query = {
+                text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
+                values: [is_good, m[1]]
+            };
+            client.query(update_query)
+                .then(res => console.log(res))
+                .catch(e => console.error(e.stack));
+        } else {
+            const add_query = {
+                text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, true )',
+                values: [m[1], is_good]
+            };
+            client.query(add_query)
+                .then(res => console.log(res))
+                .catch(e => console.error(e.stack));
+        }
+        reply(`${m[1]}は${m[2]}\nおぼえた`, note_id);
+    } else {
+        reply('それ食べれる？', note_id);
+    }
+
+    //#region comment
+    // new Promise((resolve) => {
+    //     resolve(is_noun(m[1]));
+    // })
+    //     .then(res => {
+    //         if (res) {
+    //             const is_good = m[2].match(/(おいしい|美味しい)/) ? true : false;
+    //             get_exists(m[1])
+    //                 .then(res => {
+    //                     if (res === true) {
+    //                         const update_query = {
+    //                             text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
+    //                             values: [is_good, m[1]]
+    //                         };
+    //                         client.query(update_query)
+    //                             .then(res => console.log(res))
+    //                             .catch(e => console.error(e.stack));
+    //                     }
+    //                     else {
+    //                         const add_query = {
+    //                             text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, true )',
+    //                             values: [add_name, is_good]
+    //                         };
+    //                         client.query(add_query)
+    //                             .then(res => console.log(res))
+    //                             .catch(e => console.error(e.stack));
+    //                     }
+    //                 }).then(() => {
+    //                     reply(`${m[1]}は${m[2]}\nおぼえた`, note_id);
+    //                 });
+    //         }
+    //         else {
+    //             reply('それ食べれる？', note_id);
+    //         }
+    //     });
+    //#endregion
+}
+
+async function check(m, note_id) {
+    const isN = await is_noun(m[1]);
+    if (isN) {
+        let is_good = false;
+        const query = {
+            text: 'SELECT good FROM oishii_table WHERE name=$1',
+            values: [m[1]]
+        };
+        client.query(query)
+            .then(res => {
+                if (res.rows[0].length < 1) {
+                    throw 'Not found';
+                }
+                is_good = res.rows[0].good;
+                console.log(is_good);
+                const text = is_good ? 'おいしい' : 'まずい';
+                reply(text, note_id);
+            })
+            .catch(e => {
+                console.log(e);
+                reply('わからない', note_id);
+            });
+    } else {
+        reply('それ食べれる？', note_id);
+    }
+
+    //#region comment
+    // new Promise((resolve) => {
+    //     console.log(is_noun(m[1]));
+    //     resolve(is_noun(m[1]));
+    // })
+    //     .then(res => {
+    //         if (res) {
+    //             let is_good = false;
+    //             const query = {
+    //                 text: 'SELECT good FROM oishii_table WHERE name=$1',
+    //                 values: [m[1]]
+    //             };
+    //             client.query(query)
+    //                 .then(res => {
+    //                     if (res.rows[0].length < 1) {
+    //                         throw 'Not found';
+    //                     }
+    //                     is_good = res.rows[0].good;
+    //                     console.log(is_good);
+    //                     const text = is_good ? 'おいしい' : 'まずい';
+    //                     reply(text, note_id);
+    //                 })
+    //                 .catch(e => {
+    //                     console.log(e);
+    //                     reply('わからない', note_id);
+    //                 });
+    //         }
+    //         else {
+    //             reply('それ食べれる？', note_id);
+    //         }
+    //     });
+    //#endregion
+}
+
 function reply(text, note_id) {
     const data = {
         type: 'api',
@@ -289,7 +353,7 @@ function uuid() {
 }
 
 function get_exists(text) {
-　  return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
         const query = {
             text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE name = $1)',
             values: [ text ]
@@ -304,26 +368,28 @@ function get_exists(text) {
 }
 
 function is_noun(text) {
-    console.log(`is_noun text: ${text}`);
-    builder.build((err, tokenizer) => {
-        if (err) throw err;
+    return new Promise(resolve => {
+        console.log(`is_noun text: ${text}`);
+        builder.build((err, tokenizer) => {
+            if (err) throw err;
 
-        //名詞のみ取り出す
-        const tokens = tokenizer.tokenize(text);
-        const pos_arr = tokens.map(token => {
-            return token.pos === '名詞' && token.pos_detail_1 !== 'サ変接続' ? token.surface_form : null;
+            //名詞のみ取り出す
+            const tokens = tokenizer.tokenize(text);
+            const pos_arr = tokens.map(token => {
+                return token.pos === '名詞' && token.pos_detail_1 !== 'サ変接続' ? token.surface_form : null;
+            });
+            const nouns = pos_arr.filter(n => n !== null);
+            console.log(`nouns: ${nouns}`);
+            //もし何もなかったら
+            if (nouns.length < 1) resolve(false);
+
+            //1文字のひらがな・カタカナを消す
+            const output = nouns.filter(n => n.search(/^[ぁ-んァ-ン]$/));
+            if (output) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
         });
-        const nouns = pos_arr.filter(n => n !== null);
-        console.log(`nouns: ${nouns}`);
-        //もし何もなかったら
-        if (nouns.length < 1) return false;
-
-        //1文字のひらがな・カタカナを消す
-        const output = nouns.filter(n => n.search(/^[ぁ-んァ-ン]$/));
-        if (output) {
-            return true;
-        } else {
-            return false;
-        }
     });
 }
