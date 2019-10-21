@@ -4,14 +4,16 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "async": "^2.6.3",
     "kuromoji": "^0.1.2",
-    "pg": "^7.11.0",
-    "ws": "^7.1.0"
+    "pg": "^7.12.1",
+    "ws": "^7.2.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.5.1"
+  }
 }
