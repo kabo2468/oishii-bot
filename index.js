@@ -7,6 +7,15 @@ const client = new Client({
 });
 
 client.connect();
+// const testQuery = {
+//     text: 'SELECT count(*) FROM oishii_table'
+// };
+// console.time('test');
+// client.query(testQuery).then(res => {
+//     console.log(res);
+//     console.log(res.rows[0].count);
+// });
+// console.timeEnd('test');
 
 const ws = new WebSocket(process.env.STREAMING_URL);
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
@@ -14,7 +23,8 @@ const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
 const timelineData = {
     type: "connect",
     body: {
-        channel: "localTimeline",
+        // channel: "localTimeline",
+        channel: "hybridTimeline",
         id: "1803ad27-a839-4eb6-ac74-97677ee0a055"
     }
 };
@@ -27,21 +37,33 @@ const mainData = {
 };
 
 ws.on('open', function() {
-    console.log('Connected!');
     ws.send(JSON.stringify(timelineData));
     ws.send(JSON.stringify(mainData));
+    console.log('Connected!');
 });
 
 ws.addEventListener('close', function() {
-    console.log('Disconnected!');
+    console.log('Disconnected.');
 });
 
 ws.addEventListener('message', function(data){
-    console.log('----------Start----------');
+    // console.log('----------Start----------');
     const json = JSON.parse(data.data);
 
     if (json.body.id === '1803ad27-a839-4eb6-ac74-97677ee0a055') { //Timeline
-        console.dir(json);
+        // console.dir(json);
+
+        // heroku DB 制限
+        client.query('SELECT count(*) FROM oishii_table').then(res => {
+            const count = res.rows[0].count;
+            if (Number(count) > 5000) { // 5000件以上なら
+                client.query('DELETE FROM oishii_table').then(() => {
+                    sendText('```データベースのレコード数が5000件を超えたので、データベースが初期化されました。```');
+                })
+                .catch(e => console.log(e));
+            }
+        })
+        .catch(e => console.log(e));
 
         if (json.body.body.userId === process.env.USER_ID) return;
         let text = json.body.body.text;
@@ -75,7 +97,7 @@ ws.addEventListener('message', function(data){
             console.log(`add_name: ${add_name}`);
 
             //被り
-            get_exists(add_name)
+            getExists(add_name)
             .then(res => {
                 if (res === true) {
                     console.log(`if: ${res}`);
@@ -98,8 +120,7 @@ ws.addEventListener('message', function(data){
         if (json.body.type === 'notification') return;
 
         if (json.body.type === 'followed') { //follow back
-            console.dir(json);
-
+            // console.dir(json);
             ws.send(JSON.stringify({
                 type: 'api',
                 body: {
@@ -113,14 +134,15 @@ ws.addEventListener('message', function(data){
         }
 
         if (json.body.type === 'mention') {
-            console.dir(json);
+            // console.dir(json);
 
+            // Bot属性を無視
             if (json.body.body.user.isBot === true) return;
 
             let text = json.body.body.text;
             if (text === null) return;
             text = text.replace(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?/g, '');
-            text = text.replace('@oishiibot', '');
+            text = text.replace('@oishiibot ', '');
             console.log(`json text:${text}`);
 
             const note_id = json.body.body.id;
@@ -131,36 +153,50 @@ ws.addEventListener('message', function(data){
                     endpoint: 'notes/reactions/create',
                     data: {
                         noteId: note_id,
-                        reaction: 'like'
+                        reaction: 'pudding'
                     }
                 }
             };
             ws.send(JSON.stringify(reaction_data));
 
-            let m = text.match(/(.+)(は|って)(おいしい|美味しい|まずい|不味い)[？?]+/);
+            let m;
+            // Commands
+            m = text.match(/^\s*\/ping\s*$/);
+            if (m) { // ping
+                reply('ぽん!', note_id);
+                return;
+            }
+            m = text.match(/^\s*\/info\s*$/);
+            if (m) { // info
+                client.query('SELECT count(*) FROM oishii_table').then(res => {
+                    const count = res.rows[0].count;
+                    reply(`Records: ${count}`, note_id);
+                });
+                return;
+            }
+
+            // Text
+            m = text.match(/(.+)(は|って)(おいしい|美味しい|まずい|不味い)[？?]+/);
             if (m) { // check
-                check(m, note_id);
+                foodCheck(m, note_id);
                 return;
             }
             m = text.match('(.+)[はも](おいしい|美味しい|まずい|不味い)よ?[！!]*');
             if (m) { // learn
-                learn(m, note_id);
+                foodLearn(m, note_id);
                 return;
             }
-            m = text.match('(おいしい|美味しい|まずい|不味い)(もの|物|の)は[？?]*');
+            m = text.match('(おいしい|美味しい|まずい|不味い)(もの|物|の)は(何|なに)?[？?]*');
             if (m) { // search
+                foodSearch(m, note_id);
                 return;
             }
         }
     }
-    
-    console.log('----------End----------');
 });
 
 setInterval(() => {
-    let text = '';
-    let name = '';
-    let good = '';
+    let text = '', name = '', good = '';
 
     const query = {
         text: 'SELECT (name, good) FROM oishii_table'
@@ -196,83 +232,67 @@ setInterval(() => {
 }, 1000 * 60 * process.env.INTERVAL_MIN);
 
 
+async function foodSearch(m, note_id) {
+    const is_good = m[1].match(/(おいしい|美味しい)/) ? true : false;
+    const search_query = {
+        text: 'SELECT name FROM oishii_table WHERE good=$1',
+        values: [is_good]
+    };
+    client.query(search_query)
+        .then(res => {
+            // const re = /\((.+),([tf])\)/;
+            console.dir(res);
+            const row = res.rows[Math.floor(Math.random() * res.rowCount)];
+            console.dir(row);
+            const igt = is_good ? 'おいしい' : 'まずい';
+            reply(`${row.name} は${igt}`, note_id);
+        })
+        .catch(e => console.error(e.stack));
+}
 
-async function learn(m, note_id) {
-    const isN = await is_noun(m[1]);
+
+async function foodLearn(m, note_id) {
+    const text = m[1].replace(/^\s+|\s+$/g, '');
+    const isN = await isNoun(text);
     if (isN) {
         const is_good = m[2].match(/(おいしい|美味しい)/) ? true : false;
-        const isExists = await get_exists(m[1]);
+        const isExists = await getExists(text);
         if (isExists) {
             const update_query = {
-                text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
-                values: [is_good, m[1]]
+                text: 'UPDATE oishii_table SET good=$1 WHERE name=$2',
+                values: [is_good, text]
             };
             client.query(update_query)
                 .then(res => console.log(res))
                 .catch(e => console.error(e.stack));
         } else {
             const add_query = {
-                text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, true )',
-                values: [m[1], is_good]
+                text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
+                values: [text, is_good]
             };
             client.query(add_query)
                 .then(res => console.log(res))
                 .catch(e => console.error(e.stack));
         }
-        reply(`${m[1]}は${m[2]}\nおぼえた`, note_id);
+        reply(`${text} は${m[2]}\nおぼえた`, note_id);
     } else {
         reply('それ食べれる？', note_id);
     }
-
-    //#region comment
-    // new Promise((resolve) => {
-    //     resolve(is_noun(m[1]));
-    // })
-    //     .then(res => {
-    //         if (res) {
-    //             const is_good = m[2].match(/(おいしい|美味しい)/) ? true : false;
-    //             get_exists(m[1])
-    //                 .then(res => {
-    //                     if (res === true) {
-    //                         const update_query = {
-    //                             text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
-    //                             values: [is_good, m[1]]
-    //                         };
-    //                         client.query(update_query)
-    //                             .then(res => console.log(res))
-    //                             .catch(e => console.error(e.stack));
-    //                     }
-    //                     else {
-    //                         const add_query = {
-    //                             text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, true )',
-    //                             values: [add_name, is_good]
-    //                         };
-    //                         client.query(add_query)
-    //                             .then(res => console.log(res))
-    //                             .catch(e => console.error(e.stack));
-    //                     }
-    //                 }).then(() => {
-    //                     reply(`${m[1]}は${m[2]}\nおぼえた`, note_id);
-    //                 });
-    //         }
-    //         else {
-    //             reply('それ食べれる？', note_id);
-    //         }
-    //     });
-    //#endregion
 }
 
-async function check(m, note_id) {
-    const isN = await is_noun(m[1]);
+async function foodCheck(m, note_id) {
+    const text = m[1].replace(/^\s+|\s+$/g, '');
+    const isN = await isNoun(text);
     if (isN) {
         let is_good = false;
         const query = {
             text: 'SELECT good FROM oishii_table WHERE name=$1',
-            values: [m[1]]
+            values: [text]
         };
         client.query(query)
             .then(res => {
-                if (res.rows[0].length < 1) {
+                console.log(res);
+                if (res.rows.length < 1) {
                     throw 'Not found';
                 }
                 is_good = res.rows[0].good;
@@ -287,43 +307,10 @@ async function check(m, note_id) {
     } else {
         reply('それ食べれる？', note_id);
     }
-
-    //#region comment
-    // new Promise((resolve) => {
-    //     console.log(is_noun(m[1]));
-    //     resolve(is_noun(m[1]));
-    // })
-    //     .then(res => {
-    //         if (res) {
-    //             let is_good = false;
-    //             const query = {
-    //                 text: 'SELECT good FROM oishii_table WHERE name=$1',
-    //                 values: [m[1]]
-    //             };
-    //             client.query(query)
-    //                 .then(res => {
-    //                     if (res.rows[0].length < 1) {
-    //                         throw 'Not found';
-    //                     }
-    //                     is_good = res.rows[0].good;
-    //                     console.log(is_good);
-    //                     const text = is_good ? 'おいしい' : 'まずい';
-    //                     reply(text, note_id);
-    //                 })
-    //                 .catch(e => {
-    //                     console.log(e);
-    //                     reply('わからない', note_id);
-    //                 });
-    //         }
-    //         else {
-    //             reply('それ食べれる？', note_id);
-    //         }
-    //     });
-    //#endregion
 }
 
 function reply(text, note_id) {
-    const data = {
+    ws.send(JSON.stringify({
         type: 'api',
         body: {
             id: uuid(),
@@ -336,8 +323,23 @@ function reply(text, note_id) {
                 replyId: note_id
             }
         }
-    };
-    ws.send(JSON.stringify(data));
+    }));
+}
+
+function sendText(text) {
+    ws.send(JSON.stringify({
+        type: 'api',
+        body: {
+            id: uuid(),
+            endpoint: 'notes/create',
+            data: {
+                visibility: "public",
+                text: text,
+                localOnly: false,
+                geo: null
+            }
+        }
+    }));   
 }
 
 function uuid() {
@@ -352,7 +354,7 @@ function uuid() {
     return uuid;
 }
 
-function get_exists(text) {
+function getExists(text) {
     return new Promise(resolve => {
         const query = {
             text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE name = $1)',
@@ -367,7 +369,7 @@ function get_exists(text) {
     });
 }
 
-function is_noun(text) {
+function isNoun(text) {
     return new Promise(resolve => {
         console.log(`is_noun text: ${text}`);
         builder.build((err, tokenizer) => {
