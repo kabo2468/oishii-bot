@@ -1,8 +1,9 @@
 const kuromoji = require('kuromoji');
 const WebSocket = require('ws');
 const { Client } = require('pg');
+const { messages, variables } = require('./config.json');
 const client = new Client({
-    // ssl: true,
+    ssl: true,
     connectionString: process.env.DATABASE_URL
 });
 
@@ -53,29 +54,30 @@ ws.addEventListener('message', function(data){
     if (json.body.id === '1803ad27-a839-4eb6-ac74-97677ee0a055') { //Timeline
         // console.dir(json);
 
+        if (json.body.body.userId === process.env.USER_ID) return;
+        let text = json.body.body.text;
+        if (text === null) return;
+        if (json.body.body.cw !== null) return;
+        if (/@oishiibot/.test(text)) return;
+
         // heroku DB 制限
         client.query('SELECT count(*) FROM oishii_table').then(res => {
             const count = res.rows[0].count;
             if (Number(count) > 5000) { // 5000件以上なら
                 client.query('DELETE FROM oishii_table').then(() => {
-                    sendText('```データベースのレコード数が5000件を超えたので、データベースが初期化されました。```');
+                    sendText(messages.deleteDB);
                 })
                 .catch(e => console.log(e));
             }
         })
         .catch(e => console.log(e));
 
-        if (json.body.body.userId === process.env.USER_ID) return;
-        let text = json.body.body.text;
-        if (text === null) return;
-        if (/@oishiibot/.test(text)) return;
-
         //URLを消す
         text = text.replace(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?/g, '');
 
         builder.build((err, tokenizer) => {
             if (err) throw err;
-    
+
             //名詞のみ取り出す
             const tokens = tokenizer.tokenize(text);
             const pos_arr = tokens.map(token => {
@@ -91,7 +93,7 @@ ws.addEventListener('message', function(data){
             // console.log(`output: ${output}`);
             //もし何もなかったら
             if (output.length < 1) return;
-    
+
             //どれか1つ選ぶ
             const add_name = output[Math.floor(Math.random() * output.length)];
             // console.log(`add_name: ${add_name}`);
@@ -115,7 +117,7 @@ ws.addEventListener('message', function(data){
             }).catch(e => console.log(e));
         });
     }
-    
+
     if (json.body.id === '69d71556-8747-4287-b849-d3957d33baa7') { //Main
         if (json.body.type === 'notification') return;
 
@@ -146,7 +148,7 @@ ws.addEventListener('message', function(data){
             console.log(`json text:${text}`);
 
             const note_id = json.body.body.id;
-            const reaction_data = {
+            ws.send(JSON.stringify({
                 type: 'api',
                 body: {
                     id: uuid(),
@@ -156,14 +158,18 @@ ws.addEventListener('message', function(data){
                         reaction: 'pudding'
                     }
                 }
-            };
-            ws.send(JSON.stringify(reaction_data));
+            }));
 
             let m;
             // Commands
+            m = text.match(/^\s*\/help\s*$/);
+            if (m) { // help
+                sendText(messages.commands.help, note_id);
+                return;
+            }
             m = text.match(/^\s*\/ping\s*$/);
             if (m) { // ping
-                sendText('ぽん!', note_id);
+                sendText(messages.commands.ping, note_id);
                 return;
             }
             m = text.match(/^\s*\/info\s*$/);
@@ -174,19 +180,44 @@ ws.addEventListener('message', function(data){
                 });
                 return;
             }
-
-            // Text
-            m = text.match(/(.+)(は|って)(おいしい|美味しい|まずくない|不味くない|まずい|不味い|おいしくない|美味しくない)[？?]+/);
-            if (m) { // check
-                foodCheck(m, note_id);
+            m = text.match(/^\s*\/say\s*$/);
+            if (m) { // say
+                if (json.body.body.user.username === 'kabo') {
+                    sayFood();
+                } else {
+                    sendText(messages.commands.denied, note_id);
+                }
                 return;
             }
-            m = text.match('(.+)[はも](おいしい|美味しい|まずくない|不味くない|まずい|不味い|おいしくない|美味しくない)よ?[！!]*');
+
+            // Text
+            m = text.match(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})[？?]+`);
+            if (m) { // check
+                // foodCheck(m, note_id);
+                (async function() {
+                    const is_good = m[1].match(`(${variables.food.good})`) ? true : false;
+                    const search_query = {
+                        text: 'SELECT name FROM oishii_table WHERE good=$1',
+                        values: [is_good]
+                    };
+                    client.query(search_query)
+                        .then(res => {
+                            // console.dir(res);
+                            const row = res.rows[Math.floor(Math.random() * res.rowCount)];
+                            // console.dir(row);
+                            const igt = is_good ? messages.food.good : messages.food.bad;
+                            sendText(`${row.name}${messages.food.is}${igt}`, note_id);
+                        })
+                        .catch(e => console.error(e.stack));
+                })();
+                return;
+            }
+            m = text.match(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?[！!]*`);
             if (m) { // learn
                 foodLearn(m, note_id);
                 return;
             }
-            m = text.match('(おいしい|美味しい|まずくない|不味くない|まずい|不味い|おいしくない|美味しくない)(もの|物|の)は(何|なに)?[？?]*');
+            m = text.match(`(${variables.food.good}|${variables.food.bad})(もの|物|の)は(何|なに)?[？?]*`);
             if (m) { // search
                 foodSearch(m, note_id);
                 return;
@@ -196,66 +227,55 @@ ws.addEventListener('message', function(data){
 });
 
 setInterval(() => {
-    let text = '', name = '', good = '';
+    sayFood();
+}, 1000 * 60 * process.env.INTERVAL_MIN);
 
+
+function sayFood() {
+    let text = '', name = '', good = '';
     const query = {
         text: 'SELECT (name, good) FROM oishii_table'
     };
     client.query(query)
-    .then(res => {
-        // console.log(res);
-        const re = /\((.+),([tf])\)/;
-        const row = res.rows[Math.floor(Math.random() * res.rowCount)].row;
-        console.log(`row: ${row}`);
-        name = row.match(re)[1];
-        good = row.match(re)[2];
-    })
-    .then(() => {
-        text = name;
-        text += good === 't' ? 'おいしい' : 'まずい';
-        const data = {
-            type: 'api',
-            body: {
-                id: uuid(),
-                endpoint: 'notes/create',
-                data: {
-                    visibility: "public",
-                    text: `${text}`,
-                    localOnly: false,
-                    geo: null
-                }
-            }
-        };
-        ws.send(JSON.stringify(data));
-    })
-    .catch(e => console.error(e.stack));
-}, 1000 * 60 * process.env.INTERVAL_MIN);
-
+        .then(res => {
+            // console.log(res);
+            const re = /\((.+),([tf])\)/;
+            const row = res.rows[Math.floor(Math.random() * res.rowCount)].row;
+            console.log(`row: ${row}`);
+            name = row.match(re)[1];
+            good = row.match(re)[2];
+        })
+        .then(() => {
+            text = name;
+            text += good === 't' ? messages.food.good : messages.food.bad;
+            sendText(text);
+        })
+        .catch(e => console.error(e.stack));
+}
 
 async function foodSearch(m, note_id) {
-    const is_good = m[1].match(/(おいしい|美味しい|まずくない|不味くない)/) ? true : false;
+    const is_good = m[1].match(`(${variables.food.good})`) ? true : false;
     const search_query = {
         text: 'SELECT name FROM oishii_table WHERE good=$1',
         values: [is_good]
     };
     client.query(search_query)
         .then(res => {
-            // const re = /\((.+),([tf])\)/;
             // console.dir(res);
             const row = res.rows[Math.floor(Math.random() * res.rowCount)];
             // console.dir(row);
-            const igt = is_good ? 'おいしい' : 'まずい';
-            sendText(`${row.name} は${igt}`, note_id);
+            const igt = is_good ? messages.food.good : messages.food.bad;
+            sendText(`${row.name}${messages.food.is}${igt}`, note_id);
         })
         .catch(e => console.error(e.stack));
 }
 
 
 async function foodLearn(m, note_id) {
-    const text = m[1].replace(/^\s+|\s+$/g, '');
+    const text = replaceSpace(m[1]);
     const isN = await isNoun(text);
     if (isN) {
-        const is_good = m[2].match(/(おいしい|美味しい|まずくない|不味くない)/) ? true : false;
+        const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
         const isExists = await getExists(text);
         if (isExists) {
             const update_query = {
@@ -274,14 +294,14 @@ async function foodLearn(m, note_id) {
                 .then(res => console.log(res))
                 .catch(e => console.error(e.stack));
         }
-        sendText(`${text} は${m[2]}\nおぼえた`, note_id);
+        sendText(`${text}${messages.food.is}${m[2]}\n${messages.food.learn}`, note_id);
     } else {
-        sendText('それ食べれる？', note_id);
+        sendText(messages.food.canEat, note_id);
     }
 }
 
 async function foodCheck(m, note_id) {
-    const text = m[1].replace(/^\s+|\s+$/g, '');
+    const text = replaceSpace(m[1]);
     const isN = await isNoun(text);
     if (isN) {
         let is_good = false;
@@ -297,15 +317,15 @@ async function foodCheck(m, note_id) {
                 }
                 is_good = res.rows[0].good;
                 console.log(is_good);
-                const text = is_good ? 'おいしい' : 'まずい';
+                const text = is_good ? messages.food.good : messages.food.bad;
                 sendText(text, note_id);
             })
             .catch(e => {
                 console.log(e);
-                sendText('わからない', note_id);
+                sendText(messages.food.idk, note_id);
             });
     } else {
-        sendText('それ食べれる？', note_id);
+        sendText(messages.food.canEat, note_id);
     }
 }
 
@@ -323,7 +343,7 @@ function sendText(text, reply_id = '') {
                 replyId: reply_id
             }
         }
-    }));   
+    }));
 }
 
 function uuid() {
@@ -378,4 +398,8 @@ function isNoun(text) {
             }
         });
     });
+}
+
+function replaceSpace(text) {
+    return text.replace(/^\s+|\s+$/g, '')
 }
