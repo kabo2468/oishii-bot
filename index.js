@@ -103,7 +103,7 @@ ws.addEventListener('message', function(data){
             .then(res => {
                 if (res === true) {
                     // console.log(`if: ${res}`);
-                    throw 'This word is skipped.';
+                    throw `${add_name} is skipped.`;
                 }
             }).then(() => {
                 //Add DB
