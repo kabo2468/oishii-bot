@@ -193,8 +193,71 @@ ws.addEventListener('message', function(data){
             // Text
             m = text.match(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})[？?]+`);
             if (m) { // check
-                // foodCheck(m, note_id);
-                (async function() {
+                (async () => {
+                    const text = replaceSpace(m[1]);
+                    const isN = await isNoun(text);
+                    if (isN) {
+                        let is_good = false;
+                        const query = {
+                            text: 'SELECT good FROM oishii_table WHERE name=$1',
+                            values: [text]
+                        };
+                        client.query(query)
+                            .then(res => {
+                                // console.log(res);
+                                if (res.rows.length < 1) {
+                                    throw 'Not found';
+                                }
+                                is_good = res.rows[0].good;
+                                // console.log(is_good);
+                                const text = is_good ? messages.food.good : messages.food.bad;
+                                sendText(text, note_id);
+                            })
+                            .catch(e => {
+                                console.log(e);
+                                sendText(messages.food.idk, note_id);
+                            });
+                    } else {
+                        sendText(messages.food.canEat, note_id);
+                    }
+                })();
+                return;
+            }
+            m = text.match(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?[！!]*`);
+            if (m) { // learn
+                (async () => {
+                    const text = replaceSpace(m[1]);
+                    const isN = await isNoun(text);
+                    if (isN) {
+                        const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
+                        const isExists = await getExists(text);
+                        if (isExists) {
+                            const update_query = {
+                                text: 'UPDATE oishii_table SET good=$1 WHERE name=$2',
+                                values: [is_good, text]
+                            };
+                            client.query(update_query)
+                                .then(res => console.log(res))
+                                .catch(e => console.error(e.stack));
+                        } else {
+                            const add_query = {
+                                text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
+                                values: [text, is_good]
+                            };
+                            client.query(add_query)
+                                // .then(res => console.log(res))
+                                .catch(e => console.error(e.stack));
+                        }
+                        sendText(`${text}${messages.food.is}${m[2]}\n${messages.food.learn}`, note_id);
+                    } else {
+                        sendText(messages.food.canEat, note_id);
+                    }
+                })();
+                return;
+            }
+            m = text.match(`(${variables.food.good}|${variables.food.bad})(もの|物|の)は(何|なに)?[？?]*`);
+            if (m) { // search
+                (async () => {
                     const is_good = m[1].match(`(${variables.food.good})`) ? true : false;
                     const search_query = {
                         text: 'SELECT name FROM oishii_table WHERE good=$1',
@@ -210,16 +273,6 @@ ws.addEventListener('message', function(data){
                         })
                         .catch(e => console.error(e.stack));
                 })();
-                return;
-            }
-            m = text.match(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?[！!]*`);
-            if (m) { // learn
-                foodLearn(m, note_id);
-                return;
-            }
-            m = text.match(`(${variables.food.good}|${variables.food.bad})(もの|物|の)は(何|なに)?[？?]*`);
-            if (m) { // search
-                foodSearch(m, note_id);
                 return;
             }
         }
@@ -253,84 +306,8 @@ function sayFood() {
         .catch(e => console.error(e.stack));
 }
 
-async function foodSearch(m, note_id) {
-    const is_good = m[1].match(`(${variables.food.good})`) ? true : false;
-    const search_query = {
-        text: 'SELECT name FROM oishii_table WHERE good=$1',
-        values: [is_good]
-    };
-    client.query(search_query)
-        .then(res => {
-            // console.dir(res);
-            const row = res.rows[Math.floor(Math.random() * res.rowCount)];
-            // console.dir(row);
-            const igt = is_good ? messages.food.good : messages.food.bad;
-            sendText(`${row.name}${messages.food.is}${igt}`, note_id);
-        })
-        .catch(e => console.error(e.stack));
-}
-
-
-async function foodLearn(m, note_id) {
-    const text = replaceSpace(m[1]);
-    const isN = await isNoun(text);
-    if (isN) {
-        const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
-        const isExists = await getExists(text);
-        if (isExists) {
-            const update_query = {
-                text: 'UPDATE oishii_table SET good=$1 WHERE name=$2',
-                values: [is_good, text]
-            };
-            client.query(update_query)
-                .then(res => console.log(res))
-                .catch(e => console.error(e.stack));
-        } else {
-            const add_query = {
-                text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
-                values: [text, is_good]
-            };
-            client.query(add_query)
-                .then(res => console.log(res))
-                .catch(e => console.error(e.stack));
-        }
-        sendText(`${text}${messages.food.is}${m[2]}\n${messages.food.learn}`, note_id);
-    } else {
-        sendText(messages.food.canEat, note_id);
-    }
-}
-
-async function foodCheck(m, note_id) {
-    const text = replaceSpace(m[1]);
-    const isN = await isNoun(text);
-    if (isN) {
-        let is_good = false;
-        const query = {
-            text: 'SELECT good FROM oishii_table WHERE name=$1',
-            values: [text]
-        };
-        client.query(query)
-            .then(res => {
-                console.log(res);
-                if (res.rows.length < 1) {
-                    throw 'Not found';
-                }
-                is_good = res.rows[0].good;
-                console.log(is_good);
-                const text = is_good ? messages.food.good : messages.food.bad;
-                sendText(text, note_id);
-            })
-            .catch(e => {
-                console.log(e);
-                sendText(messages.food.idk, note_id);
-            });
-    } else {
-        sendText(messages.food.canEat, note_id);
-    }
-}
-
-function sendText(text, reply_id = '') {
-    ws.send(JSON.stringify({
+function sendText(text, reply_id) {
+    const sendData = {
         type: 'api',
         body: {
             id: uuid(),
@@ -339,11 +316,12 @@ function sendText(text, reply_id = '') {
                 visibility: "public",
                 text: text,
                 localOnly: false,
-                geo: null,
-                replyId: reply_id
+                geo: null
             }
         }
-    }));
+    };
+    if (reply_id) sendData.body.data.replyId = reply_id;
+    ws.send(JSON.stringify(sendData));
 }
 
 function uuid() {
@@ -366,7 +344,7 @@ function getExists(text) {
         };
         client.query(query)
         .then(res => {
-            console.log(`func: ${res.rows[0].exists}`);
+            // console.log(`func: ${res.rows[0].exists}`);
             resolve(res.rows[0].exists);
         })
         .catch(e => console.error(e.stack));
