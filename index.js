@@ -82,25 +82,25 @@ ws.addEventListener('message', function(data){
                 return token.pos === '名詞' && token.pos_detail_1 !== 'サ変接続' ? token.surface_form : null;
             });
             const nouns = pos_arr.filter(n => n !== null);
-            console.log(`nouns: ${nouns}`);
+            // console.log(`nouns: ${nouns}`);
             //もし何もなかったら
             if (nouns.length < 1) return;
 
             //1文字のひらがな・カタカナを消す
             const output = nouns.filter(n => n.search(/^[ぁ-んァ-ン]$/));
-            console.log(`output: ${output}`);
+            // console.log(`output: ${output}`);
             //もし何もなかったら
             if (output.length < 1) return;
     
             //どれか1つ選ぶ
             const add_name = output[Math.floor(Math.random() * output.length)];
-            console.log(`add_name: ${add_name}`);
+            // console.log(`add_name: ${add_name}`);
 
             //被り
             getExists(add_name)
             .then(res => {
                 if (res === true) {
-                    console.log(`if: ${res}`);
+                    // console.log(`if: ${res}`);
                     throw 'This word is skipped.';
                 }
             }).then(() => {
@@ -163,30 +163,30 @@ ws.addEventListener('message', function(data){
             // Commands
             m = text.match(/^\s*\/ping\s*$/);
             if (m) { // ping
-                reply('ぽん!', note_id);
+                sendText('ぽん!', note_id);
                 return;
             }
             m = text.match(/^\s*\/info\s*$/);
             if (m) { // info
                 client.query('SELECT count(*) FROM oishii_table').then(res => {
                     const count = res.rows[0].count;
-                    reply(`Records: ${count}`, note_id);
+                    sendText(`Records: ${count}`, note_id);
                 });
                 return;
             }
 
             // Text
-            m = text.match(/(.+)(は|って)(おいしい|美味しい|まずい|不味い)[？?]+/);
+            m = text.match(/(.+)(は|って)(おいしい|美味しい|まずくない|不味くない|まずい|不味い|おいしくない|美味しくない)[？?]+/);
             if (m) { // check
                 foodCheck(m, note_id);
                 return;
             }
-            m = text.match('(.+)[はも](おいしい|美味しい|まずい|不味い)よ?[！!]*');
+            m = text.match('(.+)[はも](おいしい|美味しい|まずくない|不味くない|まずい|不味い|おいしくない|美味しくない)よ?[！!]*');
             if (m) { // learn
                 foodLearn(m, note_id);
                 return;
             }
-            m = text.match('(おいしい|美味しい|まずい|不味い)(もの|物|の)は(何|なに)?[？?]*');
+            m = text.match('(おいしい|美味しい|まずくない|不味くない|まずい|不味い|おいしくない|美味しくない)(もの|物|の)は(何|なに)?[？?]*');
             if (m) { // search
                 foodSearch(m, note_id);
                 return;
@@ -203,7 +203,7 @@ setInterval(() => {
     };
     client.query(query)
     .then(res => {
-        console.log(res);
+        // console.log(res);
         const re = /\((.+),([tf])\)/;
         const row = res.rows[Math.floor(Math.random() * res.rowCount)].row;
         console.log(`row: ${row}`);
@@ -233,7 +233,7 @@ setInterval(() => {
 
 
 async function foodSearch(m, note_id) {
-    const is_good = m[1].match(/(おいしい|美味しい)/) ? true : false;
+    const is_good = m[1].match(/(おいしい|美味しい|まずくない|不味くない)/) ? true : false;
     const search_query = {
         text: 'SELECT name FROM oishii_table WHERE good=$1',
         values: [is_good]
@@ -241,11 +241,11 @@ async function foodSearch(m, note_id) {
     client.query(search_query)
         .then(res => {
             // const re = /\((.+),([tf])\)/;
-            console.dir(res);
+            // console.dir(res);
             const row = res.rows[Math.floor(Math.random() * res.rowCount)];
-            console.dir(row);
+            // console.dir(row);
             const igt = is_good ? 'おいしい' : 'まずい';
-            reply(`${row.name} は${igt}`, note_id);
+            sendText(`${row.name} は${igt}`, note_id);
         })
         .catch(e => console.error(e.stack));
 }
@@ -255,7 +255,7 @@ async function foodLearn(m, note_id) {
     const text = m[1].replace(/^\s+|\s+$/g, '');
     const isN = await isNoun(text);
     if (isN) {
-        const is_good = m[2].match(/(おいしい|美味しい)/) ? true : false;
+        const is_good = m[2].match(/(おいしい|美味しい|まずくない|不味くない)/) ? true : false;
         const isExists = await getExists(text);
         if (isExists) {
             const update_query = {
@@ -274,9 +274,9 @@ async function foodLearn(m, note_id) {
                 .then(res => console.log(res))
                 .catch(e => console.error(e.stack));
         }
-        reply(`${text} は${m[2]}\nおぼえた`, note_id);
+        sendText(`${text} は${m[2]}\nおぼえた`, note_id);
     } else {
-        reply('それ食べれる？', note_id);
+        sendText('それ食べれる？', note_id);
     }
 }
 
@@ -298,18 +298,18 @@ async function foodCheck(m, note_id) {
                 is_good = res.rows[0].good;
                 console.log(is_good);
                 const text = is_good ? 'おいしい' : 'まずい';
-                reply(text, note_id);
+                sendText(text, note_id);
             })
             .catch(e => {
                 console.log(e);
-                reply('わからない', note_id);
+                sendText('わからない', note_id);
             });
     } else {
-        reply('それ食べれる？', note_id);
+        sendText('それ食べれる？', note_id);
     }
 }
 
-function reply(text, note_id) {
+function sendText(text, reply_id = '') {
     ws.send(JSON.stringify({
         type: 'api',
         body: {
@@ -320,23 +320,7 @@ function reply(text, note_id) {
                 text: text,
                 localOnly: false,
                 geo: null,
-                replyId: note_id
-            }
-        }
-    }));
-}
-
-function sendText(text) {
-    ws.send(JSON.stringify({
-        type: 'api',
-        body: {
-            id: uuid(),
-            endpoint: 'notes/create',
-            data: {
-                visibility: "public",
-                text: text,
-                localOnly: false,
-                geo: null
+                replyId: reply_id
             }
         }
     }));   
