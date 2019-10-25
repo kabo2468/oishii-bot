@@ -112,7 +112,7 @@ ws.addEventListener('message', function(data){
                     values: [ add_name ]
                 };
                 client.query(add_query)
-                .then(res => console.log(res))
+                .then(() => console.log(`INSERT: ${add_name}`))
                 .catch(e => console.error(e.stack));
             }).catch(e => console.log(e));
         });
@@ -211,6 +211,7 @@ ws.addEventListener('message', function(data){
                                 is_good = res.rows[0].good;
                                 // console.log(is_good);
                                 const text = is_good ? messages.food.good : messages.food.bad;
+                                console.log(`CHECK: ${text}`);
                                 sendText(text, note_id);
                             })
                             .catch(e => {
@@ -237,7 +238,7 @@ ws.addEventListener('message', function(data){
                                 values: [is_good, text]
                             };
                             client.query(update_query)
-                                .then(res => console.log(res))
+                                .then(() => console.log(`LEARN(UPDATE): ${text} is ${is_good}`))
                                 .catch(e => console.error(e.stack));
                         } else {
                             const add_query = {
@@ -245,7 +246,7 @@ ws.addEventListener('message', function(data){
                                 values: [text, is_good]
                             };
                             client.query(add_query)
-                                // .then(res => console.log(res))
+                                .then(() => console.log(`LEARN(INSERT): ${text} is ${is_good}`))
                                 .catch(e => console.error(e.stack));
                         }
                         sendText(`${text}${messages.food.is}${m[2]}\n${messages.food.learn}`, note_id);
@@ -269,6 +270,7 @@ ws.addEventListener('message', function(data){
                             const row = res.rows[Math.floor(Math.random() * res.rowCount)];
                             // console.dir(row);
                             const igt = is_good ? messages.food.good : messages.food.bad;
+                            console.log(`SERACH: ${row.name} (${is_good})`);
                             sendText(`${row.name}${messages.food.is}${igt}`, note_id);
                         })
                         .catch(e => console.error(e.stack));
@@ -301,6 +303,7 @@ function sayFood() {
         .then(() => {
             text = name;
             text += good === 't' ? messages.food.good : messages.food.bad;
+            console.log(`POST: ${text}`);
             sendText(text);
         })
         .catch(e => console.error(e.stack));
