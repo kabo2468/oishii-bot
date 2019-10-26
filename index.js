@@ -75,7 +75,7 @@ ws.addEventListener('message', function(data){
         //URLを消す
         text = text.replace(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?/g, '');
         // メンションを消す
-        text = text.replace(/@[\w_]+@?[\w.]+\s+/g, '');
+        text = text.replace(/@[\w_]+@?[\w.-]*\s+/g, '');
 
         builder.build((err, tokenizer) => {
             if (err) throw err;
