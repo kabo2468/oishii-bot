@@ -9,12 +9,14 @@ const client = new Client({
 
 client.connect();
 // const testQuery = {
-//     text: 'SELECT count(*) FROM oishii_table'
+//     // text: 'SELECT count(*), count(learned = true or null) FROM oishii_table'
+//     text: 'select learned, count(learned) from oishii_table group by learned'
 // };
 // console.time('test');
 // client.query(testQuery).then(res => {
 //     console.log(res);
-//     console.log(res.rows[0].count);
+//     // console.log(res.rows[0].count);
+//     console.dir(res.rows);
 // });
 // console.timeEnd('test');
 
@@ -63,9 +65,15 @@ ws.addEventListener('message', function(data){
         // heroku DB 制限
         client.query('SELECT count(*) FROM oishii_table').then(res => {
             const count = res.rows[0].count;
-            if (Number(count) > 5000) { // 5000件以上なら
-                client.query('DELETE FROM oishii_table').then(() => {
-                    sendText(messages.deleteDB);
+            const db = variables.db;
+            if (Number(count) > db.deleteCountCond) { // config.json => variables.db.deleteCountCond件以上なら
+                const deleteQuery = {
+                    text: 'DELETE FROM oishii_table WHERE name in (SELECT name FROM oishii_table WHERE learned = false LIMIT $1)',
+                    values: [ db.deleteNum ]
+                }
+                client.query(deleteQuery).then(() => {
+                    console.log(`DELETE: ${count} > ${db.deleteCountCond} -${db.deleteNum} => ${count - db.deleteNum}`)
+                    sendText(`${messages.deleteDB[0]}${db.deleteCountCond}${messages.deleteDB[1]}${db.deleteNum}${messages.deleteDB[2]}`);
                 })
                 .catch(e => console.log(e));
             }
@@ -109,12 +117,13 @@ ws.addEventListener('message', function(data){
                 }
             }).then(() => {
                 //Add DB
+                const is_good = Math.random() > 0.25 ? 'true' : 'false';
                 const add_query = {
-                    text: 'INSERT INTO oishii_table ( name ) VALUES ( $1 )',
-                    values: [ add_name ]
+                    text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
+                    values: [ add_name, is_good ]
                 };
                 client.query(add_query)
-                .then(() => console.log(`INSERT: ${add_name}`))
+                .then(() => console.log(`INSERT: ${add_name} (${is_good})`))
                 .catch(e => console.error(e.stack));
             }).catch(e => console.log(e));
         });
@@ -146,7 +155,7 @@ ws.addEventListener('message', function(data){
             let text = json.body.body.text;
             if (text === null) return;
             text = text.replace(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?/g, '');
-            text = text.replace('@oishiibot(@misskey.io)? ', '');
+            text = text.replace(/@oishiibot(@misskey\.io)? /, '');
             console.log(`json text:${text}`);
 
             const note_id = json.body.body.id;
@@ -166,24 +175,32 @@ ws.addEventListener('message', function(data){
             // Commands
             m = text.match(/^\s*\/help\s*$/);
             if (m) { // help
+                console.log('COMMAND: help');
                 sendText(messages.commands.help, note_id);
                 return;
             }
             m = text.match(/^\s*\/ping\s*$/);
             if (m) { // ping
+                console.log('COMMAND: ping');
                 sendText(messages.commands.ping, note_id);
                 return;
             }
             m = text.match(/^\s*\/info\s*$/);
             if (m) { // info
-                client.query('SELECT count(*) FROM oishii_table').then(res => {
-                    const count = res.rows[0].count;
-                    sendText(`Records: ${count}`, note_id);
+                console.log('COMMAND: info');
+                client.query('SELECT learned, count(learned) FROM oishii_table GROUP BY learned').then(res => {
+                    const fl = res.rows[0].count;
+                    const tl = res.rows[1].count;
+                    const all = Number(fl) + Number(tl);
+                    const text = `Records: ${all.toString()} (Learned: ${tl})`;
+                    console.log(`COMMAND: info[ ${text} ]`);
+                    sendText(text, note_id);
                 });
                 return;
             }
             m = text.match(/^\s*\/say\s*$/);
             if (m) { // say
+                console.log('COMMAND: say');
                 if (json.body.body.user.username === 'kabo') {
                     sayFood();
                 } else {
@@ -236,7 +253,7 @@ ws.addEventListener('message', function(data){
                         const isExists = await getExists(text);
                         if (isExists) {
                             const update_query = {
-                                text: 'UPDATE oishii_table SET good=$1 WHERE name=$2',
+                                text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
                                 values: [is_good, text]
                             };
                             client.query(update_query)
@@ -244,7 +261,7 @@ ws.addEventListener('message', function(data){
                                 .catch(e => console.error(e.stack));
                         } else {
                             const add_query = {
-                                text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
+                                text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, true )',
                                 values: [text, is_good]
                             };
                             client.query(add_query)
