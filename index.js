@@ -1,3 +1,4 @@
+require('newrelic');
 const kuromoji = require('kuromoji');
 const WebSocket = require('ws');
 const { Client } = require('pg');
