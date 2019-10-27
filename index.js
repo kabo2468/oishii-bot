@@ -159,7 +159,7 @@ ws.addEventListener('message', function(data){
             console.log(`json text:${text}`);
 
             const note_id = json.body.body.id;
-            ws.send(JSON.stringify({
+            const reactionData = {
                 type: 'api',
                 body: {
                     id: uuid(),
@@ -169,7 +169,9 @@ ws.addEventListener('message', function(data){
                         reaction: 'pudding'
                     }
                 }
-            }));
+            };
+            if (text.match(/かわいい/)) reactionData.body.data.reaction = 'love';
+            ws.send(JSON.stringify(reactionData));
 
             let m;
             // Commands
@@ -214,32 +216,29 @@ ws.addEventListener('message', function(data){
             if (m) { // check
                 (async () => {
                     const text = replaceSpace(m[1]);
-                    const isN = await isNoun(text);
-                    if (isN) {
-                        let is_good = false;
-                        const query = {
-                            text: 'SELECT good FROM oishii_table WHERE name=$1',
-                            values: [text]
-                        };
-                        client.query(query)
-                            .then(res => {
-                                // console.log(res);
-                                if (res.rows.length < 1) {
-                                    throw 'Not found';
+                    const query = {
+                        text: 'SELECT good FROM oishii_table WHERE name=$1',
+                        values: [text]
+                    };
+                    client.query(query)
+                    .then(res => {
+                        console.dir(res);
+                        if (res.rowCount < 1) {
+                            isNoun(text).then(is_noun => {
+                                if (is_noun) {
+                                    sendText(messages.food.idk, note_id);
+                                } else {
+                                    sendText(messages.food.canEat, note_id);
                                 }
-                                is_good = res.rows[0].good;
-                                // console.log(is_good);
-                                const text = is_good ? messages.food.good : messages.food.bad;
-                                console.log(`CHECK: ${text}`);
-                                sendText(text, note_id);
-                            })
-                            .catch(e => {
-                                console.log(e);
-                                sendText(messages.food.idk, note_id);
                             });
-                    } else {
-                        sendText(messages.food.canEat, note_id);
-                    }
+                            return;
+                        }
+                        const isGood = res.rows[0].good;
+                        const Tgood = isGood ? messages.food.good : messages.food.bad;
+                        console.log(`CHECK: ${text}`);
+                        sendText(Tgood, note_id);
+                    })
+                    .catch(e => console.log(e));
                 })();
                 return;
             }
@@ -247,31 +246,26 @@ ws.addEventListener('message', function(data){
             if (m) { // learn
                 (async () => {
                     const text = replaceSpace(m[1]);
-                    const isN = await isNoun(text);
-                    if (isN) {
-                        const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
-                        const isExists = await getExists(text);
-                        if (isExists) {
-                            const update_query = {
-                                text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
-                                values: [is_good, text]
-                            };
-                            client.query(update_query)
-                                .then(() => console.log(`LEARN(UPDATE): ${text} is ${is_good}`))
-                                .catch(e => console.error(e.stack));
-                        } else {
-                            const add_query = {
-                                text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, true )',
-                                values: [text, is_good]
-                            };
-                            client.query(add_query)
-                                .then(() => console.log(`LEARN(INSERT): ${text} is ${is_good}`))
-                                .catch(e => console.error(e.stack));
-                        }
-                        sendText(`${text}${messages.food.is}${m[2]}\n${messages.food.learn}`, note_id);
+                    const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
+                    const isExists = await getExists(text);
+                    if (isExists) {
+                        const update_query = {
+                            text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
+                            values: [is_good, text]
+                        };
+                        client.query(update_query)
+                            .then(() => console.log(`LEARN(UPDATE): ${text} is ${is_good}`))
+                            .catch(e => console.error(e.stack));
                     } else {
-                        sendText(messages.food.canEat, note_id);
+                        const add_query = {
+                            text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, true )',
+                            values: [text, is_good]
+                        };
+                        client.query(add_query)
+                            .then(() => console.log(`LEARN(INSERT): ${text} is ${is_good}`))
+                            .catch(e => console.error(e.stack));
                     }
+                    sendText(`${text}${messages.food.is}${m[2]}\n${messages.food.learn}`, note_id);
                 })();
                 return;
             }
