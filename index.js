@@ -213,7 +213,7 @@ ws.addEventListener('message', function(data){
             }
 
             // Text
-            m = text.match(`(.+)(は|って)?(${variables.food.good}|${variables.food.bad})[？?]+`);
+            m = text.match(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})[？?]+`);
             if (m) { // check
                 (async () => {
                     const text = replaceSpace(m[1]);
@@ -243,7 +243,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(`(.+)[はも]?(${variables.food.good}|${variables.food.bad})よ?[！!]*`);
+            m = text.match(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?[！!]*`);
             if (m) { // learn
                 (async () => {
                     const text = replaceSpace(m[1]);
