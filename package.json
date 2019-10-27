@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "kuromoji": "^0.1.2",
+    "newrelic": "^5.13.1",
     "pg": "^7.12.1",
     "ws": "^7.2.0"
   },
@@ -14,6 +15,6 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^6.5.1"
+    "eslint": "^6.6.0"
   }
 }
