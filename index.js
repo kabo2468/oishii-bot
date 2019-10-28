@@ -22,6 +22,12 @@ client.connect();
 // console.timeEnd('test');
 
 const ws = new WebSocket(process.env.STREAMING_URL);
+function heartbeat() {
+    clearTimeout(this.pingTimeout);
+    this.pingTimeout = setTimeout(() => {
+        this.terminate();
+    }, 30000 + 1000);
+}
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
 
 const timelineData = {
@@ -41,16 +47,19 @@ const mainData = {
 };
 
 ws.on('open', function() {
+    heartbeat();
     ws.send(JSON.stringify(timelineData));
     ws.send(JSON.stringify(mainData));
     console.log('Connected!');
 });
-
-ws.addEventListener('close', function() {
+ws.on('ping', heartbeat);
+ws.on('close', function() {
     console.log('Disconnected.');
+    console.log('Retry...');
+    clearTimeout(this.pingTimeout);
 });
 
-ws.addEventListener('message', function(data){
+ws.on('message', function(data){
     // console.log('----------Start----------');
     const json = JSON.parse(data.data);
 
@@ -171,7 +180,7 @@ ws.addEventListener('message', function(data){
                     }
                 }
             };
-            if (text.match(/かわいい/)) reactionData.body.data.reaction = 'love';
+            if (text.match(/^\s*かわいい*[！!]*\s*$/)) reactionData.body.data.reaction = 'love';
             ws.send(JSON.stringify(reactionData));
 
             let m;
