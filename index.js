@@ -1,6 +1,6 @@
 require('newrelic');
 const kuromoji = require('kuromoji');
-const WebSocket = require('ws');
+const WebSocket = require('reconnecting-websocket');
 const { Client } = require('pg');
 const { messages, variables } = require('./config.json');
 const client = new Client({
@@ -22,12 +22,6 @@ client.connect();
 // console.timeEnd('test');
 
 const ws = new WebSocket(process.env.STREAMING_URL);
-function heartbeat() {
-    clearTimeout(this.pingTimeout);
-    this.pingTimeout = setTimeout(() => {
-        this.terminate();
-    }, 30000 + 1000);
-}
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
 
 const timelineData = {
@@ -47,16 +41,12 @@ const mainData = {
 };
 
 ws.on('open', function() {
-    heartbeat();
     ws.send(JSON.stringify(timelineData));
     ws.send(JSON.stringify(mainData));
     console.log('Connected!');
 });
-ws.on('ping', heartbeat);
 ws.on('close', function() {
     console.log('Disconnected.');
-    console.log('Retry...');
-    clearTimeout(this.pingTimeout);
 });
 
 ws.on('message', function(data){
