@@ -1,14 +1,15 @@
 require('newrelic');
 const kuromoji = require('kuromoji');
+const ws_const = require('ws');
 const WebSocket = require('reconnecting-websocket');
 const { Client } = require('pg');
 const { messages, variables } = require('./config.json');
-const client = new Client({
+const psql = new Client({
     ssl: true,
     connectionString: process.env.DATABASE_URL
 });
 
-client.connect();
+psql.connect();
 // const testQuery = {
 //     // text: 'SELECT count(*), count(learned = true or null) FROM oishii_table'
 //     text: 'select learned, count(learned) from oishii_table group by learned'
@@ -21,7 +22,9 @@ client.connect();
 // });
 // console.timeEnd('test');
 
-const ws = new WebSocket(process.env.STREAMING_URL);
+const ws = new WebSocket(process.env.STREAMING_URL, [], {
+    WebSocket: ws_const
+});
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
 
 const timelineData = {
@@ -63,7 +66,7 @@ ws.on('message', function(data){
         if (/@oishiibot/.test(text)) return;
 
         // heroku DB 制限
-        client.query('SELECT count(*) FROM oishii_table').then(res => {
+        psql.query('SELECT count(*) FROM oishii_table').then(res => {
             const count = res.rows[0].count;
             const db = variables.db;
             if (Number(count) > db.deleteCountCond) { // config.json => variables.db.deleteCountCond件以上なら
@@ -71,7 +74,7 @@ ws.on('message', function(data){
                     text: 'DELETE FROM oishii_table WHERE name in (SELECT name FROM oishii_table WHERE learned = false LIMIT $1)',
                     values: [ db.deleteNum ]
                 }
-                client.query(deleteQuery).then(() => {
+                psql.query(deleteQuery).then(() => {
                     console.log(`DELETE: ${count} > ${db.deleteCountCond} -${db.deleteNum} => ${count - db.deleteNum}`)
                     sendText(`${messages.deleteDB[0]}${db.deleteCountCond}${messages.deleteDB[1]}${db.deleteNum}${messages.deleteDB[2]}`);
                 })
@@ -122,7 +125,7 @@ ws.on('message', function(data){
                     text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
                     values: [ add_name, is_good ]
                 };
-                client.query(add_query)
+                psql.query(add_query)
                 .then(() => console.log(`INSERT: ${add_name} (${is_good})`))
                 .catch(e => console.error(e.stack));
             }).catch(e => console.log(e));
@@ -190,7 +193,7 @@ ws.on('message', function(data){
             m = text.match(/^\s*\/info\s*$/);
             if (m) { // info
                 console.log('COMMAND: info');
-                client.query('SELECT learned, count(learned) FROM oishii_table GROUP BY learned').then(res => {
+                psql.query('SELECT learned, count(learned) FROM oishii_table GROUP BY learned').then(res => {
                     const fl = res.rows[0].count;
                     const tl = res.rows[1].count;
                     const all = Number(fl) + Number(tl);
@@ -220,7 +223,7 @@ ws.on('message', function(data){
                         text: 'SELECT good FROM oishii_table WHERE name=$1',
                         values: [text]
                     };
-                    client.query(query)
+                    psql.query(query)
                     .then(res => {
                         console.dir(res);
                         if (res.rowCount < 1) {
@@ -253,7 +256,7 @@ ws.on('message', function(data){
                             text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
                             values: [is_good, text]
                         };
-                        client.query(update_query)
+                        psql.query(update_query)
                             .then(() => console.log(`LEARN(UPDATE): ${text} is ${is_good}`))
                             .catch(e => console.error(e.stack));
                     } else {
@@ -261,7 +264,7 @@ ws.on('message', function(data){
                             text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, true )',
                             values: [text, is_good]
                         };
-                        client.query(add_query)
+                        psql.query(add_query)
                             .then(() => console.log(`LEARN(INSERT): ${text} is ${is_good}`))
                             .catch(e => console.error(e.stack));
                     }
@@ -277,7 +280,7 @@ ws.on('message', function(data){
                         text: 'SELECT name FROM oishii_table WHERE good=$1',
                         values: [is_good]
                     };
-                    client.query(search_query)
+                    psql.query(search_query)
                         .then(res => {
                             // console.dir(res);
                             const row = res.rows[Math.floor(Math.random() * res.rowCount)];
@@ -304,7 +307,7 @@ function sayFood() {
     const query = {
         text: 'SELECT (name, good) FROM oishii_table'
     };
-    client.query(query)
+    psql.query(query)
         .then(res => {
             // console.log(res);
             const re = /\((.+),([tf])\)/;
@@ -358,7 +361,7 @@ function getExists(text) {
             text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE name = $1)',
             values: [ text ]
         };
-        client.query(query)
+        psql.query(query)
         .then(res => {
             // console.log(`func: ${res.rows[0].exists}`);
             resolve(res.rows[0].exists);
