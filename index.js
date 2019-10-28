@@ -1,7 +1,7 @@
 require('newrelic');
 const kuromoji = require('kuromoji');
-const ws_const = require('ws');
-const WebSocket = require('reconnecting-websocket');
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import ws_const from 'ws';
 const { Client } = require('pg');
 const { messages, variables } = require('./config.json');
 const psql = new Client({
@@ -22,7 +22,7 @@ psql.connect();
 // });
 // console.timeEnd('test');
 
-const ws = new WebSocket(process.env.STREAMING_URL, [], {
+const ws = new ReconnectingWebSocket(process.env.STREAMING_URL, [], {
     WebSocket: ws_const
 });
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
@@ -43,16 +43,16 @@ const mainData = {
     }
 };
 
-ws.on('open', function() {
+ws.addEventListener('open', function() {
     ws.send(JSON.stringify(timelineData));
     ws.send(JSON.stringify(mainData));
     console.log('Connected!');
 });
-ws.on('close', function() {
+ws.addEventListener('close', function() {
     console.log('Disconnected.');
 });
 
-ws.on('message', function(data){
+ws.addEventListener('message', function(data){
     // console.log('----------Start----------');
     const json = JSON.parse(data.data);
 
