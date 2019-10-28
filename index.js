@@ -1,7 +1,7 @@
 require('newrelic');
 const kuromoji = require('kuromoji');
-import ReconnectingWebSocket from 'reconnecting-websocket';
-import ws_const from 'ws';
+const ReconnectingWebSocket = require('reconnecting-websocket');
+const ws_const = require('ws');
 const { Client } = require('pg');
 const { messages, variables } = require('./config.json');
 const psql = new Client({
