@@ -9,6 +9,8 @@ const psql = new Client({
     connectionString: process.env.DATABASE_URL
 });
 
+let tlCount = 0;
+
 psql.connect();
 // const testQuery = {
 //     // text: 'SELECT count(*), count(learned = true or null) FROM oishii_table'
@@ -101,8 +103,8 @@ ws.addEventListener('message', function(data){
             //もし何もなかったら
             if (nouns.length < 1) return;
 
-            //1文字のひらがな・カタカナを消す
-            const output = nouns.filter(n => n.search(/^[ぁ-んァ-ン]$/));
+            //1文字の英数字、ひらがな、カタカナ、数字を消す
+            const output = nouns.filter(n => n.search(/^([A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]|[ー～]+)$/));
             // console.log(`output: ${output}`);
             //もし何もなかったら
             if (output.length < 1) return;
@@ -129,6 +131,17 @@ ws.addEventListener('message', function(data){
                 .then(() => console.log(`INSERT: ${add_name} (${is_good})`))
                 .catch(e => console.error(e.stack));
             }).catch(e => console.log(e));
+
+            // n投稿毎、p確率で sayFood
+            if (tlCount < variables.post.count) {
+                tlCount++;
+            } else {
+                if (Math.random() > variables.post.probability) {
+                    sayFood();
+                }
+                tlCount = 0;
+            }
+            console.log(`TLCount: ${tlCount}`);
         });
     }
 

@@ -27,6 +27,10 @@
         "db": {
             "deleteCountCond": 5000,
             "deleteNum": 1000
+        },
+        "post": {
+            "count": 10,
+            "probability": 0.5
         }
     }
 }
