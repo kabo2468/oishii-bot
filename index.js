@@ -76,7 +76,7 @@ ws.addEventListener('message', function(data){
                 }
                 psql.query(deleteQuery).then(() => {
                     console.log(`DELETE: ${count} > ${db.deleteCountCond} -${db.deleteNum} => ${count - db.deleteNum}`)
-                    sendText(`${messages.deleteDB[0]}${db.deleteCountCond}${messages.deleteDB[1]}${db.deleteNum}${messages.deleteDB[2]}`);
+                    sendText({text: `${messages.deleteDB[0]}${db.deleteCountCond}${messages.deleteDB[1]}${db.deleteNum}${messages.deleteDB[2]}`});
                 })
                 .catch(e => console.log(e));
             }
@@ -181,13 +181,13 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*\/help\s*$/);
             if (m) { // help
                 console.log('COMMAND: help');
-                sendText(messages.commands.help, note_id);
+                sendText({text: messages.commands.help, reply_id: note_id});
                 return;
             }
             m = text.match(/^\s*\/ping\s*$/);
             if (m) { // ping
                 console.log('COMMAND: ping');
-                sendText(messages.commands.ping, note_id);
+                sendText({text: messages.commands.ping, reply_id: note_id});
                 return;
             }
             m = text.match(/^\s*\/info\s*$/);
@@ -199,7 +199,7 @@ ws.addEventListener('message', function(data){
                     const all = Number(fl) + Number(tl);
                     const text = `Records: ${all.toString()} (Learned: ${tl})`;
                     console.log(`COMMAND: info[ ${text} ]`);
-                    sendText(text, note_id);
+                    sendText({text: text, reply_id: note_id});
                 });
                 return;
             }
@@ -209,7 +209,7 @@ ws.addEventListener('message', function(data){
                 if (json.body.body.user.username === 'kabo') {
                     sayFood();
                 } else {
-                    sendText(messages.commands.denied, note_id);
+                    sendText({text: messages.commands.denied, reply_id: note_id});
                 }
                 return;
             }
@@ -229,9 +229,9 @@ ws.addEventListener('message', function(data){
                         if (res.rowCount < 1) {
                             isNoun(text).then(is_noun => {
                                 if (is_noun) {
-                                    sendText(messages.food.idk, note_id);
+                                    sendText({text: messages.food.idk, reply_id: note_id});
                                 } else {
-                                    sendText(messages.food.canEat, note_id);
+                                    sendText({text: messages.food.canEat, reply_id: note_id});
                                 }
                             });
                             return;
@@ -239,7 +239,7 @@ ws.addEventListener('message', function(data){
                         const isGood = res.rows[0].good;
                         const goodS = isGood ? messages.food.good : messages.food.bad;
                         console.log(`CHECK: ${text}`);
-                        sendText(goodS, note_id);
+                        sendText({text: goodS, reply_id: note_id});
                     })
                     .catch(e => console.log(e));
                 })();
@@ -268,7 +268,7 @@ ws.addEventListener('message', function(data){
                             .then(() => console.log(`LEARN(INSERT): ${text} is ${is_good}`))
                             .catch(e => console.error(e.stack));
                     }
-                    sendText(`${text}${messages.food.is}${m[2]}\n${messages.food.learn}`, note_id);
+                    sendText({text: `${text}${messages.food.is}${m[2]}\n${messages.food.learn}`, reply_id: note_id});
                 })();
                 return;
             }
@@ -287,7 +287,7 @@ ws.addEventListener('message', function(data){
                             // console.dir(row);
                             const igt = is_good ? messages.food.good : messages.food.bad;
                             console.log(`SEARCH: ${row.name} (${is_good})`);
-                            sendText(`${row.name}${messages.food.is}${igt}`, note_id);
+                            sendText({text: `${row.name}${messages.food.is}${igt}`, reply_id: note_id});
                         })
                         .catch(e => console.error(e.stack));
                 })();
@@ -309,7 +309,7 @@ ws.addEventListener('message', function(data){
                             const good = row.match(re)[2];
                             const text = `${name} とかどう？\n${good === 't' ? messages.food.good : messages.food.bad}よ`;
                             console.log(`HUNGRY: ${text}`);
-                            sendText(text, note_id);
+                            sendText({text: text, reply_id: note_id});
                         })
                         .catch(e => console.error(e.stack));
                 })();
@@ -338,19 +338,19 @@ function sayFood() {
             const good = row.match(re)[2];
             const text = `${name}${good === 't' ? messages.food.good : messages.food.bad}`;
             console.log(`POST: ${text}`);
-            sendText(text);
+            sendText({text: text});
         })
         .catch(e => console.error(e.stack));
 }
 
-function sendText(text, reply_id) {
+function sendText({text, reply_id, visibility = 'public'}) {
     const sendData = {
         type: 'api',
         body: {
             id: uuid(),
             endpoint: 'notes/create',
             data: {
-                visibility: "public",
+                visibility: visibility,
                 text: text,
                 localOnly: false,
                 geo: null
