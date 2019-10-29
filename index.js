@@ -225,7 +225,7 @@ ws.addEventListener('message', function(data){
                     };
                     psql.query(query)
                     .then(res => {
-                        console.dir(res);
+                        // console.dir(res);
                         if (res.rowCount < 1) {
                             isNoun(text).then(is_noun => {
                                 if (is_noun) {
