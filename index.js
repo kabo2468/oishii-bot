@@ -306,7 +306,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(/お?(腹|なか|はら)([空すあ]い|([減へ][っり]))た?[！!]*/);
+            m = text.match(/お?(腹|(な|にゃ)か|はら)([空すあ]い|([減へ][っり]))た?[！!]*/);
             if (m) { // hungry
                 (async () => {
                     const search_query = {
