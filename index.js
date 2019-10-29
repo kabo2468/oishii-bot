@@ -237,9 +237,9 @@ ws.addEventListener('message', function(data){
                             return;
                         }
                         const isGood = res.rows[0].good;
-                        const Tgood = isGood ? messages.food.good : messages.food.bad;
+                        const goodS = isGood ? messages.food.good : messages.food.bad;
                         console.log(`CHECK: ${text}`);
-                        sendText(Tgood, note_id);
+                        sendText(goodS, note_id);
                     })
                     .catch(e => console.log(e));
                 })();
@@ -286,8 +286,30 @@ ws.addEventListener('message', function(data){
                             const row = res.rows[Math.floor(Math.random() * res.rowCount)];
                             // console.dir(row);
                             const igt = is_good ? messages.food.good : messages.food.bad;
-                            console.log(`SERACH: ${row.name} (${is_good})`);
+                            console.log(`SEARCH: ${row.name} (${is_good})`);
                             sendText(`${row.name}${messages.food.is}${igt}`, note_id);
+                        })
+                        .catch(e => console.error(e.stack));
+                })();
+                return;
+            }
+            m = text.match(/^お?(腹|なか|はら)([空すあ]い|([減へ][っり]))た?[！!]*$/);
+            if (m) { // hungry
+                (async () => {
+                    const search_query = {
+                        text: 'SELECT (name, good) FROM oishii_table'
+                    };
+                    psql.query(search_query)
+                        .then(res => {
+                            // console.dir(res);
+                            const row = res.rows[Math.floor(Math.random() * res.rowCount)].row;
+                            console.log(`row: ${row}`);
+                            const re = /\((.+),([tf])\)/;
+                            const name = row.match(re)[1];
+                            const good = row.match(re)[2];
+                            const text = `${name} とかどう？\n${good === 't' ? messages.food.good : messages.food.bad}よ`;
+                            console.log(`HUNGRY: ${text}`);
+                            sendText(text, note_id);
                         })
                         .catch(e => console.error(e.stack));
                 })();
@@ -303,22 +325,18 @@ setInterval(() => {
 
 
 function sayFood() {
-    let text = '', name = '', good = '';
     const query = {
         text: 'SELECT (name, good) FROM oishii_table'
     };
     psql.query(query)
         .then(res => {
             // console.log(res);
-            const re = /\((.+),([tf])\)/;
             const row = res.rows[Math.floor(Math.random() * res.rowCount)].row;
             console.log(`row: ${row}`);
-            name = row.match(re)[1];
-            good = row.match(re)[2];
-        })
-        .then(() => {
-            text = name;
-            text += good === 't' ? messages.food.good : messages.food.bad;
+            const re = /\((.+),([tf])\)/;
+            const name = row.match(re)[1];
+            const good = row.match(re)[2];
+            const text = `${name}${good === 't' ? messages.food.good : messages.food.bad}`;
             console.log(`POST: ${text}`);
             sendText(text);
         })
