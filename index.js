@@ -173,7 +173,7 @@ ws.addEventListener('message', function(data){
             let text = json.body.body.text;
             if (text === null) return;
             text = text.replace(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?/g, '');
-            text = text.replace(/@oishiibot(@misskey\.io)? /, '');
+            text = text.replace(/@oishiibot(@misskey\.io)?\s/, '');
             console.log(`json text:${text}`);
 
             const note_id = json.body.body.id;
