@@ -123,7 +123,7 @@ ws.addEventListener('message', function(data){
                 }
             }).then(() => {
                 //Add DB
-                const is_good = Math.random() > 0.25 ? 'true' : 'false';
+                const is_good = Math.random() > 0.3 ? 'true' : 'false';
                 const add_query = {
                     text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
                     values: [ add_name, is_good ]
@@ -139,6 +139,7 @@ ws.addEventListener('message', function(data){
             } else {
                 if (Math.random() > variables.post.probability) {
                     sayFood();
+                    console.log('TLCount Posted.');
                 }
                 tlCount = 0;
             }
