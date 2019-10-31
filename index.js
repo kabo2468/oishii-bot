@@ -288,7 +288,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|なに)?[？?]*`);
+            m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?[？?]*`);
             if (m) { // search
                 (async () => {
                     const is_good = m[3].match(`(${variables.food.good})`) ? true : false;
