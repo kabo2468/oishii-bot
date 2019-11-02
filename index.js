@@ -236,7 +236,7 @@ ws.addEventListener('message', function(data){
                 (async () => {
                     const text = replaceSpace(m[1]);
                     const query = {
-                        text: 'SELECT good FROM oishii_table WHERE name=$1',
+                        text: 'SELECT good FROM oishii_table WHERE LOWER(name) = LOWER($1)',
                         values: [text]
                     };
                     psql.query(query)
@@ -269,7 +269,7 @@ ws.addEventListener('message', function(data){
                     const isExists = await getExists(text);
                     if (isExists) {
                         const update_query = {
-                            text: 'UPDATE oishii_table SET good=$1, learned=true WHERE name=$2',
+                            text: 'UPDATE oishii_table SET good=$1, learned=true WHERE LOWER(name) = LOWER($2)',
                             values: [is_good, text]
                         };
                         psql.query(update_query)
@@ -398,7 +398,7 @@ function uuid() {
 function getExists(text) {
     return new Promise(resolve => {
         const query = {
-            text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE name = $1)',
+            text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1))',
             values: [ text ]
         };
         psql.query(query)
