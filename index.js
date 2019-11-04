@@ -76,9 +76,9 @@ ws.addEventListener('message', function(data){
                 const deleteQuery = {
                     text: 'DELETE FROM oishii_table WHERE name in (SELECT name FROM oishii_table WHERE learned = false LIMIT $1)',
                     values: [ db.deleteNum ]
-                }
+                };
                 psql.query(deleteQuery).then(() => {
-                    console.log(`DELETE: ${count} > ${db.deleteCountCond} -${db.deleteNum} => ${count - db.deleteNum}`)
+                    console.log(`DELETE: ${count} > ${db.deleteCountCond} -${db.deleteNum} => ${count - db.deleteNum}`);
                     sendText({text: `${messages.deleteDB[0]}${db.deleteCountCond}${messages.deleteDB[1]}${db.deleteNum}${messages.deleteDB[2]}`});
                 })
                 .catch(e => console.log(e));
@@ -123,7 +123,7 @@ ws.addEventListener('message', function(data){
                 }
             }).then(() => {
                 //Add DB
-                const is_good = Math.random() > 0.3 ? 'true' : 'false';
+                const is_good = Math.random() < 0.7 ? 'true' : 'false';
                 const add_query = {
                     text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
                     values: [ add_name, is_good ]
@@ -137,7 +137,7 @@ ws.addEventListener('message', function(data){
             if (tlCount < variables.post.count) {
                 tlCount++;
             } else {
-                if (Math.random() > variables.post.probability) {
+                if (Math.random() < variables.post.probability) {
                     sayFood();
                     console.log('TLCount Posted.');
                 }
@@ -296,7 +296,7 @@ ws.addEventListener('message', function(data){
                         text: 'SELECT name FROM oishii_table WHERE good=$1',
                         values: [is_good]
                     };
-                    if (m[1]) search_query.text = 'SELECT name FROM oishii_table WHERE good=$1 AND learned=true';
+                    if (m[1]) search_query.text += ' AND learned=true';
 
                     psql.query(search_query)
                         .then(res => {
@@ -346,6 +346,7 @@ function sayFood() {
     const query = {
         text: 'SELECT (name, good) FROM oishii_table'
     };
+    if (Math.random() < 0.2) query.text += ' WHERE learned=true';
     psql.query(query)
         .then(res => {
             // console.log(res);
@@ -438,5 +439,5 @@ function isNoun(text) {
 }
 
 function replaceSpace(text) {
-    return text.replace(/^\s+|\s+$/g, '')
+    return text.replace(/^\s+|\s+$/g, '');
 }
