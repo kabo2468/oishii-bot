@@ -17,20 +17,20 @@
             "learn": "おぼえた",
             "canEat": "それ食べられる？",
             "idk": "わからない",
-            "pizza": {
-                "domino": {
+            "pizza": [
+                {
                     "name": "ドミノ・ピザ",
                     "url": "https://www.dominos.jp/"
                 },
-                "pizza-la": {
+                {
                     "name": "ピザーラ",
                     "url": "https://www.pizza-la.co.jp/"
                 },
-                "pizzahut": {
+                {
                     "name": "ピザハット",
                     "url": "https://pizzahut.jp/"
                 }
-            }
+            ]
         }
     },
     "variables": {
