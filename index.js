@@ -10,6 +10,10 @@ const psql = new Client({
 });
 
 let tlCount = 0;
+let pizzaText = '';
+messages.food.pizza.forEach(shop => {
+    pizzaText += `?[${shop.name}](${shop.url})\n`;
+});
 
 psql.connect();
 // const testQuery = {
@@ -67,6 +71,12 @@ ws.addEventListener('message', function(data){
         if (json.body.body.cw !== null) return;
         if (/@oishiibot/.test(text)) return;
         if (json.body.body.visibility === 'specified') return;
+
+        if (text.match(/^[@＠](ピザ|ぴざ)$/)) {
+            console.log('TL: PIZZA');
+            sendText({text: pizzaText, reply_id: json.body.body.id, visibility: json.body.body.visibility});
+            return;
+        }
 
         // heroku DB 制限
         psql.query('SELECT count(*) FROM oishii_table').then(res => {
@@ -336,11 +346,7 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*(ピザ|ピッツ[アァ]|ぴざ)\s*$/);
             if (m) { // pizza
                 console.log('COMMAND: PIZZA');
-                let text = '';
-                messages.food.pizza.forEach(shop => {
-                    text += `?[${shop.name}](${shop.url})\n`;
-                });
-                sendText({text: text, reply_id: note_id, visibility: visibility});
+                sendText({text: pizzaText, reply_id: note_id, visibility: visibility});
                 return;
             }
         }
