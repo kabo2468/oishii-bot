@@ -344,7 +344,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(/^\s*[@＠]?(ピザ|ピッツ[アァ]|ぴざ)\s*$/);
+            m = text.match(/^\s*[@＠]?(ピザ|ぴざ)\s*$/);
             if (m) { // pizza
                 console.log('COMMAND: PIZZA');
                 sendText({text: pizzaText, reply_id: note_id, visibility: (visibility !== 'public' ? visibility : 'home')});
