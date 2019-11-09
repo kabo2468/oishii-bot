@@ -138,7 +138,7 @@ ws.addEventListener('message', function(data){
                 tlCount++;
             } else {
                 if (Math.random() < variables.post.probability) {
-                    sayFood();
+                    setTimeout(sayFood, 1000 * Math.random() * 10 + 10);
                     console.log('TLCount Posted.');
                 }
                 tlCount = 0;
