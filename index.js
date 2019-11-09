@@ -74,7 +74,8 @@ ws.addEventListener('message', function(data){
 
         if (text.match(/^[@＠](ピザ|ぴざ)$/)) {
             console.log('TL: PIZZA');
-            sendText({text: pizzaText, reply_id: json.body.body.id, visibility: json.body.body.visibility});
+            const visibility = json.body.body.visibility;
+            sendText({text: pizzaText, reply_id: json.body.body.id, visibility: (visibility !== 'public' ? visibility : 'home')});
             return;
         }
 
@@ -343,10 +344,10 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(/^\s*(ピザ|ピッツ[アァ]|ぴざ)\s*$/);
+            m = text.match(/^\s*[@＠]?(ピザ|ピッツ[アァ]|ぴざ)\s*$/);
             if (m) { // pizza
                 console.log('COMMAND: PIZZA');
-                sendText({text: pizzaText, reply_id: note_id, visibility: visibility});
+                sendText({text: pizzaText, reply_id: note_id, visibility: (visibility !== 'public' ? visibility : 'home')});
                 return;
             }
         }
