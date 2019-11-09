@@ -333,6 +333,16 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
+            m = text.match(/^\s*(ピザ|ピッツ[アァ]|ぴざ)\s*$/);
+            if (m) { // pizza
+                console.log('COMMAND: PIZZA');
+                let text = '';
+                messages.food.pizza.forEach(shop => {
+                    text += `?[${shop.name}](${shop.url})\n`;
+                });
+                sendText({text: text, reply_id: note_id, visibility: visibility});
+                return;
+            }
         }
     }
 });
