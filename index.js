@@ -370,7 +370,7 @@ function sendText({text, reply_id, visibility = 'public', user_id}) {
             endpoint: 'notes/create',
             data: {
                 visibility: visibility,
-                text: text.replace('\\\\', '\\'),
+                text: text.replace(/\\\\/g, '\\'),
                 localOnly: false,
                 geo: null
             }
