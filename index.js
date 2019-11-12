@@ -361,16 +361,16 @@ setInterval(() => {
 
 function sayFood() {
     const query = {
-        text: 'SELECT (name, good) FROM oishii_table'
+        text: 'SELECT (name, good) FROM oishii_table ORDER BY RANDOM() LIMIT 1'
     };
-    if (Math.random() < 0.2) query.text += ' WHERE learned=true';
+    if (Math.random() < 0.2) query.text = 'SELECT (name, good) FROM oishii_table WHERE learned=true ORDER BY RANDOM() LIMIT 1';
     psql.query(query)
         .then(res => {
             // console.log(res);
-            const row = res.rows[Math.floor(Math.random() * res.rowCount)].row;
+            const row = res.rows[0].row;
             console.log(`row: ${row}`);
             const re = /\((.+),([tf])\)/;
-            const name = row.match(re)[1];
+            const name = row.match(re)[1].replace(/"(.+)"/, '$1');
             const good = row.match(re)[2];
             const text = `${name}${good === 't' ? messages.food.good : messages.food.bad}`;
             console.log(`POST: ${text}`);
