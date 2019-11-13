@@ -88,7 +88,7 @@ ws.addEventListener('message', function(data){
         if (json.body.body.cw !== null) return;
         if (/@oishiibot/.test(text)) return;
         if (json.body.body.visibility === 'specified') return;
-        
+
         //URLを消す
         text = text.replace(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?/g, '');
         // メンションを消す
@@ -298,6 +298,7 @@ ws.addEventListener('message', function(data){
                     // NGWords
                     if (isNGWord(text)) {
                         sendText({text: messages.food.ngword, reply_id: note_id, visibility: visibility});
+                        console.log(`NG WORD: ${text}`);
                         return;
                     }
                     const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
@@ -404,6 +405,7 @@ function sayFood() {
 }
 
 function sendText({text, reply_id, visibility = 'public', user_id}) {
+    const _t = text.replace(/\\\\/g, '\\');
     const sendData = {
         type: 'api',
         body: {
@@ -411,12 +413,13 @@ function sendText({text, reply_id, visibility = 'public', user_id}) {
             endpoint: 'notes/create',
             data: {
                 visibility: visibility,
-                text: text.replace(/\\\\/g, '\\'),
+                text: _t,
                 localOnly: false,
                 geo: null
             }
         }
     };
+    if (_t.length > 100) sendData.body.data.cw = messages.food.long;
     if (reply_id) sendData.body.data.replyId = reply_id;
     if (user_id) {
         sendData.body.data.visibility = 'specified';
@@ -495,5 +498,5 @@ function isNGWord(str) {
     ExcludedWords.forEach(w => {
         ngText = ngText.replace(w, '');
     });
-    return NGWords.includes(ngText) ? true : false;
+    return NGWords.some(ng => ngText.match(ng)) ? true : false;
 }
