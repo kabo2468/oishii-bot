@@ -1,4 +1,6 @@
 require('newrelic');
+const fs = require('fs');
+const readline = require('readline');
 const kuromoji = require('kuromoji');
 const ReconnectingWebSocket = require('reconnecting-websocket');
 const ws_const = require('ws');
@@ -13,6 +15,21 @@ let tlCount = 0;
 let pizzaText = '';
 messages.food.pizza.forEach(shop => {
     pizzaText += `?[${shop.name}](${shop.url})\n`;
+});
+
+// NG Words
+const ExcludedWords = [];
+const NGWords = [];
+const rs = fs.createReadStream('Citrine/Citrine.Core/Resources/ngwords.txt');
+const rl = readline.createInterface(rs, {});
+rl.on('line', line => {
+    const word = toHiragana(line.trim().toLowerCase());
+    if (/^#/.test(word)) return;
+    if (/^-/.test(word)) {
+        ExcludedWords.push(word.substring(1));
+    } else {
+        NGWords.push(word);
+    }
 });
 
 psql.connect();
@@ -71,6 +88,13 @@ ws.addEventListener('message', function(data){
         if (json.body.body.cw !== null) return;
         if (/@oishiibot/.test(text)) return;
         if (json.body.body.visibility === 'specified') return;
+        
+        //URLを消す
+        text = text.replace(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?/g, '');
+        // メンションを消す
+        text = text.replace(/@[\w_]+@?[\w.-]*\s+/g, '');
+        // NGWords
+        if (isNGWord(text)) return;
 
         if (text.match(/^[@＠](ピザ|ぴざ)$/)) {
             console.log('TL: PIZZA');
@@ -96,11 +120,6 @@ ws.addEventListener('message', function(data){
             }
         })
         .catch(e => console.log(e));
-
-        //URLを消す
-        text = text.replace(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?/g, '');
-        // メンションを消す
-        text = text.replace(/@[\w_]+@?[\w.-]*\s+/g, '');
 
         builder.build((err, tokenizer) => {
             if (err) throw err;
@@ -276,6 +295,11 @@ ws.addEventListener('message', function(data){
             if (m) { // learn
                 (async () => {
                     const text = replaceSpace(m[1]);
+                    // NGWords
+                    if (isNGWord(text)) {
+                        sendText({text: messages.food.ngword, reply_id: note_id, visibility: visibility});
+                        return;
+                    }
                     const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
                     const isExists = await getExists(text);
                     if (isExists) {
@@ -457,4 +481,19 @@ function isNoun(text) {
 
 function replaceSpace(text) {
     return text.replace(/^\s+|\s+$/g, '');
+}
+
+function toHiragana(str) {
+    return str.replace(/[\u30a1-\u30f6]/g, match => {
+        const chr = match.charCodeAt(0) - 0x60;
+        return String.fromCharCode(chr);
+    });
+}
+
+function isNGWord(str) {
+    let ngText = toHiragana(str.toLowerCase());
+    ExcludedWords.forEach(w => {
+        ngText = ngText.replace(w, '');
+    });
+    return NGWords.includes(ngText) ? true : false;
 }
