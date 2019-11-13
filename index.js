@@ -109,7 +109,7 @@ ws.addEventListener('message', function(data){
             const db = variables.db;
             if (Number(count) > db.deleteCountCond) { // config.json => variables.db.deleteCountCond件以上なら
                 const deleteQuery = {
-                    text: 'DELETE FROM oishii_table WHERE name in (SELECT name FROM oishii_table WHERE learned = false LIMIT $1)',
+                    text: 'DELETE FROM oishii_table WHERE name in (SELECT name FROM oishii_table WHERE learned = false ORDER BY RANDOM() LIMIT $1)',
                     values: [ db.deleteNum ]
                 };
                 psql.query(deleteQuery).then(() => {
