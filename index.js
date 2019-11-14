@@ -20,7 +20,7 @@ messages.food.pizza.forEach(shop => {
 // NG Words
 const ExcludedWords = [];
 const NGWords = [];
-const rs = fs.createReadStream('Citrine/Citrine.Core/Resources/ngwords.txt');
+const rs = fs.createReadStream('ngwords.txt');
 const rl = readline.createInterface(rs, {});
 rl.on('line', line => {
     const word = toHiragana(line.trim().toLowerCase());
