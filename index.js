@@ -94,7 +94,10 @@ ws.addEventListener('message', function(data){
         // メンションを消す
         text = text.replace(/@[\w_]+@?[\w.-]*\s+/g, '');
         // NGWords
-        if (isNGWord(text)) return;
+        if (isNGWord(text)) {
+            console.log(`SKIP(NG WORD): ${text}`);
+            return;
+        }
 
         if (text.match(/^[@＠](ピザ|ぴざ)$/)) {
             console.log('TL: PIZZA');
@@ -265,6 +268,12 @@ ws.addEventListener('message', function(data){
             if (m) { // check
                 (async () => {
                     const text = replaceSpace(m[1]);
+                    // NGWords
+                    if (isNGWord(text)) {
+                        sendText({text: messages.food.ngword, reply_id: note_id, visibility: visibility});
+                        console.log(`NG WORD: ${text}`);
+                        return;
+                    }
                     const query = {
                         text: 'SELECT good FROM oishii_table WHERE LOWER(name) = LOWER($1)',
                         values: [text]
