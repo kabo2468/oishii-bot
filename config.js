@@ -48,7 +48,7 @@ module.exports = {
             count: 20,
             probability: 0.5,
             rateLimitSec: 10,
-            rateLimitPost: 10
+            rateLimitPost: 5
         }
     }
 };
