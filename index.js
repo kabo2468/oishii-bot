@@ -16,7 +16,7 @@ config.messages.food.pizza.forEach(shop => {
     pizzaText += `?[${shop.name}](${shop.url})\n`;
 });
 
-const rateLimit = 20;
+// RATE LIMIT
 let limit = 0;
 
 // NG Words
@@ -396,12 +396,13 @@ setInterval(() => {
 }, 1000 * 60 * process.env.INTERVAL_MIN);
 
 setInterval(() => {
+    // console.log(limit);
     limit = 0;
-}, 1000 * 60);
+}, 1000 * config.variables.post.rateLimitSec);
 
 
 function sayFood() {
-    if (limit < rateLimit) return;
+    if (limit > config.variables.post.rateLimitPost) return;
     const query = {
         text: 'SELECT (name, good) FROM oishii_table ORDER BY RANDOM() LIMIT 1'
     };
