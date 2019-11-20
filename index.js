@@ -359,15 +359,16 @@ ws.addEventListener('message', function(data){
             if (m) { // hungry
                 (async () => {
                     const search_query = {
-                        text: 'SELECT (name, good) FROM oishii_table'
+                        text: 'SELECT (name, good) FROM oishii_table WHERE good=true ORDER BY RANDOM() LIMIT 1'
                     };
+                    if (Math.random() < 0.3) search_query.text = 'SELECT (name, good) FROM oishii_table WHERE good=false ORDER BY RANDOM() LIMIT 1'
                     psql.query(search_query)
                         .then(res => {
                             // console.dir(res);
-                            const row = res.rows[Math.floor(Math.random() * res.rowCount)].row;
+                            const row = res.rows[0].row;
                             console.log(`row: ${row}`);
                             const re = /\((.+),([tf])\)/;
-                            const name = row.match(re)[1];
+                            const name = row.match(re)[1].replace(/"(.+)"/, '$1');
                             const good = row.match(re)[2];
                             const text = `${name} とかどう？\n${good === 't' ? config.messages.food.good : config.messages.food.bad}よ`;
                             console.log(`HUNGRY: ${text}`);

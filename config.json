@@ -46,7 +46,7 @@
         },
         "post": {
             "count": 20,
-            "probability": 0.5
+            "probability": 0.4
         }
     }
 }
