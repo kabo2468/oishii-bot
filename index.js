@@ -364,7 +364,7 @@ ws.addEventListener('message', function(data){
                     const search_query = {
                         text: 'SELECT (name, good) FROM oishii_table WHERE good=true ORDER BY RANDOM() LIMIT 1'
                     };
-                    if (Math.random() < 0.3) search_query.text = 'SELECT (name, good) FROM oishii_table WHERE good=false ORDER BY RANDOM() LIMIT 1'
+                    if (Math.random() < 0.3) search_query.text = 'SELECT (name, good) FROM oishii_table WHERE good=false ORDER BY RANDOM() LIMIT 1';
                     psql.query(search_query)
                         .then(res => {
                             // console.dir(res);
