@@ -5,7 +5,7 @@ const kuromoji = require('kuromoji');
 const ReconnectingWebSocket = require('reconnecting-websocket');
 const ws_const = require('ws');
 const { Client } = require('pg');
-const { messages, variables } = require('./config.json');
+const config = require('./config.js');
 const psql = new Client({
     ssl: true,
     connectionString: process.env.DATABASE_URL
@@ -13,7 +13,7 @@ const psql = new Client({
 
 let tlCount = 0;
 let pizzaText = '';
-messages.food.pizza.forEach(shop => {
+config.messages.food.pizza.forEach(shop => {
     pizzaText += `?[${shop.name}](${shop.url})\n`;
 });
 
@@ -109,15 +109,15 @@ ws.addEventListener('message', function(data){
         // heroku DB 制限
         psql.query('SELECT count(*) FROM oishii_table').then(res => {
             const count = res.rows[0].count;
-            const db = variables.db;
-            if (Number(count) > db.deleteCountCond) { // config.json => variables.db.deleteCountCond件以上なら
+            const db = config.variables.db;
+            if (Number(count) > db.deleteCountCond) { // config.json => config.variables.db.deleteCountCond件以上なら
                 const deleteQuery = {
                     text: 'DELETE FROM oishii_table WHERE name in (SELECT name FROM oishii_table WHERE learned = false ORDER BY RANDOM() LIMIT $1)',
                     values: [ db.deleteNum ]
                 };
                 psql.query(deleteQuery).then(() => {
                     console.log(`DELETE: ${count} > ${db.deleteCountCond} -${db.deleteNum} => ${count - db.deleteNum}`);
-                    sendText({text: `${messages.deleteDB[0]}${db.deleteCountCond}${messages.deleteDB[1]}${db.deleteNum}${messages.deleteDB[2]}`});
+                    sendText({text: `${config.messages.deleteDB[0]}${db.deleteCountCond}${config.messages.deleteDB[1]}${db.deleteNum}${config.messages.deleteDB[2]}`});
                 })
                 .catch(e => console.log(e));
             }
@@ -167,10 +167,10 @@ ws.addEventListener('message', function(data){
             }).catch(e => console.log(e));
 
             // n投稿毎、p確率で sayFood
-            if (tlCount < variables.post.count) {
+            if (tlCount < config.variables.post.count) {
                 tlCount++;
             } else {
-                if (Math.random() < variables.post.probability) {
+                if (Math.random() < config.variables.post.probability) {
                     setTimeout(sayFood, 1000 * Math.random() * 10 + 10);
                     console.log('TLCount Posted.');
                 }
@@ -230,13 +230,13 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*\/help\s*$/);
             if (m) { // help
                 console.log('COMMAND: help');
-                sendText({text: messages.commands.help, reply_id: note_id, visibility: visibility});
+                sendText({text: config.messages.commands.help, reply_id: note_id, visibility: visibility});
                 return;
             }
             m = text.match(/^\s*\/ping\s*$/);
             if (m) { // ping
                 console.log('COMMAND: ping');
-                sendText({text: messages.commands.ping, reply_id: note_id, visibility: visibility});
+                sendText({text: config.messages.commands.ping, reply_id: note_id, visibility: visibility});
                 return;
             }
             m = text.match(/^\s*\/info\s*$/);
@@ -258,19 +258,19 @@ ws.addEventListener('message', function(data){
                 if (json.body.body.user.username === 'kabo') {
                     sayFood();
                 } else {
-                    sendText({text: messages.commands.denied, reply_id: note_id, visibility: visibility});
+                    sendText({text: config.messages.commands.denied, reply_id: note_id, visibility: visibility});
                 }
                 return;
             }
 
             // Text
-            m = text.match(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})[？?]+`);
+            m = text.match(`(.+)(は|って)(${config.variables.food.good}|${config.variables.food.bad})[？?]+`);
             if (m) { // check
                 (async () => {
                     const text = replaceSpace(m[1]);
                     // NGWords
                     if (isNGWord(text)) {
-                        sendText({text: messages.food.ngword, reply_id: note_id, visibility: visibility});
+                        sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility});
                         console.log(`NG WORD: ${text}`);
                         return;
                     }
@@ -284,15 +284,15 @@ ws.addEventListener('message', function(data){
                         if (res.rowCount < 1) {
                             isNoun(text).then(is_noun => {
                                 if (is_noun) {
-                                    sendText({text: messages.food.idk, reply_id: note_id, visibility: visibility});
+                                    sendText({text: config.messages.food.idk, reply_id: note_id, visibility: visibility});
                                 } else {
-                                    sendText({text: messages.food.canEat, reply_id: note_id, visibility: visibility});
+                                    sendText({text: config.messages.food.canEat, reply_id: note_id, visibility: visibility});
                                 }
                             });
                             return;
                         }
                         const isGood = res.rows[0].good;
-                        const goodS = isGood ? messages.food.good : messages.food.bad;
+                        const goodS = isGood ? config.messages.food.good : config.messages.food.bad;
                         console.log(`CHECK: ${text}`);
                         sendText({text: goodS, reply_id: note_id, visibility: visibility});
                     })
@@ -300,17 +300,17 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?[！!]*`);
+            m = text.match(`(.+)[はも](${config.variables.food.good}|${config.variables.food.bad})よ?[！!]*`);
             if (m) { // learn
                 (async () => {
                     const text = replaceSpace(m[1]);
                     // NGWords
                     if (isNGWord(text)) {
-                        sendText({text: messages.food.ngword, reply_id: note_id, visibility: visibility});
+                        sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility});
                         console.log(`NG WORD: ${text}`);
                         return;
                     }
-                    const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
+                    const is_good = m[2].match(`(${config.variables.food.good})`) ? true : false;
                     const isExists = await getExists(text);
                     if (isExists) {
                         const update_query = {
@@ -329,14 +329,14 @@ ws.addEventListener('message', function(data){
                             .then(() => console.log(`LEARN(INSERT): ${text} is ${is_good}`))
                             .catch(e => console.error(e.stack));
                     }
-                    sendText({text: `${text}${messages.food.is}${m[2]}\n${messages.food.learn}`, reply_id: note_id, visibility: visibility});
+                    sendText({text: `${text}${config.messages.food.is}${m[2]}\n${config.messages.food.learn}`, reply_id: note_id, visibility: visibility});
                 })();
                 return;
             }
-            m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?[？?]*`);
+            m = text.match(`(みん(な|にゃ)の)?(${config.variables.food.good}|${config.variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?[？?]*`);
             if (m) { // search
                 (async () => {
-                    const is_good = m[3].match(`(${variables.food.good})`) ? true : false;
+                    const is_good = m[3].match(`(${config.variables.food.good})`) ? true : false;
                     const search_query = {
                         text: 'SELECT name FROM oishii_table WHERE good=$1',
                         values: [is_good]
@@ -348,9 +348,9 @@ ws.addEventListener('message', function(data){
                             // console.dir(res);
                             const row = res.rows[Math.floor(Math.random() * res.rowCount)];
                             // console.dir(row);
-                            const igt = is_good ? messages.food.good : messages.food.bad;
+                            const igt = is_good ? config.messages.food.good : config.messages.food.bad;
                             console.log(`SEARCH: ${row.name} (${is_good})`);
-                            sendText({text: `${row.name}${messages.food.is}${igt}`, reply_id: note_id, visibility: visibility});
+                            sendText({text: `${row.name}${config.messages.food.is}${igt}`, reply_id: note_id, visibility: visibility});
                         })
                         .catch(e => console.error(e.stack));
                 })();
@@ -370,7 +370,7 @@ ws.addEventListener('message', function(data){
                             const re = /\((.+),([tf])\)/;
                             const name = row.match(re)[1];
                             const good = row.match(re)[2];
-                            const text = `${name} とかどう？\n${good === 't' ? messages.food.good : messages.food.bad}よ`;
+                            const text = `${name} とかどう？\n${good === 't' ? config.messages.food.good : config.messages.food.bad}よ`;
                             console.log(`HUNGRY: ${text}`);
                             sendText({text: text, reply_id: note_id, visibility: visibility});
                         })
@@ -406,7 +406,7 @@ function sayFood() {
             const re = /\((.+),([tf])\)/;
             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
             const good = row.match(re)[2];
-            const text = `${name}${good === 't' ? messages.food.good : messages.food.bad}`;
+            const text = `${name}${good === 't' ? config.messages.food.good : config.messages.food.bad}`;
             console.log(`POST: ${text}`);
             sendText({text: text});
         })
@@ -428,7 +428,7 @@ function sendText({text, reply_id, visibility = 'public', user_id}) {
             }
         }
     };
-    if (_t.length > 100) sendData.body.data.cw = messages.food.long;
+    if (_t.length > 100) sendData.body.data.cw = config.messages.food.long;
     if (reply_id) sendData.body.data.replyId = reply_id;
     if (user_id) {
         sendData.body.data.visibility = 'specified';
