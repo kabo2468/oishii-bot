@@ -1,4 +1,3 @@
-require('newrelic');
 const fs = require('fs');
 const readline = require('readline');
 const kuromoji = require('kuromoji');
