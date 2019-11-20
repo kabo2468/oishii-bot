@@ -16,6 +16,9 @@ config.messages.food.pizza.forEach(shop => {
     pizzaText += `?[${shop.name}](${shop.url})\n`;
 });
 
+const rateLimit = 20;
+let limit = 0;
+
 // NG Words
 const ExcludedWords = [];
 const NGWords = [];
@@ -392,8 +395,13 @@ setInterval(() => {
     sayFood();
 }, 1000 * 60 * process.env.INTERVAL_MIN);
 
+setInterval(() => {
+    limit = 0;
+}, 1000 * 60);
+
 
 function sayFood() {
+    if (limit < rateLimit) return;
     const query = {
         text: 'SELECT (name, good) FROM oishii_table ORDER BY RANDOM() LIMIT 1'
     };
@@ -411,6 +419,7 @@ function sayFood() {
             sendText({text: text});
         })
         .catch(e => console.error(e.stack));
+    limit++;
 }
 
 function sendText({text, reply_id, visibility = 'public', user_id}) {
