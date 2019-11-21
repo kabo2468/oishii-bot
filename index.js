@@ -119,7 +119,7 @@ ws.addEventListener('message', function(data){
                 };
                 psql.query(deleteQuery).then(() => {
                     console.log(`DELETE: ${count} > ${db.deleteCountCond} -${db.deleteNum} => ${count - db.deleteNum}`);
-                    sendText({text: `${config.messages.deleteDB[0]}${db.deleteCountCond}${config.messages.deleteDB[1]}${db.deleteNum}${config.messages.deleteDB[2]}`});
+                    sendText({text: config.messages.deleteDB(db.deleteCountCond, db.deleteNum)});
                 })
                 .catch(e => console.log(e));
             }

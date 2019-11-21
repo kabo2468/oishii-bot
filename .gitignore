@@ -3,3 +3,4 @@ node_modules
 test
 *.log
 *.bat
+add_ngwords.txt
