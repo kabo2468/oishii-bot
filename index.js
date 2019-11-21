@@ -1,3 +1,11 @@
+const error = [];
+if (!process.env.DATABASE_URL) error.push('[ERROR]:You must set DATABASE_URL');
+if (!process.env.STREAMING_URL) error.push('[ERROR]:You must set STREAMING_URL');
+if (!process.env.USER_ID) error.push('[ERROR]:You must set USER_ID');
+if (error.length > 0) {
+    for (const err in error) console.log(error[err]);
+    process.exit(1);
+}
 const fs = require('fs');
 const readline = require('readline');
 const kuromoji = require('kuromoji');
@@ -393,7 +401,7 @@ ws.addEventListener('message', function(data){
 
 setInterval(() => {
     sayFood();
-}, 1000 * 60 * process.env.INTERVAL_MIN);
+}, 1000 * 60 * (process.env.INTERVAL_MIN || 60));
 
 setInterval(() => {
     // console.log(limit);
