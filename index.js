@@ -410,7 +410,7 @@ setInterval(() => {
 
 
 function sayFood() {
-    if (limit > config.variables.post.rateLimitPost) return;
+    if (limit > config.variables.post.rateLimitPost - 1) return;
     const query = {
         text: 'SELECT (name, good) FROM oishii_table ORDER BY RANDOM() LIMIT 1'
     };
