@@ -338,15 +338,15 @@ ws.addEventListener('message', function(data){
                 (async () => {
                     const is_good = m[3].match(`(${config.variables.food.good})`) ? true : false;
                     const search_query = {
-                        text: 'SELECT name FROM oishii_table WHERE good=$1',
+                        text: 'SELECT name FROM oishii_table WHERE good=$1 ORDER BY RANDOM() LIMIT 1',
                         values: [is_good]
                     };
-                    if (m[1]) search_query.text += ' AND learned=true';
+                    if (m[1]) search_query.text = 'SELECT name FROM oishii_table WHERE good=$1 AND learned=true ORDER BY RANDOM() LIMIT 1';
 
                     psql.query(search_query)
                         .then(res => {
                             // console.dir(res);
-                            const row = res.rows[Math.floor(Math.random() * res.rowCount)];
+                            const row = res.rows[0];
                             // console.dir(row);
                             // const igt = is_good ? config.messages.food.good : config.messages.food.bad;
                             console.log(`SEARCH: ${row.name} (${is_good})`);
@@ -413,9 +413,9 @@ function sayFood() {
             const re = /\((.+),([tf])\)/;
             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
             const good = row.match(re)[2];
-            // const text = `${name}${good === 't' ? config.messages.food.good : config.messages.food.bad}`;
-            console.log(`POST: ${name} (${good})`);
-            sendText({text: config.messages.food.say(name, good)});
+            const text = config.messages.food.say(name, good);
+            console.log(`POST: ${text}`);
+            sendText({text: text});
         })
         .catch(e => console.error(e.stack));
     limit++;
