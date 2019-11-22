@@ -1,3 +1,5 @@
+const goodText = 'おいしい', badText = 'まずい';
+
 module.exports = {
     messages: {
         deleteDB: (cond, del) => `\`\`\`\nデータベースのレコード数が${cond}件を超えたため、学習されてないものを${del}件削除しました。\n\`\`\``,
@@ -7,10 +9,10 @@ module.exports = {
             ping: 'ぽん！'
         },
         food: {
-            good: 'おいしい',
-            bad: 'まずい',
-            is: ' は',
-            learn: 'おぼえた',
+            learn: (food, good) => `${food} は${good}\nおぼえた`,
+            search: (food, good) => `${food} は${good ? goodText : badText}`,
+            hungry: (food, good) => `${food} とかどう？\n${good === 't' ? goodText : badText}よ`,
+            say: (food, good) => `${food}${good === 't' ? goodText : badText}`,
             canEat: 'それ食べられる？',
             idk: 'わからない',
             ngword: 'それ食べられない',

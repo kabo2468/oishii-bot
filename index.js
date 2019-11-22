@@ -43,17 +43,6 @@ rl.on('line', line => {
 });
 
 psql.connect();
-// const testQuery = {
-//     // text: 'SELECT count(*), count(learned = true or null) FROM oishii_table'
-//     text: 'select learned, count(learned) from oishii_table group by learned'
-// };
-// console.time('test');
-// client.query(testQuery).then(res => {
-//     console.log(res);
-//     // console.log(res.rows[0].count);
-//     console.dir(res.rows);
-// });
-// console.timeEnd('test');
 
 const ws = new ReconnectingWebSocket(process.env.STREAMING_URL, [], {
     WebSocket: ws_const
@@ -102,7 +91,7 @@ ws.addEventListener('message', function(data){
         //URLを消す
         text = text.replace(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?/g, '');
         // メンションを消す
-        text = text.replace(/@[\w_]+@?[\w.-]*\s+/g, '');
+        text = text.replace(/@\w+@?[\w.-]*\s+/g, '');
         // NGWords
         if (isNGWord(text)) {
             console.log(`SKIP(NG WORD): ${text}`);
@@ -181,8 +170,9 @@ ws.addEventListener('message', function(data){
                 tlCount++;
             } else {
                 if (Math.random() < config.variables.post.probability) {
-                    setTimeout(sayFood, 1000 * Math.random() * 10 + 10);
-                    console.log('TLCount Posted.');
+                    const _time = 1000 * Math.random() * 10 + 10;
+                    setTimeout(sayFood, _time);
+                    console.log(`TLCount Posted. After ${_time}ms`);
                 }
                 tlCount = 0;
             }
@@ -339,7 +329,7 @@ ws.addEventListener('message', function(data){
                             .then(() => console.log(`LEARN(INSERT): ${text} is ${is_good}`))
                             .catch(e => console.error(e.stack));
                     }
-                    sendText({text: `${text}${config.messages.food.is}${m[2]}\n${config.messages.food.learn}`, reply_id: note_id, visibility: visibility});
+                    sendText({text: config.messages.food.learn(text, m[2]), reply_id: note_id, visibility: visibility});
                 })();
                 return;
             }
@@ -358,9 +348,9 @@ ws.addEventListener('message', function(data){
                             // console.dir(res);
                             const row = res.rows[Math.floor(Math.random() * res.rowCount)];
                             // console.dir(row);
-                            const igt = is_good ? config.messages.food.good : config.messages.food.bad;
+                            // const igt = is_good ? config.messages.food.good : config.messages.food.bad;
                             console.log(`SEARCH: ${row.name} (${is_good})`);
-                            sendText({text: `${row.name}${config.messages.food.is}${igt}`, reply_id: note_id, visibility: visibility});
+                            sendText({text: config.messages.food.search(row.name, is_good), reply_id: note_id, visibility: visibility});
                         })
                         .catch(e => console.error(e.stack));
                 })();
@@ -372,7 +362,7 @@ ws.addEventListener('message', function(data){
                     const search_query = {
                         text: 'SELECT (name, good) FROM oishii_table WHERE good=true ORDER BY RANDOM() LIMIT 1'
                     };
-                    if (Math.random() < 0.3) search_query.text = 'SELECT (name, good) FROM oishii_table WHERE good=false ORDER BY RANDOM() LIMIT 1';
+                    if (Math.random() < 0.4) search_query.text = 'SELECT (name, good) FROM oishii_table WHERE good=false ORDER BY RANDOM() LIMIT 1';
                     psql.query(search_query)
                         .then(res => {
                             // console.dir(res);
@@ -381,9 +371,9 @@ ws.addEventListener('message', function(data){
                             const re = /\((.+),([tf])\)/;
                             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
                             const good = row.match(re)[2];
-                            const text = `${name} とかどう？\n${good === 't' ? config.messages.food.good : config.messages.food.bad}よ`;
-                            console.log(`HUNGRY: ${text}`);
-                            sendText({text: text, reply_id: note_id, visibility: visibility});
+                            // const text = `${name} とかどう？\n${good === 't' ? config.messages.food.good : config.messages.food.bad}よ`;
+                            console.log(`HUNGRY: ${name} (${good})`);
+                            sendText({text: config.messages.food.hungry(name, good), reply_id: note_id, visibility: visibility});
                         })
                         .catch(e => console.error(e.stack));
                 })();
@@ -423,9 +413,9 @@ function sayFood() {
             const re = /\((.+),([tf])\)/;
             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
             const good = row.match(re)[2];
-            const text = `${name}${good === 't' ? config.messages.food.good : config.messages.food.bad}`;
-            console.log(`POST: ${text}`);
-            sendText({text: text});
+            // const text = `${name}${good === 't' ? config.messages.food.good : config.messages.food.bad}`;
+            console.log(`POST: ${name} (${good})`);
+            sendText({text: config.messages.food.say(name, good)});
         })
         .catch(e => console.error(e.stack));
     limit++;
