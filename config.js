@@ -9,6 +9,8 @@ module.exports = {
             ping: 'ぽん！'
         },
         food: {
+            good: goodText,
+            bad: badText,
             learn: (food, good) => `${food} は${good}\nおぼえた`,
             search: (food, good) => `${food} は${good ? goodText : badText}`,
             hungry: (food, good) => `${food} とかどう？\n${good === 't' ? goodText : badText}よ`,
