@@ -46,7 +46,7 @@ module.exports = {
         },
         post: {
             count: 30,
-            probability: 0.5,
+            probability: 0.3,
             rateLimitSec: 10,
             rateLimitPost: 5
         }

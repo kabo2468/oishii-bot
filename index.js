@@ -155,7 +155,7 @@ ws.addEventListener('message', function(data){
                 }
             }).then(() => {
                 //Add DB
-                const is_good = Math.random() < 0.7 ? 'true' : 'false';
+                const is_good = Math.random() < 0.8 ? 'true' : 'false';
                 const add_query = {
                     text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
                     values: [ add_name, is_good ]
