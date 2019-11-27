@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "kuromoji": "^0.1.2",
+    "moji": "^0.5.1",
     "pg": "^7.12.1",
     "reconnecting-websocket": "^4.2.0",
     "ws": "^7.2.0"

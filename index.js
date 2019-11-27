@@ -9,6 +9,7 @@ if (error.length > 0) {
 const fs = require('fs');
 const readline = require('readline');
 const kuromoji = require('kuromoji');
+const moji = require('moji');
 const ReconnectingWebSocket = require('reconnecting-websocket');
 const ws_const = require('ws');
 const { Client } = require('pg');
@@ -506,10 +507,7 @@ function replaceSpace(text) {
 }
 
 function toHiragana(str) {
-    return str.replace(/[\u30a1-\u30f6]/g, match => {
-        const chr = match.charCodeAt(0) - 0x60;
-        return String.fromCharCode(chr);
-    });
+    return moji(str).convert('HK', 'ZK').convert('KK', 'HG').toString();
 }
 
 function isNGWord(str) {
