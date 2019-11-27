@@ -106,6 +106,7 @@ ws.addEventListener('message', function(data){
         }
 
         // heroku DB 制限
+        /*
         psql.query('SELECT count(*) FROM oishii_table').then(res => {
             const count = res.rows[0].count;
             const db = config.variables.db;
@@ -122,6 +123,7 @@ ws.addEventListener('message', function(data){
             }
         })
         .catch(e => console.log(e));
+        */
 
         builder.build((err, tokenizer) => {
             if (err) throw err;
