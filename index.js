@@ -14,7 +14,7 @@ const ws_const = require('ws');
 const { Client } = require('pg');
 const config = require('./config.js');
 const psql = new Client({
-    ssl: true,
+    ssl: false,
     connectionString: process.env.DATABASE_URL
 });
 
