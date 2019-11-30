@@ -9,6 +9,7 @@ if (error.length > 0) {
 const fs = require('fs');
 const readline = require('readline');
 const kuromoji = require('kuromoji');
+const moji = require('moji');
 const ReconnectingWebSocket = require('reconnecting-websocket');
 const ws_const = require('ws');
 const { Client } = require('pg');
@@ -113,6 +114,7 @@ ws.addEventListener('message', function(data){
         }
 
         // heroku DB 制限
+        /*
         psql.query('SELECT count(*) FROM oishii_table').then(res => {
             const count = res.rows[0].count;
             const db = config.variables.db;
@@ -129,6 +131,7 @@ ws.addEventListener('message', function(data){
             }
         })
         .catch(e => console.log(e));
+        */
 
         builder.build((err, tokenizer) => {
             if (err) throw err;
@@ -162,7 +165,7 @@ ws.addEventListener('message', function(data){
                 }
             }).then(() => {
                 //Add DB
-                const is_good = Math.random() < 0.7 ? 'true' : 'false';
+                const is_good = Math.random() < 0.8 ? 'true' : 'false';
                 const add_query = {
                     text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
                     values: [ add_name, is_good ]
@@ -534,10 +537,7 @@ function replaceSpace(text) {
 }
 
 function toHiragana(str) {
-    return str.replace(/[\u30a1-\u30f6]/g, match => {
-        const chr = match.charCodeAt(0) - 0x60;
-        return String.fromCharCode(chr);
-    });
+    return moji(str).convert('HK', 'ZK').convert('KK', 'HG').toString();
 }
 
 function isNGWord(str) {

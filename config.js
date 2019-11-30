@@ -13,6 +13,8 @@ module.exports = {
             }
         },
         food: {
+            good: goodText,
+            bad: badText,
             learn: (food, good) => `${food} は${good}\nおぼえた`,
             search: (food, good) => `${food} は${good ? goodText : badText}`,
             hungry: (food, good) => `${food} とかどう？\n${good === 't' ? goodText : badText}よ`,
@@ -48,8 +50,8 @@ module.exports = {
         },
         post: {
             count: 30,
-            probability: 0.5,
-            rateLimitSec: 10,
+            probability: 0.3,
+            rateLimitSec: 60,
             rateLimitPost: 5
         },
         probability: {
