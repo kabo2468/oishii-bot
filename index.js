@@ -43,6 +43,13 @@ rl.on('line', line => {
     }
 });
 
+// Poll
+const pollData = {
+    prevDate: null,
+    currNoteID: null,
+    apiID: null
+};
+
 psql.connect();
 
 const ws = new ReconnectingWebSocket(process.env.STREAMING_URL, [], {
@@ -265,6 +272,28 @@ ws.addEventListener('message', function(data){
                 }
                 return;
             }
+            m = text.match(/^\s*\/poll\s*$/);
+            if (m) { // poll
+                console.log('COMMAND: poll');
+                const nowDate = new Date();
+                // const aWeekDate = new Date().setDate(nowDate.getDate() + 7);
+                if (nowDate.getTime() < pollData.prevDate + 1000 * 60 * 60 * 24 * 7) {
+                    sendText({ text: config.messages.commands.poll(pollData.prevDate + 1000 * 60 * 60 * 24 * 7)});
+                    return;
+                }
+                const id = uuid();
+                psql.query('SELECT name FROM oishii_table WHERE learned=false ORDER BY RANDOM() LIMIT 1').then(res => {
+                    const poll = {
+                        choices: [ config.messages.food.good, config.messages.food.bad ],
+                        multiple: false,
+                        expiredAfter: 1000 * 60 * 60 * 24 * 7
+                    };
+                    sendText({id: id, text: config.messages.commands.poll.post(res.rows[0].name), poll: poll});
+                });
+                pollData.prevDate = nowDate.getTime();
+                pollData.apiID = id;
+                return;
+            }
 
             // Text
             m = text.match(`(.+)(は|って)(${config.variables.food.good}|${config.variables.food.bad})[？?]+`);
@@ -365,7 +394,7 @@ ws.addEventListener('message', function(data){
                     const search_query = {
                         text: 'SELECT (name, good) FROM oishii_table WHERE good=true ORDER BY RANDOM() LIMIT 1'
                     };
-                    if (Math.random() < 0.4) search_query.text = 'SELECT (name, good) FROM oishii_table WHERE good=false ORDER BY RANDOM() LIMIT 1';
+                    if (Math.random() < config.variables.probability.hungry) search_query.text = 'SELECT (name, good) FROM oishii_table WHERE good=false ORDER BY RANDOM() LIMIT 1';
                     psql.query(search_query)
                         .then(res => {
                             // console.dir(res);
@@ -407,7 +436,7 @@ function sayFood() {
     const query = {
         text: 'SELECT (name, good) FROM oishii_table ORDER BY RANDOM() LIMIT 1'
     };
-    if (Math.random() < 0.2) query.text = 'SELECT (name, good) FROM oishii_table WHERE learned=true ORDER BY RANDOM() LIMIT 1';
+    if (Math.random() < config.variables.probability.auto) query.text = 'SELECT (name, good) FROM oishii_table WHERE learned=true ORDER BY RANDOM() LIMIT 1';
     psql.query(query)
         .then(res => {
             // console.log(res);
@@ -424,12 +453,12 @@ function sayFood() {
     limit++;
 }
 
-function sendText({text, reply_id, visibility = 'public', user_id}) {
+function sendText({id, text, reply_id, visibility = 'public', user_id, poll}) {
     const _t = text.replace(/\\\\/g, '\\');
     const sendData = {
         type: 'api',
         body: {
-            id: uuid(),
+            id: id || uuid(),
             endpoint: 'notes/create',
             data: {
                 visibility: visibility,
@@ -445,6 +474,7 @@ function sendText({text, reply_id, visibility = 'public', user_id}) {
         sendData.body.data.visibility = 'specified';
         sendData.body.data.visibleUserIds = user_id;
     }
+    if (poll) sendData.body.data.poll = poll;
     ws.send(JSON.stringify(sendData));
 }
 

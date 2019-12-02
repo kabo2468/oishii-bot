@@ -6,7 +6,11 @@ module.exports = {
         commands: {
             denied: 'このコマンドは、オーナーのみ実行できます。',
             help: '```\n/help: コマンドリストを表示する。\n/ping: 生存確認する。\n/info: (今のところは)DBのレコード数を表示する。\n/say: なにか言わせる。(オーナーのみ)\n```',
-            ping: 'ぽん！'
+            ping: 'ぽん！',
+            poll: {
+                post: food => `${food}って${goodText}？`,
+                denied: time => `次の投票は、${time}後に出来ます。`
+            }
         },
         food: {
             good: goodText,
@@ -49,6 +53,10 @@ module.exports = {
             probability: 0.3,
             rateLimitSec: 60,
             rateLimitPost: 5
+        },
+        probability: {
+            auto: 0.2,
+            hungry: 0.2
         }
     }
 };
