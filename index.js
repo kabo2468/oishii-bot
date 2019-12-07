@@ -382,10 +382,18 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(/^\s*[@＠]?(ピザ|ぴざ)\s*$/);
+            // option
+            text = toHiragana(text);
+            m = text.match(/^\s*[@＠]?ぴざ\s*$/);
             if (m) { // pizza
                 console.log('COMMAND: PIZZA');
                 sendText({text: pizzaText, reply_id: note_id, visibility: (visibility !== 'public' ? visibility : 'home')});
+                return;
+            }
+            m = text.match(/^\s*ぬるぽ\s*$/);
+            if (m) { // nullpo
+                console.log('COMMAND: NULLPO');
+                sendText({text: config.messages.commands.nullpo, reply_id: note_id, visibility: visibility});
                 return;
             }
         }

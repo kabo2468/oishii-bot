@@ -6,7 +6,8 @@ module.exports = {
         commands: {
             denied: 'このコマンドは、オーナーのみ実行できます。',
             help: '```\n/help: コマンドリストを表示する。\n/ping: 生存確認する。\n/info: (今のところは)DBのレコード数を表示する。\n/say: なにか言わせる。(オーナーのみ)\n```',
-            ping: 'ぽん！'
+            ping: 'ぽん！',
+            nullpo: 'ガッ'
         },
         food: {
             good: goodText,
