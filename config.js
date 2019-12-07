@@ -10,7 +10,6 @@ module.exports = {
             poll: {
                 post: food => `${food}って${goodText}？`,
                 denied: time => `次の投票は、${time}後に出来ます。`
-            }
             },
             nullpo: 'ガッ'
         },
