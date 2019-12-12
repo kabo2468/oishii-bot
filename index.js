@@ -93,7 +93,7 @@ ws.addEventListener('message', function(data){
     const json = JSON.parse(data.data);
 
     if (json.type === `api:${followDataID}`) {
-        followCount = json.body.followingCount;
+        followCount = json.body.res.followingCount;
         console.log(`Now Following: ${followCount}`);
         return;
     }
