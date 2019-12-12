@@ -66,10 +66,23 @@ const mainData = {
     }
 };
 
+let followCount = 0;
+const followDataID = uuid();
+const followSendData = {
+    type: 'api',
+    body: {
+        id: followDataID,
+        endpoint: 'users/show',
+        data: {
+            userId: process.env.USER_ID
+        }
+    }
+};
 ws.addEventListener('open', function() {
     ws.send(JSON.stringify(timelineData));
     ws.send(JSON.stringify(mainData));
     console.log('Connected!');
+    ws.send(JSON.stringify(followSendData));
 });
 ws.addEventListener('close', function() {
     console.log('Disconnected.');
@@ -78,6 +91,12 @@ ws.addEventListener('close', function() {
 ws.addEventListener('message', function(data){
     // console.log('----------Start----------');
     const json = JSON.parse(data.data);
+
+    if (json.type === `api:${followDataID}`) {
+        followCount = json.body.followingCount;
+        console.log(`Now Following: ${followCount}`);
+        return;
+    }
 
     if (json.body.id === '1803ad27-a839-4eb6-ac74-97677ee0a055') { //Timeline
         // console.dir(json);
@@ -169,7 +188,7 @@ ws.addEventListener('message', function(data){
             }).catch(e => console.log(e));
 
             // n投稿毎、p確率で sayFood
-            if (tlCount < config.variables.post.count) {
+            if (tlCount < (followCount / 2)) {
                 tlCount++;
             } else {
                 if (Math.random() < config.variables.post.probability) {
@@ -198,6 +217,8 @@ ws.addEventListener('message', function(data){
                     }
                 }
             }));
+            followCount++;
+            console.log(`Now Following: ${followCount}`);
         }
 
         if (json.body.type === 'mention') {

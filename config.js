@@ -46,7 +46,6 @@ module.exports = {
             deleteNum: 1000
         },
         post: {
-            count: 30,
             probability: 0.3,
             rateLimitSec: 60,
             rateLimitPost: 5
