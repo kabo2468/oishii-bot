@@ -455,6 +455,10 @@ function sayFood() {
 
 function sendText({text, reply_id, visibility = 'public', user_id}) {
     const _t = text.replace(/\\\\/g, '\\');
+    if (isNGWord(_t)) {
+        console.log(`Post Canceled: NG Word (${_t})`);
+        return;
+    }
     const sendData = {
         type: 'api',
         body: {
