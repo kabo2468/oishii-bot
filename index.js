@@ -114,7 +114,7 @@ ws.addEventListener('message', function(data){
         text = text.replace(/@\w+@?[\w.-]*\s+/g, '');
         // NGWords
         if (isNGWord(text)) {
-            console.log(`SKIP(NG WORD): ${text}`);
+            console.log(`SKIP(NG WORD): ${findNGWord(text)}`);
             return;
         }
 
@@ -295,7 +295,7 @@ ws.addEventListener('message', function(data){
                     // NGWords
                     if (isNGWord(text)) {
                         sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility});
-                        console.log(`NG WORD: ${text}`);
+                        console.log(`NG WORD: ${findNGWord(text)}`);
                         return;
                     }
                     const query = {
@@ -331,7 +331,7 @@ ws.addEventListener('message', function(data){
                     // NGWords
                     if (isNGWord(text)) {
                         sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility});
-                        console.log(`NG WORD: ${text}`);
+                        console.log(`NG WORD: ${findNGWord(text)}`);
                         return;
                     }
                     const is_good = m[2].match(`(${config.variables.food.good})`) ? true : false;
@@ -456,7 +456,7 @@ function sayFood() {
 function sendText({text, reply_id, visibility = 'public', user_id}) {
     const _t = text.replace(/\\\\/g, '\\');
     if (isNGWord(_t)) {
-        console.log(`Post Canceled: NG Word (${_t})`);
+        console.log(`Post Canceled: NG Word (${findNGWord(_t)})`);
         return;
     }
     const sendData = {
@@ -543,10 +543,20 @@ function toHiragana(str) {
     return moji(str).convert('HK', 'ZK').convert('KK', 'HG').toString();
 }
 
-function isNGWord(str) {
-    let ngText = toHiragana(str.toLowerCase());
+function excludeNGWord(str) {
+    let text = toHiragana(str.toLowerCase());
     ExcludedWords.forEach(w => {
-        ngText = ngText.replace(w, '');
+        text = text.replace(w, '');
     });
-    return NGWords.some(ng => ngText.match(ng)) ? true : false;
+    return text;
+}
+
+function isNGWord(str) {
+    const text = excludeNGWord(str);
+    return NGWords.some(ng => text.match(ng));
+}
+
+function findNGWord(str) {
+    const text = excludeNGWord(str);
+    return NGWords.find(ng => text.match(ng));
 }
