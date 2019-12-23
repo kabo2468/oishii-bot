@@ -254,13 +254,13 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*\/help\s*$/);
             if (m) { // help
                 console.log('COMMAND: help');
-                sendText({text: config.messages.commands.help, reply_id: note_id, visibility: visibility});
+                sendText({text: config.messages.commands.help, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
             m = text.match(/^\s*\/ping\s*$/);
             if (m) { // ping
                 console.log('COMMAND: ping');
-                sendText({text: config.messages.commands.ping, reply_id: note_id, visibility: visibility});
+                sendText({text: config.messages.commands.ping, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
             m = text.match(/^\s*\/info\s*$/);
@@ -271,8 +271,8 @@ ws.addEventListener('message', function(data){
                     const tl = res.rows[1].count;
                     const all = Number(fl) + Number(tl);
                     const text = `Records: ${all.toString()} (Learned: ${tl})`;
-                    console.log(`COMMAND: info[ ${text} ]`);
-                    sendText({text: text, reply_id: note_id, visibility: visibility});
+                    console.log(`INFO: [ ${text} ]`);
+                    sendText({text: text, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 });
                 return;
             }
@@ -282,7 +282,7 @@ ws.addEventListener('message', function(data){
                 if (json.body.body.user.username === 'kabo') {
                     sayFood();
                 } else {
-                    sendText({text: config.messages.commands.denied, reply_id: note_id, visibility: visibility});
+                    sendText({text: config.messages.commands.denied, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 }
                 return;
             }
@@ -297,15 +297,15 @@ ws.addEventListener('message', function(data){
                     psql.query(query)
                     .then(res => {
                         if (res.rowCount > 0) {
-                            sendText({text: config.messages.commands.delete.done(res.rowCount), reply_id: note_id, visibility: visibility});
+                            sendText({text: config.messages.commands.delete.done(res.rowCount), reply_id: note_id, visibility: visibility, ignoreNG: true});
                             console.log(`DELETE: ${m[1]}`);
                         } else {
-                            sendText({text: config.messages.commands.delete.notFound, reply_id: note_id, visibility: visibility});
-                            console.log('NOT FOUND.');
+                            sendText({text: config.messages.commands.delete.notFound, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                            console.log('DELETE: NOT FOUND.');
                         }
                     });
                 } else {
-                    sendText({text: config.messages.commands.denied, reply_id: note_id, visibility: visibility});
+                    sendText({text: config.messages.commands.denied, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 }
                 return;
             }
@@ -317,7 +317,7 @@ ws.addEventListener('message', function(data){
                     const text = replaceSpace(m[1]);
                     // NGWords
                     if (isNGWord(text)) {
-                        sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility});
+                        sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility, ignoreNG: true});
                         console.log(`NG WORD: ${findNGWord(text)}`);
                         return;
                     }
@@ -331,9 +331,9 @@ ws.addEventListener('message', function(data){
                         if (res.rowCount < 1) {
                             isNoun(text).then(is_noun => {
                                 if (is_noun) {
-                                    sendText({text: config.messages.food.idk, reply_id: note_id, visibility: visibility});
+                                    sendText({text: config.messages.food.idk, reply_id: note_id, visibility: visibility, ignoreNG: true});
                                 } else {
-                                    sendText({text: config.messages.food.canEat, reply_id: note_id, visibility: visibility});
+                                    sendText({text: config.messages.food.canEat, reply_id: note_id, visibility: visibility, ignoreNG: true});
                                 }
                             });
                             return;
@@ -341,7 +341,7 @@ ws.addEventListener('message', function(data){
                         const isGood = res.rows[0].good;
                         const goodS = isGood ? config.messages.food.good : config.messages.food.bad;
                         console.log(`CHECK: ${text}`);
-                        sendText({text: goodS, reply_id: note_id, visibility: visibility});
+                        sendText({text: goodS, reply_id: note_id, visibility: visibility, ignoreNG: true});
                     })
                     .catch(e => console.log(e));
                 })();
@@ -353,7 +353,7 @@ ws.addEventListener('message', function(data){
                     const text = replaceSpace(m[1]);
                     // NGWords
                     if (isNGWord(text)) {
-                        sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility});
+                        sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility, ignoreNG: true});
                         console.log(`NG WORD: ${findNGWord(text)}`);
                         return;
                     }
@@ -431,13 +431,13 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*[@＠]?ぴざ\s*$/);
             if (m) { // pizza
                 console.log('COMMAND: PIZZA');
-                sendText({text: pizzaText, reply_id: note_id, visibility: (visibility !== 'public' ? visibility : 'home')});
+                sendText({text: pizzaText, reply_id: note_id, visibility: (visibility !== 'public' ? visibility : 'home'), ignoreNG: true});
                 return;
             }
             m = text.match(/^\s*ぬるぽ\s*$/);
             if (m) { // nullpo
                 console.log('COMMAND: NULLPO');
-                sendText({text: config.messages.commands.nullpo, reply_id: note_id, visibility: visibility});
+                sendText({text: config.messages.commands.nullpo, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
         }
@@ -476,11 +476,13 @@ function sayFood() {
     limit++;
 }
 
-function sendText({text, reply_id, visibility = 'public', user_id}) {
+function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = false}) {
     const _t = text.replace(/\\\\/g, '\\');
-    if (isNGWord(_t)) {
-        console.log(`Post Canceled: NG Word (${findNGWord(_t)})`);
-        return;
+    if (!ignoreNG) {
+        if (isNGWord(_t)) {
+            console.log(`Post Canceled: NG Word (${findNGWord(_t)})`);
+            return;
+        }
     }
     const sendData = {
         type: 'api',
