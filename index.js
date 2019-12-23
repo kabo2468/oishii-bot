@@ -286,6 +286,29 @@ ws.addEventListener('message', function(data){
                 }
                 return;
             }
+            m = text.match(/^\s*\/delete (.+)\s*$/);
+            if (m) { // delete
+                console.log('COMMAND: delete');
+                if (json.body.body.user.username === 'kabo') {
+                    const query = {
+                        text: 'DELETE FROM oishii_table WHERE name in (SELECT name FROM oishii_table WHERE LOWER(name) = LOWER($1) LIMIT 1)',
+                        values: [m[1]]
+                    };
+                    psql.query(query)
+                    .then(res => {
+                        if (res.rowCount > 0) {
+                            sendText({text: config.messages.commands.delete.done(res.rowCount), reply_id: note_id, visibility: visibility});
+                            console.log(`DELETE: ${m[1]}`);
+                        } else {
+                            sendText({text: config.messages.commands.delete.notFound, reply_id: note_id, visibility: visibility});
+                            console.log('NOT FOUND.');
+                        }
+                    });
+                } else {
+                    sendText({text: config.messages.commands.denied, reply_id: note_id, visibility: visibility});
+                }
+                return;
+            }
 
             // Text
             m = text.match(`(.+)(は|って)(${config.variables.food.good}|${config.variables.food.bad})[？?]+`);

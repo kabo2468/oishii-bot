@@ -7,7 +7,11 @@ module.exports = {
             denied: 'このコマンドは、オーナーのみ実行できます。',
             help: '```\n/help: コマンドリストを表示する。\n/ping: 生存確認する。\n/info: (今のところは)DBのレコード数を表示する。\n/say: なにか言わせる。(オーナーのみ)\n```',
             ping: 'ぽん！',
-            nullpo: 'ガッ'
+            nullpo: 'ガッ',
+            delete: {
+                done: num => `${num}件削除しました。`,
+                notFound: '見つかりませんでした。'
+            }
         },
         food: {
             good: goodText,
