@@ -453,6 +453,12 @@ setInterval(() => {
     limit = 0;
 }, 1000 * config.variables.post.rateLimitSec);
 
+const newYearTime = new Date(2020,0,1,0,0,0,0).getTime() - Date.now();
+if (newYearTime > 0) {
+    setTimeout(() => {
+        sendText({text: 'あけおめおいしい'});
+    }, new Date(2020,0,1,0,0,0,0).getTime() - Date.now());
+}
 
 function sayFood() {
     if (limit > config.variables.post.rateLimitPost - 1) return;
