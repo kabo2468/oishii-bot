@@ -457,7 +457,7 @@ const newYearTime = new Date(2020,0,1,0,0,0,0).getTime() - Date.now();
 if (newYearTime > 0) {
     setTimeout(() => {
         sendText({text: 'あけおめおいしい'});
-    }, new Date(2020,0,1,0,0,0,0).getTime() - Date.now());
+    }, newYearTime);
 }
 
 function sayFood() {
