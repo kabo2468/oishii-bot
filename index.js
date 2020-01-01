@@ -113,10 +113,10 @@ ws.addEventListener('message', function(data){
         // メンションを消す
         text = text.replace(/@\w+@?[\w.-]*\s+/g, '');
         // NGWords
-        // if (isNGWord(text)) {
-        //     console.log(`SKIP(NG WORD): ${findNGWord(text)}`);
-        //     return;
-        // }
+        if (isNGWord(text)) {
+            console.log(`SKIP(NG WORD): ${findNGWord(text)}`);
+            return;
+        }
 
         if (text.match(/^[@＠](ピザ|ぴざ)$/)) {
             console.log('TL: PIZZA');
@@ -316,11 +316,11 @@ ws.addEventListener('message', function(data){
                 (async () => {
                     const text = replaceSpace(m[1]);
                     // NGWords
-                    // if (isNGWord(text)) {
-                    //     sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility, ignoreNG: true});
-                    //     console.log(`NG WORD: ${findNGWord(text)}`);
-                    //     return;
-                    // }
+                    if (isNGWord(text)) {
+                        sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                        console.log(`NG WORD: ${findNGWord(text)}`);
+                        return;
+                    }
                     const query = {
                         text: 'SELECT good FROM oishii_table WHERE LOWER(name) = LOWER($1)',
                         values: [text]
@@ -352,11 +352,11 @@ ws.addEventListener('message', function(data){
                 (async () => {
                     const text = replaceSpace(m[1]);
                     // NGWords
-                    // if (isNGWord(text)) {
-                    //     sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility, ignoreNG: true});
-                    //     console.log(`NG WORD: ${findNGWord(text)}`);
-                    //     return;
-                    // }
+                    if (isNGWord(text)) {
+                        sendText({text: config.messages.food.ngword, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                        console.log(`NG WORD: ${findNGWord(text)}`);
+                        return;
+                    }
                     const is_good = m[2].match(`(${config.variables.food.good})`) ? true : false;
                     const isExists = await getExists(text);
                     if (isExists) {
@@ -453,12 +453,6 @@ setInterval(() => {
     limit = 0;
 }, 1000 * config.variables.post.rateLimitSec);
 
-const newYearTime = new Date(2020,0,1,0,0,0,0).getTime() - Date.now();
-if (newYearTime > 0) {
-    setTimeout(() => {
-        sendText({text: '***あけおめおいしい！***'});
-    }, newYearTime);
-}
 
 function sayFood() {
     if (limit > config.variables.post.rateLimitPost - 1) return;
@@ -484,12 +478,10 @@ function sayFood() {
 
 function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = false}) {
     const _t = text.replace(/\\\\/g, '\\');
-    let local = false;
     if (!ignoreNG) {
         if (isNGWord(_t)) {
-            // console.log(`Post Canceled: NG Word (${findNGWord(_t)})`);
-            // return;
-            local = true;
+            console.log(`Post Canceled: NG Word (${findNGWord(_t)})`);
+            return;
         }
     }
     const sendData = {
@@ -500,7 +492,7 @@ function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = fa
             data: {
                 visibility: visibility,
                 text: _t,
-                localOnly: local,
+                localOnly: false,
                 geo: null
             }
         }
