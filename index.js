@@ -54,7 +54,8 @@ const timelineData = {
     type: "connect",
     body: {
         // channel: "localTimeline",
-        channel: "hybridTimeline",
+        // channel: "hybridTimeline",
+        channel: "homeTimeline",
         id: "1803ad27-a839-4eb6-ac74-97677ee0a055"
     }
 };
