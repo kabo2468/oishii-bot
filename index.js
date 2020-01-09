@@ -435,6 +435,14 @@ ws.addEventListener('message', function(data){
                 sendText({text: pizzaText, reply_id: note_id, visibility: (visibility !== 'public' ? visibility : 'home'), ignoreNG: true});
                 return;
             }
+            m = text.match(/^\s*お?(寿司|すし)(握|にぎ)(って|れ)$/);
+            if (m) { // sushi
+                console.log('COMMAND: sushi');
+                // 1～10個
+                const _t = config.getWord(config.messages.food.sushi).repeat(Math.floor(Math.random() * 10) + 1);
+                sendText({text: _t, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                return;
+            }
             m = text.match(/^\s*ぬるぽ\s*$/);
             if (m) { // nullpo
                 console.log('COMMAND: NULLPO');

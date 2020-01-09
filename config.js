@@ -1,6 +1,13 @@
 const goodText = 'おいしい', badText = 'まずい';
 
 module.exports = {
+    getWord: word => {
+        if (Array.isArray(word)) {
+            return word[Math.floor(Math.random() * word.length)];
+        } else {
+            return word;
+        }
+    },
     messages: {
         deleteDB: (cond, del) => `\`\`\`\nデータベースのレコード数が${cond}件を超えたため、学習されてないものを${del}件削除しました。\n\`\`\``,
         commands: {
@@ -37,6 +44,11 @@ module.exports = {
                     name: 'ピザハット',
                     url: 'https://pizzahut.jp/'
                 }
+            ],
+            sushi: [
+                '🍣',
+                '🍙',
+                '🍘'
             ]
         }
     },
