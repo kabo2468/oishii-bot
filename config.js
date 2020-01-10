@@ -18,13 +18,21 @@ module.exports = {
                 '/info: (今のところは)DBのレコード数を表示する。',
                 '/say: なにか言わせる。(オーナーのみ)',
                 '/follow: フォローする。',
-                '/unfollow: フォロー解除する。'
+                '/unfollow: フォローを解除する。'
             ],
             ping: 'ぽん！',
             nullpo: 'ガッ',
             delete: {
                 done: num => `${num}件削除しました。`,
                 notFound: '見つかりませんでした。'
+            },
+            follow: {
+                already: '既にフォローしています。',
+                cant: 'フォローできませんでした。'
+            },
+            unfollow: {
+                not: 'フォローしていません。',
+                cant: 'フォロー解除できませんでした。'
             }
         },
         food: {

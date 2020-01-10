@@ -70,11 +70,10 @@ const mainData = {
 };
 
 let followCount = 0;
-const followDataID = uuid();
 const followSendData = {
     type: 'api',
     body: {
-        id: followDataID,
+        id: '7e5f734f-920c-43e2-ae2c-3dcff866f2f6',
         endpoint: 'users/show',
         data: {
             userId: process.env.USER_ID
@@ -95,10 +94,30 @@ ws.addEventListener('message', function(data){
     // console.log('----------Start----------');
     const json = JSON.parse(data.data);
 
-    if (json.type === `api:${followDataID}`) {
+    if (json.type === 'api:7e5f734f-920c-43e2-ae2c-3dcff866f2f6') { // Follow Count
         followCount = json.body.res.followingCount;
         console.log(`Now Following: ${followCount}`);
         return;
+    }
+
+    if (json.type === 'api:ae2a63d4-7e17-41e1-b58c-f960becaab03') { // Follow Command
+        if (json.body.e.id === '35387507-38c7-4cb9-9197-300b93783fa0') { // ALREADY_FOLLOWING
+            sendText({text: config.messages.commands.follow.already, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+            return;
+        } else {
+            sendText({text: config.messages.commands.follow.cant, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+            return;
+        }
+    }
+
+    if (json.type === 'api:8a06d0ae-b801-483b-9dc5-540865b348c9') { // Unfollow Command
+        if (json.body.e.id === '5dbf82f5-c92b-40b1-87d1-6c8c0741fd09') { // NOT_FOLLOWING
+            sendText({text: config.messages.commands.unfollow.not, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+            return;
+        } else {
+            sendText({text: config.messages.commands.unfollow.cant, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+            return;
+        }
     }
 
     if (json.body.id === '1803ad27-a839-4eb6-ac74-97677ee0a055') { //Timeline
@@ -209,6 +228,8 @@ ws.addEventListener('message', function(data){
     if (json.body.id === '69d71556-8747-4287-b849-d3957d33baa7') { //Main
         if (json.body.type === 'notification') return;
 
+        if (json.body.type === 'readAllUnreadSpecifiedNotes') return;
+
         if (json.body.type === 'followed') { //follow back
             // console.dir(json);
             ws.send(JSON.stringify({
@@ -290,7 +311,7 @@ ws.addEventListener('message', function(data){
                 ws.send(JSON.stringify({
                     type: 'api',
                     body: {
-                        id: uuid(),
+                        id: 'ae2a63d4-7e17-41e1-b58c-f960becaab03',
                         endpoint: 'following/create',
                         data: {
                             userId: json.body.body.userId
@@ -307,7 +328,7 @@ ws.addEventListener('message', function(data){
                 ws.send(JSON.stringify({
                     type: 'api',
                     body: {
-                        id: uuid(),
+                        id: '8a06d0ae-b801-483b-9dc5-540865b348c9',
                         endpoint: 'following/delete',
                         data: {
                             userId: json.body.body.userId
