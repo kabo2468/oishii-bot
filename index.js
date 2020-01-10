@@ -6,6 +6,7 @@ if (error.length > 0) {
     for (const err in error) console.log(error[err]);
     process.exit(1);
 }
+
 const fs = require('fs');
 const readline = require('readline');
 const kuromoji = require('kuromoji');
@@ -14,6 +15,7 @@ const ReconnectingWebSocket = require('reconnecting-websocket');
 const ws_const = require('ws');
 const { Client } = require('pg');
 const config = require('./config.js');
+const { getWord } = require('./config.js');
 const psql = new Client({
     ssl: false,
     connectionString: process.env.DATABASE_URL
@@ -277,6 +279,40 @@ ws.addEventListener('message', function(data){
                 });
                 return;
             }
+            m = text.match(/^\s*\/follow\s*$/);
+            if (m) { // follow
+                console.log('COMMAND: follow');
+                ws.send(JSON.stringify({
+                    type: 'api',
+                    body: {
+                        id: uuid(),
+                        endpoint: 'following/create',
+                        data: {
+                            userId: json.body.body.id
+                        }
+                    }
+                }));
+                followCount++;
+                console.log(`Now Following: ${followCount}`);
+                return;
+            }
+            m = text.match(/^\s*\/unfollow\s*$/);
+            if (m) { // unfollow
+                console.log('COMMAND: unfollow');
+                ws.send(JSON.stringify({
+                    type: 'api',
+                    body: {
+                        id: uuid(),
+                        endpoint: 'following/delete',
+                        data: {
+                            userId: json.body.body.id
+                        }
+                    }
+                }));
+                followCount--;
+                console.log(`Now Following: ${followCount}`);
+                return;
+            }
             m = text.match(/^\s*\/say\s*$/);
             if (m) { // say
                 console.log('COMMAND: say');
@@ -439,7 +475,7 @@ ws.addEventListener('message', function(data){
             if (m) { // sushi
                 console.log('COMMAND: sushi');
                 // 1～10個
-                const _t = config.getWord(config.messages.food.sushi).repeat(Math.floor(Math.random() * 10) + 1);
+                const _t = getWord(config.messages.food.sushi).repeat(Math.floor(Math.random() * 10) + 1);
                 sendText({text: _t, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
@@ -451,6 +487,7 @@ ws.addEventListener('message', function(data){
             }
         }
     }
+    console.dir(json);
 });
 
 setInterval(() => {
@@ -461,6 +498,11 @@ setInterval(() => {
     // console.log(limit);
     limit = 0;
 }, 1000 * config.variables.post.rateLimitSec);
+
+// 1時間毎にフォロー数を取得
+setInterval(() => {
+    ws.send(JSON.stringify(followSendData));
+}, 1000 * 60 * 60);
 
 
 function sayFood() {
