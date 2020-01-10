@@ -260,7 +260,7 @@ ws.addEventListener('message', function(data){
                 console.log('COMMAND: help');
                 let _t = '';
                 for (const command in config.messages.commands.help) {
-                    _t += `${command}\n`;
+                    _t += `${config.messages.commands.help[command]}\n`;
                 }
                 sendText({text: `\`\`\`\n${_t}\`\`\``, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
@@ -293,7 +293,7 @@ ws.addEventListener('message', function(data){
                         id: uuid(),
                         endpoint: 'following/create',
                         data: {
-                            userId: json.body.body.id
+                            userId: json.body.body.userId
                         }
                     }
                 }));
@@ -310,7 +310,7 @@ ws.addEventListener('message', function(data){
                         id: uuid(),
                         endpoint: 'following/delete',
                         data: {
-                            userId: json.body.body.id
+                            userId: json.body.body.userId
                         }
                     }
                 }));
@@ -491,8 +491,8 @@ ws.addEventListener('message', function(data){
                 return;
             }
         }
+        console.dir(json);
     }
-    console.dir(json);
 });
 
 setInterval(() => {
