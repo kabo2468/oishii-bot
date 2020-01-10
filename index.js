@@ -80,7 +80,10 @@ const followSendData = {
         }
     }
 };
-let commandPostId = '';
+const commandPost = {
+    id: '',
+    visibility: ''
+};
 
 ws.addEventListener('open', function() {
     ws.send(JSON.stringify(timelineData));
@@ -113,7 +116,7 @@ ws.addEventListener('message', function(data){
                 _t = config.messages.commands.follow.cant;
             }
         }
-        sendText({text: _t, reply_id: commandPostId, visibility: json.body.body.visibility, ignoreNG: true});
+        sendText({text: _t, reply_id: commandPost.id, visibility: commandPost.visibility, ignoreNG: true});
         return;
     }
 
@@ -128,7 +131,7 @@ ws.addEventListener('message', function(data){
                 _t = config.messages.commands.unfollow.cant;
             }
         }
-        sendText({text: _t, reply_id: commandPostId, visibility: json.body.body.visibility, ignoreNG: true});
+        sendText({text: _t, reply_id: commandPost.id, visibility: commandPost.visibility, ignoreNG: true});
         return;
     }
 
@@ -320,7 +323,8 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*\/follow\s*$/);
             if (m) { // follow
                 console.log('COMMAND: follow');
-                commandPostId = note_id;
+                commandPost.id = note_id;
+                commandPost.visibility = visibility;
                 ws.send(JSON.stringify({
                     type: 'api',
                     body: {
@@ -338,7 +342,8 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*\/unfollow\s*$/);
             if (m) { // unfollow
                 console.log('COMMAND: unfollow');
-                commandPostId = note_id;
+                commandPost.id = note_id;
+                commandPost.visibility = visibility;
                 ws.send(JSON.stringify({
                     type: 'api',
                     body: {
