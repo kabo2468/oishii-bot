@@ -203,6 +203,7 @@ ws.addEventListener('message', function(data){
             }
             console.log(`TLCount: ${tlCount}`);
         });
+        return;
     }
 
     if (json.body.id === '69d71556-8747-4287-b849-d3957d33baa7') { //Main
