@@ -257,7 +257,11 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*\/help\s*$/);
             if (m) { // help
                 console.log('COMMAND: help');
-                sendText({text: config.messages.commands.help, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                let _t = '';
+                for (const command in config.messages.commands.help) {
+                    _t += `${command}\n`;
+                }
+                sendText({text: `\`\`\`\n${_t}\`\`\``, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
             m = text.match(/^\s*\/ping\s*$/);
