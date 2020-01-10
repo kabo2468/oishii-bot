@@ -80,6 +80,8 @@ const followSendData = {
         }
     }
 };
+let commandPostId = '';
+
 ws.addEventListener('open', function() {
     ws.send(JSON.stringify(timelineData));
     ws.send(JSON.stringify(mainData));
@@ -101,33 +103,33 @@ ws.addEventListener('message', function(data){
     }
 
     if (json.type === 'api:ae2a63d4-7e17-41e1-b58c-f960becaab03') { // Follow Command
+        let _t = '';
         if ('res' in json.body) {
-            sendText({text: config.messages.commands.follow.done, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
-            return;
+            _t = config.messages.commands.follow.done;
         } else {
             if (json.body.e.id === '35387507-38c7-4cb9-9197-300b93783fa0') { // ALREADY_FOLLOWING
-                sendText({text: config.messages.commands.follow.already, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
-                return;
+                _t = config.messages.commands.follow.already;
             } else {
-                sendText({text: config.messages.commands.follow.cant, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
-                return;
+                _t = config.messages.commands.follow.cant;
             }
         }
+        sendText({text: _t, reply_id: commandPostId, visibility: json.body.body.visibility, ignoreNG: true});
+        return;
     }
 
     if (json.type === 'api:8a06d0ae-b801-483b-9dc5-540865b348c9') { // Unfollow Command
+        let _t = '';
         if ('res' in json.body) {
-            sendText({text: config.messages.commands.unfollow.done, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
-            return;
+            _t = config.messages.commands.unfollow.done;
         } else {
             if (json.body.e.id === '5dbf82f5-c92b-40b1-87d1-6c8c0741fd09') { // NOT_FOLLOWING
-                sendText({text: config.messages.commands.unfollow.not, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
-                return;
+                _t = config.messages.commands.unfollow.not;
             } else {
-                sendText({text: config.messages.commands.unfollow.cant, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
-                return;
+                _t = config.messages.commands.unfollow.cant;
             }
         }
+        sendText({text: _t, reply_id: commandPostId, visibility: json.body.body.visibility, ignoreNG: true});
+        return;
     }
 
     if (json.body.id === '1803ad27-a839-4eb6-ac74-97677ee0a055') { //Timeline
@@ -318,6 +320,7 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*\/follow\s*$/);
             if (m) { // follow
                 console.log('COMMAND: follow');
+                commandPostId = note_id;
                 ws.send(JSON.stringify({
                     type: 'api',
                     body: {
@@ -335,6 +338,7 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\s*\/unfollow\s*$/);
             if (m) { // unfollow
                 console.log('COMMAND: unfollow');
+                commandPostId = note_id;
                 ws.send(JSON.stringify({
                     type: 'api',
                     body: {
