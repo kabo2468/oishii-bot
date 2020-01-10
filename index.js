@@ -249,7 +249,7 @@ ws.addEventListener('message', function(data){
                     }
                 }
             };
-            if (text.match(/^\s*かわい{2,}[！!]*\s*$/)) reactionData.body.data.reaction = 'love';
+            if (text.match(/(かわいい|カワイイ|可愛い|kawaii)/i)) reactionData.body.data.reaction = 'love';
             ws.send(JSON.stringify(reactionData));
 
             let m;
@@ -348,7 +348,7 @@ ws.addEventListener('message', function(data){
             }
 
             // Text
-            m = text.match(`(.+)(は|って)(${config.variables.food.good}|${config.variables.food.bad})[？?]+`);
+            m = text.match(`(.+)(は|って)(${config.variables.food.good}|${config.variables.food.bad})の?[？?]+`);
             if (m) { // check
                 (async () => {
                     const text = replaceSpace(m[1]);
@@ -381,6 +381,29 @@ ws.addEventListener('message', function(data){
                         sendText({text: goodS, reply_id: note_id, visibility: visibility, ignoreNG: true});
                     })
                     .catch(e => console.log(e));
+                })();
+                return;
+            }
+            m = text.match(`(みん(な|にゃ)の)?(${config.variables.food.good}|${config.variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?[？?]*`);
+            if (m) { // search
+                (async () => {
+                    const is_good = m[3].match(`(${config.variables.food.good})`) ? true : false;
+                    const search_query = {
+                        text: 'SELECT name FROM oishii_table WHERE good=$1 ORDER BY RANDOM() LIMIT 1',
+                        values: [is_good]
+                    };
+                    if (m[1]) search_query.text = 'SELECT name FROM oishii_table WHERE good=$1 AND learned=true ORDER BY RANDOM() LIMIT 1';
+
+                    psql.query(search_query)
+                        .then(res => {
+                            // console.dir(res);
+                            const row = res.rows[0];
+                            // console.dir(row);
+                            // const igt = is_good ? config.messages.food.good : config.messages.food.bad;
+                            console.log(`SEARCH: ${row.name} (${is_good})`);
+                            sendText({text: config.messages.food.search(row.name, is_good), reply_id: note_id, visibility: visibility});
+                        })
+                        .catch(e => console.error(e.stack));
                 })();
                 return;
             }
@@ -417,30 +440,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(`(みん(な|にゃ)の)?(${config.variables.food.good}|${config.variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?[？?]*`);
-            if (m) { // search
-                (async () => {
-                    const is_good = m[3].match(`(${config.variables.food.good})`) ? true : false;
-                    const search_query = {
-                        text: 'SELECT name FROM oishii_table WHERE good=$1 ORDER BY RANDOM() LIMIT 1',
-                        values: [is_good]
-                    };
-                    if (m[1]) search_query.text = 'SELECT name FROM oishii_table WHERE good=$1 AND learned=true ORDER BY RANDOM() LIMIT 1';
-
-                    psql.query(search_query)
-                        .then(res => {
-                            // console.dir(res);
-                            const row = res.rows[0];
-                            // console.dir(row);
-                            // const igt = is_good ? config.messages.food.good : config.messages.food.bad;
-                            console.log(`SEARCH: ${row.name} (${is_good})`);
-                            sendText({text: config.messages.food.search(row.name, is_good), reply_id: note_id, visibility: visibility});
-                        })
-                        .catch(e => console.error(e.stack));
-                })();
-                return;
-            }
-            m = text.match(/お?(腹|(な|にゃ)か|はら)([空すあ]い|([減へ][っり]))た?[！!]*/);
+            m = text.match(/お?(腹|(な|にゃ)か|はら)が?([空すあ]い|([減へ][っり]))た?[！!]*/);
             if (m) { // hungry
                 (async () => {
                     const search_query = {
@@ -471,7 +471,7 @@ ws.addEventListener('message', function(data){
                 sendText({text: pizzaText, reply_id: note_id, visibility: (visibility !== 'public' ? visibility : 'home'), ignoreNG: true});
                 return;
             }
-            m = text.match(/^\s*お?(寿司|すし)(握|にぎ)(って|れ)$/);
+            m = text.match(/^\s*お?(寿司|すし)を?(握|にぎ)(って|れ)/);
             if (m) { // sushi
                 console.log('COMMAND: sushi');
                 // 1～10個

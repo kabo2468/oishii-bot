@@ -62,7 +62,7 @@ module.exports = {
             deleteNum: 1000
         },
         post: {
-            probability: 0.3,
+            probability: 0.4,
             rateLimitSec: 60,
             rateLimitPost: 5
         }
