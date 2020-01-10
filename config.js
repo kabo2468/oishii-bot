@@ -27,10 +27,12 @@ module.exports = {
                 notFound: '見つかりませんでした。'
             },
             follow: {
+                done: 'フォローしました。',
                 already: '既にフォローしています。',
                 cant: 'フォローできませんでした。'
             },
             unfollow: {
+                done: 'フォロー解除しました。',
                 not: 'フォローしていません。',
                 cant: 'フォロー解除できませんでした。'
             }

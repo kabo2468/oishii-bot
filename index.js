@@ -101,22 +101,32 @@ ws.addEventListener('message', function(data){
     }
 
     if (json.type === 'api:ae2a63d4-7e17-41e1-b58c-f960becaab03') { // Follow Command
-        if (json.body.e.id === '35387507-38c7-4cb9-9197-300b93783fa0') { // ALREADY_FOLLOWING
-            sendText({text: config.messages.commands.follow.already, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+        if ('res' in json.body) {
+            sendText({text: config.messages.commands.follow.done, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
             return;
         } else {
-            sendText({text: config.messages.commands.follow.cant, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
-            return;
+            if (json.body.e.id === '35387507-38c7-4cb9-9197-300b93783fa0') { // ALREADY_FOLLOWING
+                sendText({text: config.messages.commands.follow.already, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+                return;
+            } else {
+                sendText({text: config.messages.commands.follow.cant, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+                return;
+            }
         }
     }
 
     if (json.type === 'api:8a06d0ae-b801-483b-9dc5-540865b348c9') { // Unfollow Command
-        if (json.body.e.id === '5dbf82f5-c92b-40b1-87d1-6c8c0741fd09') { // NOT_FOLLOWING
-            sendText({text: config.messages.commands.unfollow.not, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+        if ('res' in json.body) {
+            sendText({text: config.messages.commands.unfollow.done, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
             return;
         } else {
-            sendText({text: config.messages.commands.unfollow.cant, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
-            return;
+            if (json.body.e.id === '5dbf82f5-c92b-40b1-87d1-6c8c0741fd09') { // NOT_FOLLOWING
+                sendText({text: config.messages.commands.unfollow.not, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+                return;
+            } else {
+                sendText({text: config.messages.commands.unfollow.cant, user_id: json.body.body.id, visibility: json.body.body.visibility, ignoreNG: true});
+                return;
+            }
         }
     }
 
