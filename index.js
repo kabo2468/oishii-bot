@@ -115,6 +115,7 @@ ws.addEventListener('message', function(data){
             } else {
                 _t = config.messages.commands.follow.cant;
             }
+            followCount--;
         }
         sendText({text: _t, reply_id: commandPost.id, visibility: commandPost.visibility, ignoreNG: true});
         return;
@@ -130,6 +131,7 @@ ws.addEventListener('message', function(data){
             } else {
                 _t = config.messages.commands.unfollow.cant;
             }
+            followCount++;
         }
         sendText({text: _t, reply_id: commandPost.id, visibility: commandPost.visibility, ignoreNG: true});
         return;
@@ -531,7 +533,6 @@ ws.addEventListener('message', function(data){
                 return;
             }
         }
-        console.dir(json);
     }
 });
 
