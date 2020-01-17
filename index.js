@@ -23,7 +23,7 @@ const psql = new Client({
 
 let tlCount = 0;
 let pizzaText = '';
-config.messages.food.pizza.forEach(shop => {
+config.variables.food.pizza.forEach(shop => {
     pizzaText += `?[${shop.name}](${shop.url})\n`;
 });
 
@@ -501,7 +501,7 @@ ws.addEventListener('message', function(data){
                             console.log(`row: ${row}`);
                             const re = /\((.+),([tf])\)/;
                             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
-                            const good = row.match(re)[2];
+                            const good = row.match(re)[2] === 't' ? true : false;
                             // const text = `${name} とかどう？\n${good === 't' ? config.messages.food.good : config.messages.food.bad}よ`;
                             console.log(`HUNGRY: ${name} (${good})`);
                             sendText({text: config.messages.food.hungry(name, good), reply_id: note_id, visibility: visibility});
@@ -522,7 +522,19 @@ ws.addEventListener('message', function(data){
             if (m) { // sushi
                 console.log('COMMAND: sushi');
                 // 1～10個
-                const _t = getWord(config.messages.food.sushi).repeat(Math.floor(Math.random() * 10) + 1);
+                const _t = config.messages.food.sushi(Math.floor(Math.random() * 10) + 1);
+                sendText({text: _t, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                return;
+            }
+            m = text.match(/^\s*((何|なに|なん)か)?[食た]べる?(物|もの)(くれ|ちょうだい|頂戴|ください)/);
+            if (m) { // food
+                console.log('COMMAND: food');
+                // 1～5個
+                const num = Math.floor(Math.random() * 5) + 1;
+                let _t = '';
+                for (let i = 0; i < num; i++) {
+                    _t += getWord(config.messages.food.food);
+                }
                 sendText({text: _t, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
@@ -564,7 +576,7 @@ function sayFood() {
             console.log(`row: ${row}`);
             const re = /\((.+),([tf])\)/;
             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
-            const good = row.match(re)[2];
+            const good = row.match(re)[2] === 't' ? true : false;
             const text = config.messages.food.say(name, good);
             console.log(`POST: ${text}`);
             sendText({text: text});
