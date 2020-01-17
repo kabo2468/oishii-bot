@@ -6,9 +6,9 @@
   "dependencies": {
     "kuromoji": "^0.1.2",
     "moji": "^0.5.1",
-    "pg": "^7.12.1",
+    "pg": "^7.17.1",
     "reconnecting-websocket": "^4.2.0",
-    "ws": "^7.2.0"
+    "ws": "^7.2.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,7 +16,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^6.6.0"
+    "eslint": "^6.8.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.1",
