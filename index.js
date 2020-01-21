@@ -526,7 +526,7 @@ ws.addEventListener('message', function(data){
                 sendText({text: _t, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
-            m = text.match(/^\s*((何|なに|なん)か)?[食た]べる?(物|もの)(くれ|ちょうだい|頂戴|ください)/);
+            m = text.match(/^\s*((何|(な|にゃ)に|(な|にゃ)ん)か)?[食た]べる?(物|もの)(くれ|ちょうだい|頂戴|ください)/);
             if (m) { // food
                 console.log('COMMAND: food');
                 // 1～5個
