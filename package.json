@@ -8,6 +8,7 @@
     "moji": "^0.5.1",
     "pg": "^7.17.1",
     "reconnecting-websocket": "^4.2.0",
+    "uuid": "^3.4.0",
     "ws": "^7.2.1"
   },
   "scripts": {
