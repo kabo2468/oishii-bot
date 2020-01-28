@@ -295,7 +295,7 @@ ws.addEventListener('message', function(data){
 
             let m;
             // Commands
-            m = text.match(/^\s*\/help\s*$/);
+            m = text.match(/^\/help$/);
             if (m) { // help
                 console.log('COMMAND: help');
                 let _t = '';
@@ -305,14 +305,14 @@ ws.addEventListener('message', function(data){
                 sendText({text: `\`\`\`\n${_t}\`\`\``, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
-            m = text.match(/^\s*\/ping\s*$/);
-            if (m) { // ping
+            m = text.match(/^\/ping$/);
+            if (m) { // C: ping
                 console.log('COMMAND: ping');
                 sendText({text: config.messages.commands.ping, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
-            m = text.match(/^\s*\/info\s*$/);
-            if (m) { // info
+            m = text.match(/^\/info$/);
+            if (m) { // C: info
                 console.log('COMMAND: info');
                 psql.query('SELECT learned, count(learned) FROM oishii_table GROUP BY learned').then(res => {
                     const fl = res.rows[0].count;
@@ -324,8 +324,8 @@ ws.addEventListener('message', function(data){
                 });
                 return;
             }
-            m = text.match(/^\s*\/follow\s*$/);
-            if (m) { // follow
+            m = text.match(/^\/follow$/);
+            if (m) { // C: follow
                 console.log('COMMAND: follow');
                 commandPost.id = note_id;
                 commandPost.visibility = visibility;
@@ -343,8 +343,8 @@ ws.addEventListener('message', function(data){
                 console.log(`Now Following: ${followCount}`);
                 return;
             }
-            m = text.match(/^\s*\/unfollow\s*$/);
-            if (m) { // unfollow
+            m = text.match(/^\/unfollow$/);
+            if (m) { // C: unfollow
                 console.log('COMMAND: unfollow');
                 commandPost.id = note_id;
                 commandPost.visibility = visibility;
@@ -362,8 +362,8 @@ ws.addEventListener('message', function(data){
                 console.log(`Now Following: ${followCount}`);
                 return;
             }
-            m = text.match(/^\s*\/say\s*$/);
-            if (m) { // say
+            m = text.match(/^\/say$/);
+            if (m) { // C: say
                 console.log('COMMAND: say');
                 if (json.body.body.user.username === 'kabo') {
                     sayFood();
@@ -372,8 +372,8 @@ ws.addEventListener('message', function(data){
                 }
                 return;
             }
-            m = text.match(/^\s*\/delete (.+)\s*$/);
-            if (m) { // delete
+            m = text.match(/^\/delete (.+)$/);
+            if (m) { // C: delete
                 console.log('COMMAND: delete');
                 if (json.body.body.user.username === 'kabo') {
                     const query = {
