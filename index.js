@@ -12,6 +12,7 @@ const readline = require('readline');
 const uuid = require('uuid/v4');
 const kuromoji = require('kuromoji');
 const moji = require('moji');
+const ms = require('ms');
 const ReconnectingWebSocket = require('reconnecting-websocket');
 const ws_const = require('ws');
 const { Client } = require('pg');
@@ -551,17 +552,17 @@ ws.addEventListener('message', function(data){
 
 setInterval(() => {
     sayFood();
-}, 1000 * 60 * (process.env.INTERVAL_MIN || 60));
+}, ms(`${(process.env.INTERVAL_MIN || 60)}m`));
 
 setInterval(() => {
     // console.log(limit);
     limit = 0;
-}, 1000 * config.variables.post.rateLimitSec);
+}, ms(`${config.variables.post.rateLimitSec}s`));
 
 // 1時間毎にフォロー数を取得
 setInterval(() => {
     ws.send(JSON.stringify(followSendData));
-}, 1000 * 60 * 60);
+}, ms('1h'));
 
 
 function sayFood() {
