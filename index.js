@@ -168,26 +168,6 @@ ws.addEventListener('message', function(data){
             return;
         }
 
-        // heroku DB 制限
-        /*
-        psql.query('SELECT count(*) FROM oishii_table').then(res => {
-            const count = res.rows[0].count;
-            const db = variables.db;
-            if (Number(count) > db.deleteCountCond) { // json => variables.db.deleteCountCond件以上なら
-                const deleteQuery = {
-                    text: 'DELETE FROM oishii_table WHERE name in (SELECT name FROM oishii_table WHERE learned = false ORDER BY RANDOM() LIMIT $1)',
-                    values: [ db.deleteNum ]
-                };
-                psql.query(deleteQuery).then(() => {
-                    console.log(`DELETE: ${count} > ${db.deleteCountCond} -${db.deleteNum} => ${count - db.deleteNum}`);
-                    sendText({text: messages.deleteDB(db.deleteCountCond, db.deleteNum)});
-                })
-                .catch(e => console.log(e));
-            }
-        })
-        .catch(e => console.log(e));
-        */
-
         builder.build((err, tokenizer) => {
             if (err) throw err;
 
@@ -516,7 +496,6 @@ ws.addEventListener('message', function(data){
                             const re = /\((.+),([tf])\)/;
                             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
                             const good = row.match(re)[2] === 't' ? true : false;
-                            // const text = `${name} とかどう？\n${good === 't' ? messages.food.good : messages.food.bad}よ`;
                             console.log(`HUNGRY: ${name} (${good})`);
                             sendText({text: messages.food.hungry(name, good), reply_id: note_id, visibility: visibility});
                         })
