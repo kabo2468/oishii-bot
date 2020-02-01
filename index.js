@@ -52,7 +52,7 @@ rl.on('line', line => {
 
 psql.connect();
 
-const ws = new ReconnectingWebSocket(`ws://${process.env.MISSKEY_URL}/streaming?i=${process.env.API_KEY}`, [], {
+const ws = new ReconnectingWebSocket(`wss://${process.env.MISSKEY_URL}/streaming?i=${process.env.API_KEY}`, [], {
     WebSocket: ws_const
 });
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
@@ -652,7 +652,7 @@ function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = fa
 
 async function fileUpload(file, filename, contentType) {
     const res = await request.post({
-        url: `http://${process.env.MISSKEY_URL}/api/drive/files/create`,
+        url: `https://${process.env.MISSKEY_URL}/api/drive/files/create`,
         formData: {
             i: process.env.API_KEY,
             file: {
