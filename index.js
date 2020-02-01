@@ -52,7 +52,7 @@ rl.on('line', line => {
 
 psql.connect();
 
-const ws = new ReconnectingWebSocket(`wss://${process.env.MISSKEY_URL}/streaming?i=${process.env.API_KEY}`, [], {
+const ws = new ReconnectingWebSocket(`ws://${process.env.MISSKEY_URL}/streaming?i=${process.env.API_KEY}`, [], {
     WebSocket: ws_const
 });
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
@@ -412,15 +412,18 @@ ws.addEventListener('message', function(data){
                             TT: Number(res.rows[0].tt),
                             FT: Number(res.rows[0].ft)
                         };
+                        console.log('Generating Chart.');
                         return genChart(1024, 1024, data);
                     }).then(image => {
+                        console.log('Uploading Chart.');
                         const date = new Date();
-                        return fileUpload(image, `${date.getFullYear}-${date.getMonth + 1}-${date.getDate}-${date.getHours}-${date.getMinutes}-${date.getSeconds}.png`, 'image/png');
+                        return fileUpload(image, `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`, 'image/png');
                     }).then(res => {
-                        sendText({text: 'test', ignoreNG: true, files: [ res ]});
+                        console.log('Send Chart.');
+                        // sendText({text: 'test', ignoreNG: true, files: [ res.id ]});
                     });
                     return;
-                });
+                })();
             }
 
             // Text
@@ -649,7 +652,7 @@ function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = fa
 
 async function fileUpload(file, filename, contentType) {
     const res = await request.post({
-        url: `https://${process.env.MISSKEY_URL}/api/drive/files/create`,
+        url: `http://${process.env.MISSKEY_URL}/api/drive/files/create`,
         formData: {
             i: process.env.API_KEY,
             file: {

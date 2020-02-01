@@ -1,6 +1,6 @@
 const { CanvasRenderService } = require('chartjs-node-canvas');
 
-export async function genChart(width, height, data) {
+async function genChart(width, height, data) {
     const total = data.TF + data.FF + data.TT + data.FT;
 
     const bgColors = [
@@ -78,3 +78,7 @@ export async function genChart(width, height, data) {
 
     return image;
 }
+
+module.exports = {
+    genChart
+};
