@@ -4,17 +4,20 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "chart.js": "^2.9.3",
+    "chartjs-node-canvas": "^2.4.2",
     "kuromoji": "^0.1.2",
     "moji": "^0.5.1",
-    "pg": "^7.17.1",
+    "ms": "^2.1.2",
+    "pg": "^7.18.1",
     "reconnecting-websocket": "^4.2.0",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.8",
+    "uuid": "^3.4.0",
     "ws": "^7.2.1"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
   "license": "MIT",
+  "private": true,
   "devDependencies": {
     "eslint": "^6.8.0"
   },

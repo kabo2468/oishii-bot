@@ -1,6 +1,7 @@
 const error = [];
 if (!process.env.DATABASE_URL) error.push('[ERROR]:You must set DATABASE_URL');
-if (!process.env.STREAMING_URL) error.push('[ERROR]:You must set STREAMING_URL');
+if (!process.env.MISSKEY_URL) error.push('[ERROR]:You must set MISSKEY_URL');
+if (!process.env.API_KEY) error.push('[ERROR]:You must set API_KEY');
 if (!process.env.USER_ID) error.push('[ERROR]:You must set USER_ID');
 if (error.length > 0) {
     for (const err in error) console.log(error[err]);
@@ -9,13 +10,17 @@ if (error.length > 0) {
 
 const fs = require('fs');
 const readline = require('readline');
+const uuid = require('uuid/v4');
 const kuromoji = require('kuromoji');
 const moji = require('moji');
+const ms = require('ms');
 const ReconnectingWebSocket = require('reconnecting-websocket');
 const ws_const = require('ws');
 const { Client } = require('pg');
+const request = require('request-promise-native');
 const config = require('./config.js');
 const { getWord } = require('./config.js');
+const { genChart } = require('./chart.js');
 const psql = new Client({
     ssl: false,
     connectionString: process.env.DATABASE_URL
@@ -47,7 +52,7 @@ rl.on('line', line => {
 
 psql.connect();
 
-const ws = new ReconnectingWebSocket(process.env.STREAMING_URL, [], {
+const ws = new ReconnectingWebSocket(`wss://${process.env.MISSKEY_URL}/streaming?i=${process.env.API_KEY}`, [], {
     WebSocket: ws_const
 });
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
@@ -293,7 +298,7 @@ ws.addEventListener('message', function(data){
 
             let m;
             // Commands
-            m = text.match(/^\s*\/help\s*$/);
+            m = text.match(/^\/help$/);
             if (m) { // help
                 console.log('COMMAND: help');
                 let _t = '';
@@ -303,14 +308,14 @@ ws.addEventListener('message', function(data){
                 sendText({text: `\`\`\`\n${_t}\`\`\``, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
-            m = text.match(/^\s*\/ping\s*$/);
-            if (m) { // ping
+            m = text.match(/^\/ping$/);
+            if (m) { // C: ping
                 console.log('COMMAND: ping');
                 sendText({text: config.messages.commands.ping, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
-            m = text.match(/^\s*\/info\s*$/);
-            if (m) { // info
+            m = text.match(/^\/info$/);
+            if (m) { // C: info
                 console.log('COMMAND: info');
                 psql.query('SELECT learned, count(learned) FROM oishii_table GROUP BY learned').then(res => {
                     const fl = res.rows[0].count;
@@ -322,8 +327,8 @@ ws.addEventListener('message', function(data){
                 });
                 return;
             }
-            m = text.match(/^\s*\/follow\s*$/);
-            if (m) { // follow
+            m = text.match(/^\/follow$/);
+            if (m) { // C: follow
                 console.log('COMMAND: follow');
                 commandPost.id = note_id;
                 commandPost.visibility = visibility;
@@ -341,8 +346,8 @@ ws.addEventListener('message', function(data){
                 console.log(`Now Following: ${followCount}`);
                 return;
             }
-            m = text.match(/^\s*\/unfollow\s*$/);
-            if (m) { // unfollow
+            m = text.match(/^\/unfollow$/);
+            if (m) { // C: unfollow
                 console.log('COMMAND: unfollow');
                 commandPost.id = note_id;
                 commandPost.visibility = visibility;
@@ -360,8 +365,8 @@ ws.addEventListener('message', function(data){
                 console.log(`Now Following: ${followCount}`);
                 return;
             }
-            m = text.match(/^\s*\/say\s*$/);
-            if (m) { // say
+            m = text.match(/^\/say$/);
+            if (m) { // C: say
                 console.log('COMMAND: say');
                 if (json.body.body.user.username === 'kabo') {
                     sayFood();
@@ -370,8 +375,8 @@ ws.addEventListener('message', function(data){
                 }
                 return;
             }
-            m = text.match(/^\s*\/delete (.+)\s*$/);
-            if (m) { // delete
+            m = text.match(/^\/delete (.+)$/);
+            if (m) { // C: delete
                 console.log('COMMAND: delete');
                 if (json.body.body.user.username === 'kabo') {
                     const query = {
@@ -392,6 +397,33 @@ ws.addEventListener('message', function(data){
                     sendText({text: config.messages.commands.denied, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 }
                 return;
+            }
+            m = text.match(/^\/chart$/);
+            if (m) { // C: chart
+                console.log('COMMAND: chart');
+                (async () => {
+                    const query = {
+                        text: 'SELECT COUNT(good = true AND learned = false OR NULL) as TF, COUNT(good = false AND learned = false OR NULL) as FF, COUNT(good = true AND learned = true OR NULL) as TT, COUNT(good=false AND learned=true OR NULL) as FT from oishii_table'
+                    };
+                    psql.query(query).then(res => {
+                        const data = {
+                            TF: Number(res.rows[0].tf),
+                            FF: Number(res.rows[0].ff),
+                            TT: Number(res.rows[0].tt),
+                            FT: Number(res.rows[0].ft)
+                        };
+                        console.log('Generating Chart.');
+                        return genChart(1024, 1024, data);
+                    }).then(image => {
+                        console.log('Uploading Chart.');
+                        const date = new Date();
+                        return fileUpload(image, `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`, 'image/png');
+                    }).then(res => {
+                        console.log('Send Chart.');
+                        // sendText({text: 'test', ignoreNG: true, files: [ res.id ]});
+                    });
+                    return;
+                })();
             }
 
             // Text
@@ -550,17 +582,17 @@ ws.addEventListener('message', function(data){
 
 setInterval(() => {
     sayFood();
-}, 1000 * 60 * (process.env.INTERVAL_MIN || 60));
+}, ms(`${(process.env.INTERVAL_MIN || 60)}m`));
 
 setInterval(() => {
     // console.log(limit);
     limit = 0;
-}, 1000 * config.variables.post.rateLimitSec);
+}, ms(`${config.variables.post.rateLimitSec}s`));
 
 // 1時間毎にフォロー数を取得
 setInterval(() => {
     ws.send(JSON.stringify(followSendData));
-}, 1000 * 60 * 60);
+}, ms('1h'));
 
 
 function sayFood() {
@@ -585,7 +617,7 @@ function sayFood() {
     limit++;
 }
 
-function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = false}) {
+function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = false, files}) {
     const _t = text.replace(/\\\\/g, '\\');
     if (!ignoreNG) {
         if (isNGWord(_t)) {
@@ -612,19 +644,28 @@ function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = fa
         sendData.body.data.visibility = 'specified';
         sendData.body.data.visibleUserIds = user_id;
     }
+    if (files) {
+        sendData.body.data.fileIds = files;
+    }
     ws.send(JSON.stringify(sendData));
 }
 
-function uuid() {
-    let uuid = '', i, random;
-    for (i = 0; i < 32; i++) {
-        random = Math.random() * 16 | 0;
-        if (i == 8 || i == 12 || i == 16 || i == 20) {
-            uuid += '-';
-        }
-        uuid += (i == 12 ? 4 : (i == 16 ? (random & 3 | 8) : random)).toString(16);
-    }
-    return uuid;
+async function fileUpload(file, filename, contentType) {
+    const res = await request.post({
+        url: `https://${process.env.MISSKEY_URL}/api/drive/files/create`,
+        formData: {
+            i: process.env.API_KEY,
+            file: {
+                value: file,
+                options: {
+                    filename: filename,
+                    contentType: contentType
+                }
+            }
+        },
+        json: true
+    });
+    return res;
 }
 
 function getExists(text) {
