@@ -1,6 +1,7 @@
 const error = [];
 if (!process.env.DATABASE_URL) error.push('[ERROR]:You must set DATABASE_URL');
-if (!process.env.STREAMING_URL) error.push('[ERROR]:You must set STREAMING_URL');
+if (!process.env.MISSKEY_URL) error.push('[ERROR]:You must set MISSKEY_URL');
+if (!process.env.API_KEY) error.push('[ERROR]:You must set API_KEY');
 if (!process.env.USER_ID) error.push('[ERROR]:You must set USER_ID');
 if (error.length > 0) {
     for (const err in error) console.log(error[err]);
@@ -16,8 +17,10 @@ const ms = require('ms');
 const ReconnectingWebSocket = require('reconnecting-websocket');
 const ws_const = require('ws');
 const { Client } = require('pg');
+const request = require('request-promise-native');
 const config = require('./config.js');
 const { getWord } = require('./config.js');
+const { genChart } = require('./chart.js');
 const psql = new Client({
     ssl: false,
     connectionString: process.env.DATABASE_URL
@@ -49,7 +52,7 @@ rl.on('line', line => {
 
 psql.connect();
 
-const ws = new ReconnectingWebSocket(process.env.STREAMING_URL, [], {
+const ws = new ReconnectingWebSocket(`wss://${process.env.MISSKEY_URL}/streaming?i=${process.env.API_KEY}`, [], {
     WebSocket: ws_const
 });
 const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
@@ -395,6 +398,30 @@ ws.addEventListener('message', function(data){
                 }
                 return;
             }
+            m = text.match(/^\/chart$/);
+            if (m) { // C: chart
+                console.log('COMMAND: chart');
+                (async () => {
+                    const query = {
+                        text: 'SELECT COUNT(good = true AND learned = false OR NULL) as TF, COUNT(good = false AND learned = false OR NULL) as FF, COUNT(good = true AND learned = true OR NULL) as TT, COUNT(good=false AND learned=true OR NULL) as FT from oishii_table'
+                    };
+                    psql.query(query).then(res => {
+                        const data = {
+                            TF: Number(res.rows[0].tf),
+                            FF: Number(res.rows[0].ff),
+                            TT: Number(res.rows[0].tt),
+                            FT: Number(res.rows[0].ft)
+                        };
+                        return genChart(1024, 1024, data);
+                    }).then(image => {
+                        const date = new Date();
+                        return fileUpload(image, `${date.getFullYear}-${date.getMonth + 1}-${date.getDate}-${date.getHours}-${date.getMinutes}-${date.getSeconds}.png`, 'image/png');
+                    }).then(res => {
+                        sendText({text: 'test', ignoreNG: true, files: [ res ]});
+                    });
+                    return;
+                });
+            }
 
             // Text
             m = text.match(`(.+)(は|って)(${config.variables.food.good}|${config.variables.food.bad})の?[？?]+`);
@@ -587,7 +614,7 @@ function sayFood() {
     limit++;
 }
 
-function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = false}) {
+function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = false, files}) {
     const _t = text.replace(/\\\\/g, '\\');
     if (!ignoreNG) {
         if (isNGWord(_t)) {
@@ -614,7 +641,28 @@ function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = fa
         sendData.body.data.visibility = 'specified';
         sendData.body.data.visibleUserIds = user_id;
     }
+    if (files) {
+        sendData.body.data.fileIds = files;
+    }
     ws.send(JSON.stringify(sendData));
+}
+
+async function fileUpload(file, filename, contentType) {
+    const res = await request.post({
+        url: `https://${process.env.MISSKEY_URL}/api/drive/files/create`,
+        formData: {
+            i: process.env.API_KEY,
+            file: {
+                value: file,
+                options: {
+                    filename: filename,
+                    contentType: contentType
+                }
+            }
+        },
+        json: true
+    });
+    return res;
 }
 
 function getExists(text) {
