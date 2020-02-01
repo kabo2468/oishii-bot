@@ -18,7 +18,9 @@ module.exports = {
                 '/info: (今のところは)DBのレコード数を表示する。',
                 '/say: なにか言わせる。(オーナーのみ)',
                 '/follow: フォローする。',
-                '/unfollow: フォローを解除する。'
+                '/unfollow: フォローを解除する。',
+                '/delete: 削除する。（オーナーのみ）',
+                '/chart: DBのレコード数をチャートにする。（オーナーのみ）'
             ],
             ping: 'ぽん！',
             nullpo: 'ガッ',
@@ -35,7 +37,8 @@ module.exports = {
                 done: 'フォロー解除しました。',
                 not: 'フォローしていません。',
                 cant: 'フォロー解除できませんでした。'
-            }
+            },
+            chart: 'DBのレコード数です。'
         },
         food: {
             good: goodText,

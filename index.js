@@ -401,29 +401,12 @@ ws.addEventListener('message', function(data){
             m = text.match(/^\/chart$/);
             if (m) { // C: chart
                 console.log('COMMAND: chart');
-                (async () => {
-                    const query = {
-                        text: 'SELECT COUNT(good = true AND learned = false OR NULL) as TF, COUNT(good = false AND learned = false OR NULL) as FF, COUNT(good = true AND learned = true OR NULL) as TT, COUNT(good=false AND learned=true OR NULL) as FT from oishii_table'
-                    };
-                    psql.query(query).then(res => {
-                        const data = {
-                            TF: Number(res.rows[0].tf),
-                            FF: Number(res.rows[0].ff),
-                            TT: Number(res.rows[0].tt),
-                            FT: Number(res.rows[0].ft)
-                        };
-                        console.log('Generating Chart.');
-                        return genChart(1024, 1024, data);
-                    }).then(image => {
-                        console.log('Uploading Chart.');
-                        const date = new Date();
-                        return fileUpload(image, `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`, 'image/png');
-                    }).then(res => {
-                        console.log('Send Chart.');
-                        // sendText({text: 'test', ignoreNG: true, files: [ res.id ]});
-                    });
-                    return;
-                })();
+                if (json.body.body.user.username === 'kabo') {
+                    sendChart();
+                } else {
+                    sendText({text: config.messages.commands.denied, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                }
+                return;
             }
 
             // Text
@@ -594,6 +577,30 @@ setInterval(() => {
     ws.send(JSON.stringify(followSendData));
 }, ms('1h'));
 
+
+function sendChart() {
+    const query = {
+        text: 'SELECT COUNT(good = true AND learned = false OR NULL) as TF, COUNT(good = false AND learned = false OR NULL) as FF, COUNT(good = true AND learned = true OR NULL) as TT, COUNT(good=false AND learned=true OR NULL) as FT from oishii_table'
+    };
+    psql.query(query).then(res => {
+        const data = {
+            TF: Number(res.rows[0].tf),
+            FF: Number(res.rows[0].ff),
+            TT: Number(res.rows[0].tt),
+            FT: Number(res.rows[0].ft)
+        };
+        console.log('Generating Chart.');
+        return genChart(1024, 1024, data);
+    }).then(image => {
+        console.log('Uploading Chart.');
+        const date = new Date();
+        return fileUpload(image, `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`, 'image/png');
+    }).then(res => {
+        console.log('Send Chart.');
+        sendText({text: config.messages.commands.chart, ignoreNG: true, files: [ res.id ]});
+    });
+    return;
+}
 
 function sayFood() {
     if (limit > config.variables.post.rateLimitPost - 1) return;

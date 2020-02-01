@@ -4,8 +4,8 @@ async function genChart(width, height, data) {
     const total = data.TF + data.FF + data.TT + data.FT;
 
     const bgColors = [
-        'rgba(255, 99, 132, 1)',
-        'rgba(54, 162, 235, 1)'
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 99, 132, 1)'
     ];
     const configuration = {
         type: 'doughnut',
