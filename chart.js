@@ -5,19 +5,18 @@ async function genChart(width, height, data) {
 
     const bgColors = [
         'rgba(255, 99, 132, 1)',
-        'rgba(255, 81, 235, 0.5)',
         'rgba(54, 162, 235, 1)'
     ];
     const configuration = {
         type: 'doughnut',
         data: {
-            labels: ['Good', 'Not Learned', 'Bad'],
+            labels: ['Good', 'Bad'],
             datasets: [{
-                data: [data.TF + data.TT, 0, data.FF + data.FT],
+                data: [data.TF + data.TT, data.FF + data.FT],
                 backgroundColor: bgColors
             },
             {
-                data: [data.TT, data.TF + data.FF, data.FT],
+                data: [data.TT, data.FT],
                 backgroundColor: bgColors
             }]
         }
@@ -33,7 +32,7 @@ async function genChart(width, height, data) {
             afterDatasetsDraw: function(chart) {
                 const ctx = chart.ctx;
                 const fontStyle = 'normal';
-                const fontFamily = 'Sans';
+                const fontFamily = ChartJS.defaults.global.defaultFontFamily;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
