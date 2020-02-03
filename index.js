@@ -428,7 +428,7 @@ ws.addEventListener('message', function(data){
             m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?[？?]*`);
             if (m) { // search
                 (async () => {
-                    const is_good = m[3].match(`(${variables.food.good})`) ? true : false;
+                    const is_good = m[3].match(`${variables.food.good}`) ? true : false;
                     const search_query = {
                         text: 'SELECT name FROM oishii_table WHERE good=$1 ORDER BY RANDOM() LIMIT 1',
                         values: [is_good]
@@ -458,7 +458,7 @@ ws.addEventListener('message', function(data){
                         console.log(`NG WORD: ${findNGWord(text)}`);
                         return;
                     }
-                    const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
+                    const is_good = m[2].match(`${variables.food.good}`) ? true : false;
                     const isExists = await getExists(text);
                     if (isExists) {
                         const update_query = {
