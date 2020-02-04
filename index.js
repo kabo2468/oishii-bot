@@ -387,6 +387,36 @@ ws.addEventListener('message', function(data){
                 }
                 return;
             }
+            m = text.match(/^\/hiragana$/);
+            if (m) { // C: hiragana
+                console.log('COMMAND: hiragana');
+                if (json.body.body.user.username === 'kabo') {
+                    const query = {
+                        text: 'SELECT count(*) FROM oishii_table WHERE name ~ \'[\u3041-\u3096]+\''
+                    };
+                    psql.query(query).then(res => {
+                        console.log(`hiragana: ${res.rows[0].count}`);
+                    });
+                } else {
+                    sendText({text: messages.commands.denied, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                }
+                return;
+            }
+            m = text.match(/^\/katakana$/);
+            if (m) { // C: katakana
+                console.log('COMMAND: katakana');
+                if (json.body.body.user.username === 'kabo') {
+                    const query = {
+                        text: 'SELECT count(*) FROM oishii_table WHERE name ~ \'[\u30A1-\u30FA]+\''
+                    };
+                    psql.query(query).then(res => {
+                        console.log(`katakana: ${res.rows[0].count}`);
+                    });
+                } else {
+                    sendText({text: messages.commands.denied, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                }
+                return;
+            }
 
             // Text
             m = text.match(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})の?[？?]+`);
