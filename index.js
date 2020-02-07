@@ -674,7 +674,9 @@ function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = fa
     if (files) {
         sendData.body.data.fileIds = files;
     }
-    ws.send(JSON.stringify(sendData));
+    setTimeout(() => {
+        ws.send(JSON.stringify(sendData));
+    }, ms('1s'));
 }
 
 async function fileUpload(file, filename, contentType) {
