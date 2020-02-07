@@ -545,7 +545,7 @@ ws.addEventListener('message', function(data){
             if (m) { // sushi
                 console.log('COMMAND: sushi');
                 // 1～10個
-                const _t = messages.food.sushi(Math.floor(Math.random() * 10) + 1);
+                const _t = getWord(messages.food.sushi(Math.floor(Math.random() * 10) + 1));
                 sendText({text: _t, reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
@@ -554,11 +554,11 @@ ws.addEventListener('message', function(data){
                 console.log('COMMAND: food');
                 // 1～5個
                 const num = Math.floor(Math.random() * 5) + 1;
-                let _t = '';
+                let foods = '';
                 for (let i = 0; i < num; i++) {
-                    _t += getWord(messages.food.food);
+                    foods += getWord(variables.food.food);
                 }
-                sendText({text: _t, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                sendText({text: getWord(messages.food.food(foods)), reply_id: note_id, visibility: visibility, ignoreNG: true});
                 return;
             }
             m = text.match(/^\s*ぬるぽ\s*$/);
