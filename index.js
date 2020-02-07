@@ -59,8 +59,6 @@ const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
 const timelineData = {
     type: "connect",
     body: {
-        // channel: "localTimeline",
-        // channel: "hybridTimeline",
         channel: "homeTimeline",
         id: "1803ad27-a839-4eb6-ac74-97677ee0a055"
     }
@@ -100,7 +98,6 @@ ws.addEventListener('close', function() {
 });
 
 ws.addEventListener('message', function(data){
-    // console.log('----------Start----------');
     const json = JSON.parse(data.data);
 
     if (json.type === 'api:7e5f734f-920c-43e2-ae2c-3dcff866f2f6') { // Follow Count
@@ -217,7 +214,7 @@ ws.addEventListener('message', function(data){
                 if (Math.random() < variables.post.probability) {
                     const _time = 1000 * Math.random() * 10 + 10;
                     setTimeout(sayFood, _time);
-                    console.log(`TLCount Posted. After ${_time}ms`);
+                    console.log(`Posted by TLCount. After ${_time}ms`);
                 }
                 tlCount = 0;
             }
