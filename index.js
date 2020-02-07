@@ -159,6 +159,7 @@ ws.addEventListener('message', function(data){
         }
 
         if (text.match(/^[@＠](ピザ|ぴざ)$/)) {
+            if (json.body.body.replyId !== null) return;
             console.log('TL: PIZZA');
             const visibility = json.body.body.visibility;
             sendText({text: pizzaText, reply_id: json.body.body.id, visibility: (visibility !== 'public' ? visibility : 'home')});
