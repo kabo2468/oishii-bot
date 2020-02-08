@@ -633,7 +633,7 @@ function sayFood() {
             const good = row.match(re)[2] === 't' ? true : false;
             const text = messages.food.say(name, good);
             console.log(`POST: ${text}`);
-            sendText({text: text});
+            sendText({text});
         })
         .catch(e => console.error(e.stack));
     limit++;
