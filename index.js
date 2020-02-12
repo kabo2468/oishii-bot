@@ -424,6 +424,31 @@ ws.addEventListener('message', function(data){
                 }
                 return;
             }
+            m = text.match(/^\/file (.+)$/);
+            if (m) { // C: file
+                console.log('COMMAND: file');
+                if (json.body.body.user.username === 'kabo') {
+                    let isExists = false;
+                    switch (m[1]) {
+                        case 'create':
+                            fs.writeFile('testFile.txt', 'わーーーーーーーーーーーーーーー', err => {
+                                if (err) throw err;
+                            });
+                            console.log('File Created.');
+                            break;
+                        case 'exist':
+                            try {
+                                fs.statSync('testFile.txt');
+                                isExists = true;
+                            } catch (e) {
+                                isExists = false;
+                            }
+                            console.log(`isExists: ${isExists}`);
+                            break;
+                    }
+                }
+                return;
+            }
 
             // Text
             m = text.match(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})の?[？?]+`);
