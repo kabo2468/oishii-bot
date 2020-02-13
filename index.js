@@ -49,6 +49,13 @@ rl.on('line', line => {
     }
 });
 
+// バレンタイン2020
+const valentineFile = './valentine2020.json';
+if (!fs.existsSync(valentineFile)) {
+    console.log('"valentine2020.json" does not exist. Create file.');
+    fs.writeFileSync(valentineFile, '[]');
+}
+
 psql.connect();
 
 const ws = new ReconnectingWebSocket(`wss://${process.env.MISSKEY_URL}/streaming?i=${process.env.API_KEY}`, [], {
@@ -424,31 +431,6 @@ ws.addEventListener('message', function(data){
                 }
                 return;
             }
-            m = text.match(/^\/file (.+)$/);
-            if (m) { // C: file
-                console.log('COMMAND: file');
-                if (json.body.body.user.username === 'kabo') {
-                    let isExists = false;
-                    switch (m[1]) {
-                        case 'create':
-                            fs.writeFile('testFile.txt', 'わーーーーーーーーーーーーーーー', err => {
-                                if (err) throw err;
-                            });
-                            console.log('File Created.');
-                            break;
-                        case 'exist':
-                            try {
-                                fs.statSync('testFile.txt');
-                                isExists = true;
-                            } catch (e) {
-                                isExists = false;
-                            }
-                            console.log(`isExists: ${isExists}`);
-                            break;
-                    }
-                }
-                return;
-            }
 
             // Text
             m = text.match(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})の?[？?]+`);
@@ -487,7 +469,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?[？?]*`);
+            m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?`);
             if (m) { // search
                 (async () => {
                     const is_good = m[3].match(`${variables.food.good}`) ? true : false;
@@ -510,7 +492,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?[！!]*`);
+            m = text.match(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?`);
             if (m) { // learn
                 (async () => {
                     const text = replaceSpace(m[1]);
@@ -543,7 +525,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(/お?(腹|(な|にゃ)か|はら)が?([空すあ]い|([減へ][っり]))た?[！!]*/);
+            m = text.match(/お?(腹|(な|にゃ)か|はら)が?([空すあ]い|([減へ][っり]))た?/);
             if (m) { // hungry
                 (async () => {
                     const search_query = {
@@ -563,6 +545,66 @@ ws.addEventListener('message', function(data){
                         })
                         .catch(e => console.error(e.stack));
                 })();
+                return;
+            }
+            m = text.match(/^\s*チョコ(レート)?を?(あげる|くれ|ちょうだい|頂戴|ください)/);
+            if (m) { // chocolate
+                console.log('COMMAND: CHOCOLATE');
+                const now = Date.now();
+                if (new Date(2020, 1, 14, 0, 0, 0).getTime() > now || now > new Date(2020, 1, 15, 0, 0, 0).getTime()) {
+                    sendText({text: messages.food.valentine.notDay, reply_id: note_id, visibility, ignoreNG: true});
+                    return;
+                }
+                const data = JSON.parse(fs.readFileSync(valentineFile));
+                const userId = json.body.body.userId;
+                const given = m[2] === 'あげる' ? true : false;
+                const user = data.find(obj => obj.userId === userId);
+                if (user) { // already
+                    if (given) { // 受け取った
+                        console.log('chocolate given');
+                        if (user.count.get < 1) { //まだ受け取ったことがない
+                            console.log('first');
+                            sendText({text: messages.food.valentine.get.thx, reply_id: note_id, visibility, ignoreNG: true});
+                        } else {
+                            console.log('again');
+                            sendText({text: messages.food.valentine.get.again, reply_id: note_id, visibility, ignoreNG: true});
+                        }
+                        user.count.get++;
+                    } else { // 渡した
+                        console.log('chocolate got');
+                        const chocolate = getWord(variables.food.chocolate);
+                        if (user.count.give < 1) { //まだ渡したことがない
+                            console.log('first');
+                            sendText({text: messages.food.valentine.give.give(chocolate), reply_id: note_id, visibility, ignoreNG: true});
+                        } else {
+                            console.log('again');
+                            sendText({text: messages.food.valentine.give.again(chocolate), reply_id: note_id, visibility, ignoreNG: true});
+                        }
+                        user.count.give++;
+                    }
+                } else { // not yet
+                    const obj = {
+                        userId: userId,
+                        count: {
+                            give: 0,
+                            get: 0
+                        }
+                    };
+                    if (given) { // 受け取った
+                        console.log('chocolate given');
+                        console.log('first');
+                        obj.count.get = 1;
+                        sendText({text: messages.food.valentine.get.thx, reply_id: note_id, visibility, ignoreNG: true});
+                    } else { // 渡す
+                        console.log('chocolate got');
+                        console.log('first');
+                        obj.count.give = 1;
+                        const chocolate = getWord(variables.food.chocolate);
+                        sendText({text: messages.food.valentine.give.give(chocolate), reply_id: note_id, visibility, ignoreNG: true});
+                    }
+                    data.push(obj);
+                }
+                fs.writeFileSync(valentineFile, JSON.stringify(data));
                 return;
             }
             // option
