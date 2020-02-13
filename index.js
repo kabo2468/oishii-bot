@@ -66,8 +66,6 @@ const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
 const timelineData = {
     type: "connect",
     body: {
-        // channel: "localTimeline",
-        // channel: "hybridTimeline",
         channel: "homeTimeline",
         id: "1803ad27-a839-4eb6-ac74-97677ee0a055"
     }
@@ -107,7 +105,6 @@ ws.addEventListener('close', function() {
 });
 
 ws.addEventListener('message', function(data){
-    // console.log('----------Start----------');
     const json = JSON.parse(data.data);
 
     if (json.type === 'api:7e5f734f-920c-43e2-ae2c-3dcff866f2f6') { // Follow Count
@@ -169,31 +166,12 @@ ws.addEventListener('message', function(data){
         }
 
         if (text.match(/^[@＠](ピザ|ぴざ)$/)) {
+            if (json.body.body.replyId !== null) return;
             console.log('TL: PIZZA');
             const visibility = json.body.body.visibility;
             sendText({text: pizzaText, reply_id: json.body.body.id, visibility: (visibility !== 'public' ? visibility : 'home')});
             return;
         }
-
-        // heroku DB 制限
-        /*
-        psql.query('SELECT count(*) FROM oishii_table').then(res => {
-            const count = res.rows[0].count;
-            const db = variables.db;
-            if (Number(count) > db.deleteCountCond) { // json => variables.db.deleteCountCond件以上なら
-                const deleteQuery = {
-                    text: 'DELETE FROM oishii_table WHERE name in (SELECT name FROM oishii_table WHERE learned = false ORDER BY RANDOM() LIMIT $1)',
-                    values: [ db.deleteNum ]
-                };
-                psql.query(deleteQuery).then(() => {
-                    console.log(`DELETE: ${count} > ${db.deleteCountCond} -${db.deleteNum} => ${count - db.deleteNum}`);
-                    sendText({text: messages.deleteDB(db.deleteCountCond, db.deleteNum)});
-                })
-                .catch(e => console.log(e));
-            }
-        })
-        .catch(e => console.log(e));
-        */
 
         builder.build((err, tokenizer) => {
             if (err) throw err;
@@ -244,7 +222,7 @@ ws.addEventListener('message', function(data){
                 if (Math.random() < variables.post.probability) {
                     const _time = 1000 * Math.random() * 10 + 10;
                     setTimeout(sayFood, _time);
-                    console.log(`TLCount Posted. After ${_time}ms`);
+                    console.log(`Posted by TLCount. After ${_time}ms`);
                 }
                 tlCount = 0;
             }
@@ -311,13 +289,13 @@ ws.addEventListener('message', function(data){
                 for (const command in messages.commands.help) {
                     _t += `${messages.commands.help[command]}\n`;
                 }
-                sendText({text: `\`\`\`\n${_t}\`\`\``, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                sendText({text: `\`\`\`\n${_t}\`\`\``, reply_id: note_id, visibility, ignoreNG: true});
                 return;
             }
             m = text.match(/^\/ping$/);
             if (m) { // C: ping
                 console.log('COMMAND: ping');
-                sendText({text: messages.commands.ping, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                sendText({text: messages.commands.ping, reply_id: note_id, visibility, ignoreNG: true});
                 return;
             }
             m = text.match(/^\/info$/);
@@ -329,7 +307,7 @@ ws.addEventListener('message', function(data){
                     const all = Number(fl) + Number(tl);
                     const text = `Records: ${all.toString()} (Learned: ${tl})`;
                     console.log(`INFO: [ ${text} ]`);
-                    sendText({text: text, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                    sendText({text, reply_id: note_id, visibility, ignoreNG: true});
                 });
                 return;
             }
@@ -377,7 +355,7 @@ ws.addEventListener('message', function(data){
                 if (json.body.body.user.username === 'kabo') {
                     sayFood();
                 } else {
-                    sendText({text: messages.commands.denied, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                    sendText({text: messages.commands.denied, reply_id: note_id, visibility, ignoreNG: true});
                 }
                 return;
             }
@@ -392,15 +370,15 @@ ws.addEventListener('message', function(data){
                     psql.query(query)
                     .then(res => {
                         if (res.rowCount > 0) {
-                            sendText({text: messages.commands.delete.done(res.rowCount), reply_id: note_id, visibility: visibility, ignoreNG: true});
+                            sendText({text: messages.commands.delete.done(res.rowCount), reply_id: note_id, visibility, ignoreNG: true});
                             console.log(`DELETE: ${m[1]}`);
                         } else {
-                            sendText({text: messages.commands.delete.notFound, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                            sendText({text: messages.commands.delete.notFound, reply_id: note_id, visibility, ignoreNG: true});
                             console.log('DELETE: NOT FOUND.');
                         }
                     });
                 } else {
-                    sendText({text: messages.commands.denied, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                    sendText({text: messages.commands.denied, reply_id: note_id, visibility, ignoreNG: true});
                 }
                 return;
             }
@@ -461,7 +439,7 @@ ws.addEventListener('message', function(data){
                     const text = replaceSpace(m[1]);
                     // NGWords
                     if (isNGWord(text)) {
-                        sendText({text: messages.food.ngword, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                        sendText({text: messages.food.ngword, reply_id: note_id, visibility, ignoreNG: true});
                         console.log(`NG WORD: ${findNGWord(text)}`);
                         return;
                     }
@@ -475,9 +453,9 @@ ws.addEventListener('message', function(data){
                         if (res.rowCount < 1) {
                             isNoun(text).then(is_noun => {
                                 if (is_noun) {
-                                    sendText({text: messages.food.idk, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                                    sendText({text: messages.food.idk, reply_id: note_id, visibility, ignoreNG: true});
                                 } else {
-                                    sendText({text: messages.food.canEat, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                                    sendText({text: messages.food.canEat, reply_id: note_id, visibility, ignoreNG: true});
                                 }
                             });
                             return;
@@ -485,7 +463,7 @@ ws.addEventListener('message', function(data){
                         const isGood = res.rows[0].good;
                         const goodS = isGood ? messages.food.good : messages.food.bad;
                         console.log(`CHECK: ${text}`);
-                        sendText({text: goodS, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                        sendText({text: goodS, reply_id: note_id, visibility, ignoreNG: true});
                     })
                     .catch(e => console.log(e));
                 })();
@@ -494,7 +472,7 @@ ws.addEventListener('message', function(data){
             m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?[？?]*`);
             if (m) { // search
                 (async () => {
-                    const is_good = m[3].match(`(${variables.food.good})`) ? true : false;
+                    const is_good = m[3].match(`${variables.food.good}`) ? true : false;
                     const search_query = {
                         text: 'SELECT name FROM oishii_table WHERE good=$1 ORDER BY RANDOM() LIMIT 1',
                         values: [is_good]
@@ -508,7 +486,7 @@ ws.addEventListener('message', function(data){
                             // console.dir(row);
                             // const igt = is_good ? messages.food.good : messages.food.bad;
                             console.log(`SEARCH: ${row.name} (${is_good})`);
-                            sendText({text: messages.food.search(row.name, is_good), reply_id: note_id, visibility: visibility});
+                            sendText({text: messages.food.search(row.name, is_good), reply_id: note_id, visibility});
                         })
                         .catch(e => console.error(e.stack));
                 })();
@@ -520,11 +498,11 @@ ws.addEventListener('message', function(data){
                     const text = replaceSpace(m[1]);
                     // NGWords
                     if (isNGWord(text)) {
-                        sendText({text: messages.food.ngword, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                        sendText({text: messages.food.ngword, reply_id: note_id, visibility, ignoreNG: true});
                         console.log(`NG WORD: ${findNGWord(text)}`);
                         return;
                     }
-                    const is_good = m[2].match(`(${variables.food.good})`) ? true : false;
+                    const is_good = m[2].match(`${variables.food.good}`) ? true : false;
                     const isExists = await getExists(text);
                     if (isExists) {
                         const update_query = {
@@ -543,7 +521,7 @@ ws.addEventListener('message', function(data){
                             .then(() => console.log(`LEARN(INSERT): ${text} is ${is_good}`))
                             .catch(e => console.error(e.stack));
                     }
-                    sendText({text: messages.food.learn(text, m[2]), reply_id: note_id, visibility: visibility});
+                    sendText({text: messages.food.learn(text, m[2]), reply_id: note_id, visibility});
                 })();
                 return;
             }
@@ -562,9 +540,8 @@ ws.addEventListener('message', function(data){
                             const re = /\((.+),([tf])\)/;
                             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
                             const good = row.match(re)[2] === 't' ? true : false;
-                            // const text = `${name} とかどう？\n${good === 't' ? messages.food.good : messages.food.bad}よ`;
                             console.log(`HUNGRY: ${name} (${good})`);
-                            sendText({text: messages.food.hungry(name, good), reply_id: note_id, visibility: visibility});
+                            sendText({text: messages.food.hungry(name, good), reply_id: note_id, visibility});
                         })
                         .catch(e => console.error(e.stack));
                 })();
@@ -582,8 +559,8 @@ ws.addEventListener('message', function(data){
             if (m) { // sushi
                 console.log('COMMAND: sushi');
                 // 1～10個
-                const _t = messages.food.sushi(Math.floor(Math.random() * 10) + 1);
-                sendText({text: _t, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                const _t = getWord(messages.food.sushi(Math.floor(Math.random() * 10) + 1));
+                sendText({text: _t, reply_id: note_id, visibility, ignoreNG: true});
                 return;
             }
             m = text.match(/^\s*((何|(な|にゃ)に|(な|にゃ)ん)か)?[食た]べる?(物|もの)(くれ|ちょうだい|頂戴|ください)/);
@@ -591,17 +568,17 @@ ws.addEventListener('message', function(data){
                 console.log('COMMAND: food');
                 // 1～5個
                 const num = Math.floor(Math.random() * 5) + 1;
-                let _t = '';
+                let foods = '';
                 for (let i = 0; i < num; i++) {
-                    _t += getWord(messages.food.food);
+                    foods += getWord(variables.food.food);
                 }
-                sendText({text: _t, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                sendText({text: getWord(messages.food.food(foods)), reply_id: note_id, visibility, ignoreNG: true});
                 return;
             }
             m = text.match(/^\s*ぬるぽ\s*$/);
             if (m) { // nullpo
                 console.log('COMMAND: NULLPO');
-                sendText({text: messages.commands.nullpo, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                sendText({text: messages.commands.nullpo, reply_id: note_id, visibility, ignoreNG: true});
                 return;
             }
             m = text.match(/^\s*チョコ(レート)?を?(あげる|くれ|ちょうだい|頂戴|ください)[!！]*$/);
@@ -711,7 +688,7 @@ function sayFood() {
             const good = row.match(re)[2] === 't' ? true : false;
             const text = messages.food.say(name, good);
             console.log(`POST: ${text}`);
-            sendText({text: text});
+            sendText({text});
         })
         .catch(e => console.error(e.stack));
     limit++;
@@ -747,7 +724,9 @@ function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = fa
     if (files) {
         sendData.body.data.fileIds = files;
     }
-    ws.send(JSON.stringify(sendData));
+    setTimeout(() => {
+        ws.send(JSON.stringify(sendData));
+    }, ms('1s'));
 }
 
 async function fileUpload(file, filename, contentType) {
