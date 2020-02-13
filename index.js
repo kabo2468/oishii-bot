@@ -561,17 +561,23 @@ ws.addEventListener('message', function(data){
                 const user = data.find(obj => obj.userId === userId);
                 if (user) { // already
                     if (given) { // 受け取った
+                        console.log('chocolate given');
                         if (user.count.get < 1) { //まだ受け取ったことがない
+                            console.log('first');
                             sendText({text: messages.food.valentine.get.thx, reply_id: note_id, visibility, ignoreNG: true});
                         } else {
+                            console.log('again');
                             sendText({text: messages.food.valentine.get.again, reply_id: note_id, visibility, ignoreNG: true});
                         }
                         user.count.get++;
                     } else { // 渡した
+                        console.log('chocolate got');
                         const chocolate = getWord(variables.food.chocolate);
                         if (user.count.give < 1) { //まだ渡したことがない
+                            console.log('first');
                             sendText({text: messages.food.valentine.give.give(chocolate), reply_id: note_id, visibility, ignoreNG: true});
                         } else {
+                            console.log('again');
                             sendText({text: messages.food.valentine.give.again(chocolate), reply_id: note_id, visibility, ignoreNG: true});
                         }
                         user.count.give++;
@@ -585,9 +591,13 @@ ws.addEventListener('message', function(data){
                         }
                     };
                     if (given) { // 受け取った
+                        console.log('chocolate given');
+                        console.log('first');
                         obj.count.get = 1;
                         sendText({text: messages.food.valentine.get.thx, reply_id: note_id, visibility, ignoreNG: true});
                     } else { // 渡す
+                        console.log('chocolate got');
+                        console.log('first');
                         obj.count.give = 1;
                         const chocolate = getWord(variables.food.chocolate);
                         sendText({text: messages.food.valentine.give.give(chocolate), reply_id: note_id, visibility, ignoreNG: true});
