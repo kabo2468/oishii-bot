@@ -585,8 +585,10 @@ ws.addEventListener('message', function(data){
             if (m) { // chocolate
                 console.log('COMMAND: CHOCOLATE');
                 const now = Date.now();
-                if (new Date(2020, 1, 14, 0, 0, 0).getTime() > now) return;
-                if (now > new Date(2020, 1, 15, 0, 0, 0).getTime()) return;
+                if (new Date(2020, 1, 14, 0, 0, 0).getTime() > now || now > new Date(2020, 1, 15, 0, 0, 0).getTime()) {
+                    sendText({text: messages.food.valentine.notDay, reply_id: note_id, visibility, ignoreNG: true});
+                    return;
+                }
                 const data = JSON.parse(fs.readFileSync(valentineFile));
                 const userId = json.body.body.userId;
                 const given = m[2] === 'あげる' ? true : false;
