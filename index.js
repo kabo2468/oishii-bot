@@ -49,6 +49,13 @@ rl.on('line', line => {
     }
 });
 
+// バレンタイン2020
+const valentineFile = './valentine2020.json';
+if (!fs.existsSync(valentineFile)) {
+    console.log('"valentine2020.json" does not exist. Create file.');
+    fs.writeFileSync(valentineFile, '[]');
+}
+
 psql.connect();
 
 const ws = new ReconnectingWebSocket(`wss://${process.env.MISSKEY_URL}/streaming?i=${process.env.API_KEY}`, [], {
@@ -403,7 +410,46 @@ ws.addEventListener('message', function(data){
                 if (json.body.body.user.username === 'kabo') {
                     sendChart();
                 } else {
-                    sendText({text: messages.commands.denied, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                    sendText({text: messages.commands.denied, reply_id: note_id, visibility, ignoreNG: true});
+                }
+                return;
+            }
+            m = text.match(/^\/hiragana$/);
+            if (m) { // C: hiragana
+                console.log('COMMAND: hiragana');
+                if (json.body.body.user.username === 'kabo') {
+                    const query = {
+                        text: 'SELECT count(*) FROM oishii_table WHERE name ~ \'[\u3041-\u3096]+\''
+                    };
+                    psql.query(query).then(res => {
+                        console.log(`hiragana: ${res.rows[0].count}`);
+                    });
+                }
+                return;
+            }
+            m = text.match(/^\/hiragana--$/);
+            if (m) { // C: hiragana--
+                console.log('COMMAND: hiragana--');
+                if (json.body.body.user.username === 'kabo') {
+                    const query = {
+                        text: 'SELECT count(*) FROM oishii_table WHERE name ~ \'^(?!.*[ぁぃぅぇぉゕゖっゃゅょゎァィゥェォヵヶッャュョヮ]+).*(?=[ぁ-ん]+).*$\''
+                    };
+                    psql.query(query).then(res => {
+                        console.log(`hiragana--: ${res.rows[0].count}`);
+                    });
+                }
+                return;
+            }
+            m = text.match(/^\/katakana$/);
+            if (m) { // C: katakana
+                console.log('COMMAND: katakana');
+                if (json.body.body.user.username === 'kabo') {
+                    const query = {
+                        text: 'SELECT count(*) FROM oishii_table WHERE name ~ \'[\u30A1-\u30FA]+\''
+                    };
+                    psql.query(query).then(res => {
+                        console.log(`katakana: ${res.rows[0].count}`);
+                    });
                 }
                 return;
             }
@@ -556,6 +602,54 @@ ws.addEventListener('message', function(data){
             if (m) { // nullpo
                 console.log('COMMAND: NULLPO');
                 sendText({text: messages.commands.nullpo, reply_id: note_id, visibility: visibility, ignoreNG: true});
+                return;
+            }
+            m = text.match(/^\s*チョコ(レート)?を?(あげる|くれ|ちょうだい|頂戴|ください)[!！]*$/);
+            if (m) { // chocolate
+                console.log('COMMAND: CHOCOLATE');
+                const now = Date.now();
+                if (new Date(2020, 1, 14, 0, 0, 0).getTime() > now) return;
+                if (now > new Date(2020, 1, 15, 0, 0, 0).getTime()) return;
+                const data = JSON.parse(fs.readFileSync(valentineFile));
+                const userId = json.body.body.userId;
+                const given = m[2] === 'あげる' ? true : false;
+                const user = data.find(obj => obj.userId === userId);
+                if (user) { // already
+                    if (given) { // 受け取った
+                        if (user.count.get < 1) { //まだ受け取ったことがない
+                            sendText({text: messages.food.valentine.get.thx, reply_id: note_id, visibility, ignoreNG: true});
+                        } else {
+                            sendText({text: messages.food.valentine.get.again, reply_id: note_id, visibility, ignoreNG: true});
+                        }
+                        user.count.get++;
+                    } else { // 渡した
+                        const chocolate = getWord(variables.food.chocolate);
+                        if (user.count.give < 1) { //まだ渡したことがない
+                            sendText({text: messages.food.valentine.give.give(chocolate), reply_id: note_id, visibility, ignoreNG: true});
+                        } else {
+                            sendText({text: messages.food.valentine.give.again(chocolate), reply_id: note_id, visibility, ignoreNG: true});
+                        }
+                        user.count.give++;
+                    }
+                } else { // not yet
+                    const obj = {
+                        userId: userId,
+                        count: {
+                            give: 0,
+                            get: 0
+                        }
+                    };
+                    if (given) { // 受け取った
+                        obj.count.get = 1;
+                        sendText({text: messages.food.valentine.get.thx, reply_id: note_id, visibility, ignoreNG: true});
+                    } else { // 渡す
+                        obj.count.give = 1;
+                        const chocolate = getWord(variables.food.chocolate);
+                        sendText({text: messages.food.valentine.give.give(chocolate), reply_id: note_id, visibility, ignoreNG: true});
+                    }
+                    data.push(obj);
+                }
+                fs.writeFileSync(valentineFile, JSON.stringify(data));
                 return;
             }
         }
