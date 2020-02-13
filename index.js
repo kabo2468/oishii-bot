@@ -469,7 +469,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?[？?]*`);
+            m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?`);
             if (m) { // search
                 (async () => {
                     const is_good = m[3].match(`${variables.food.good}`) ? true : false;
@@ -492,7 +492,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?[！!]*`);
+            m = text.match(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?`);
             if (m) { // learn
                 (async () => {
                     const text = replaceSpace(m[1]);
@@ -525,7 +525,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(/お?(腹|(な|にゃ)か|はら)が?([空すあ]い|([減へ][っり]))た?[！!]*/);
+            m = text.match(/お?(腹|(な|にゃ)か|はら)が?([空すあ]い|([減へ][っり]))た?/);
             if (m) { // hungry
                 (async () => {
                     const search_query = {
@@ -547,41 +547,7 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            // option
-            text = toHiragana(text);
-            m = text.match(/^\s*[@＠]?ぴざ\s*$/);
-            if (m) { // pizza
-                console.log('COMMAND: PIZZA');
-                sendText({text: pizzaText, reply_id: note_id, visibility: (visibility !== 'public' ? visibility : 'home'), ignoreNG: true});
-                return;
-            }
-            m = text.match(/^\s*お?(寿司|すし)を?(握|にぎ)(って|れ)/);
-            if (m) { // sushi
-                console.log('COMMAND: sushi');
-                // 1～10個
-                const _t = getWord(messages.food.sushi(Math.floor(Math.random() * 10) + 1));
-                sendText({text: _t, reply_id: note_id, visibility, ignoreNG: true});
-                return;
-            }
-            m = text.match(/^\s*((何|(な|にゃ)に|(な|にゃ)ん)か)?[食た]べる?(物|もの)(くれ|ちょうだい|頂戴|ください)/);
-            if (m) { // food
-                console.log('COMMAND: food');
-                // 1～5個
-                const num = Math.floor(Math.random() * 5) + 1;
-                let foods = '';
-                for (let i = 0; i < num; i++) {
-                    foods += getWord(variables.food.food);
-                }
-                sendText({text: getWord(messages.food.food(foods)), reply_id: note_id, visibility, ignoreNG: true});
-                return;
-            }
-            m = text.match(/^\s*ぬるぽ\s*$/);
-            if (m) { // nullpo
-                console.log('COMMAND: NULLPO');
-                sendText({text: messages.commands.nullpo, reply_id: note_id, visibility, ignoreNG: true});
-                return;
-            }
-            m = text.match(/^\s*チョコ(レート)?を?(あげる|くれ|ちょうだい|頂戴|ください)[!！]*$/);
+            m = text.match(/^\s*チョコ(レート)?を?(あげる|くれ|ちょうだい|頂戴|ください)/);
             if (m) { // chocolate
                 console.log('COMMAND: CHOCOLATE');
                 const now = Date.now();
@@ -629,6 +595,40 @@ ws.addEventListener('message', function(data){
                     data.push(obj);
                 }
                 fs.writeFileSync(valentineFile, JSON.stringify(data));
+                return;
+            }
+            // option
+            text = toHiragana(text);
+            m = text.match(/^\s*[@＠]?ぴざ\s*$/);
+            if (m) { // pizza
+                console.log('COMMAND: PIZZA');
+                sendText({text: pizzaText, reply_id: note_id, visibility: (visibility !== 'public' ? visibility : 'home'), ignoreNG: true});
+                return;
+            }
+            m = text.match(/^\s*お?(寿司|すし)を?(握|にぎ)(って|れ)/);
+            if (m) { // sushi
+                console.log('COMMAND: sushi');
+                // 1～10個
+                const _t = getWord(messages.food.sushi(Math.floor(Math.random() * 10) + 1));
+                sendText({text: _t, reply_id: note_id, visibility, ignoreNG: true});
+                return;
+            }
+            m = text.match(/^\s*((何|(な|にゃ)に|(な|にゃ)ん)か)?[食た]べる?(物|もの)(くれ|ちょうだい|頂戴|ください)/);
+            if (m) { // food
+                console.log('COMMAND: food');
+                // 1～5個
+                const num = Math.floor(Math.random() * 5) + 1;
+                let foods = '';
+                for (let i = 0; i < num; i++) {
+                    foods += getWord(variables.food.food);
+                }
+                sendText({text: getWord(messages.food.food(foods)), reply_id: note_id, visibility, ignoreNG: true});
+                return;
+            }
+            m = text.match(/^\s*ぬるぽ\s*$/);
+            if (m) { // nullpo
+                console.log('COMMAND: NULLPO');
+                sendText({text: messages.commands.nullpo, reply_id: note_id, visibility, ignoreNG: true});
                 return;
             }
         }
