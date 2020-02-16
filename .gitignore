@@ -1,6 +1,4 @@
 node_modules
 .vscode
 test
-*.log
-*.bat
-add_ngwords.txt
+built
