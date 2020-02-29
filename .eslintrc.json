@@ -4,7 +4,14 @@
         "es6": true,
         "node": true
     },
-    "extends": "eslint:recommended",
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "plugins": [
+        "@typescript-eslint"
+    ],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
@@ -14,6 +21,14 @@
         "sourceType": "module"
     },
     "rules": {
-        "semi": "error"
-    }
+        "semi": "off",
+        "@typescript-eslint/semi": ["error"],
+        "prefer-exponentiation-operator": "error",
+        "camelcase": "error",
+        "comma-spacing": "error",
+        "space-infix-ops": "error"
+    },
+    "ignorePatterns": [
+        "*.js"
+    ]
 }
