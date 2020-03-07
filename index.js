@@ -547,66 +547,6 @@ ws.addEventListener('message', function(data){
                 })();
                 return;
             }
-            m = text.match(/^\s*チョコ(レート)?を?(あげる|くれ|ちょうだい|頂戴|ください)/);
-            if (m) { // chocolate
-                console.log('COMMAND: CHOCOLATE');
-                const now = Date.now();
-                if (new Date(2020, 1, 14, 0, 0, 0).getTime() > now || now > new Date(2020, 1, 15, 0, 0, 0).getTime()) {
-                    sendText({text: messages.food.valentine.notDay, reply_id: note_id, visibility, ignoreNG: true});
-                    return;
-                }
-                const data = JSON.parse(fs.readFileSync(valentineFile));
-                const userId = json.body.body.userId;
-                const given = m[2] === 'あげる' ? true : false;
-                const user = data.find(obj => obj.userId === userId);
-                if (user) { // already
-                    if (given) { // 受け取った
-                        console.log('chocolate given');
-                        if (user.count.get < 1) { //まだ受け取ったことがない
-                            console.log('first');
-                            sendText({text: messages.food.valentine.get.thx, reply_id: note_id, visibility, ignoreNG: true});
-                        } else {
-                            console.log('again');
-                            sendText({text: messages.food.valentine.get.again, reply_id: note_id, visibility, ignoreNG: true});
-                        }
-                        user.count.get++;
-                    } else { // 渡した
-                        console.log('chocolate got');
-                        const chocolate = getWord(variables.food.chocolate);
-                        if (user.count.give < 1) { //まだ渡したことがない
-                            console.log('first');
-                            sendText({text: messages.food.valentine.give.give(chocolate), reply_id: note_id, visibility, ignoreNG: true});
-                        } else {
-                            console.log('again');
-                            sendText({text: messages.food.valentine.give.again(chocolate), reply_id: note_id, visibility, ignoreNG: true});
-                        }
-                        user.count.give++;
-                    }
-                } else { // not yet
-                    const obj = {
-                        userId: userId,
-                        count: {
-                            give: 0,
-                            get: 0
-                        }
-                    };
-                    if (given) { // 受け取った
-                        console.log('chocolate given');
-                        console.log('first');
-                        obj.count.get = 1;
-                        sendText({text: messages.food.valentine.get.thx, reply_id: note_id, visibility, ignoreNG: true});
-                    } else { // 渡す
-                        console.log('chocolate got');
-                        console.log('first');
-                        obj.count.give = 1;
-                        const chocolate = getWord(variables.food.chocolate);
-                        sendText({text: messages.food.valentine.give.give(chocolate), reply_id: note_id, visibility, ignoreNG: true});
-                    }
-                    data.push(obj);
-                }
-                fs.writeFileSync(valentineFile, JSON.stringify(data));
-                return;
-            }
             // option
             text = toHiragana(text);
             m = text.match(/^\s*[@＠]?ぴざ\s*$/);
@@ -659,6 +599,24 @@ setInterval(() => {
     ws.send(JSON.stringify(followSendData));
 }, ms('1h'));
 
+// ホワイトデー
+const whiteDayTime = new Date(2020, 2, 14, 9, 0, 0, 0).getTime() - Date.now();
+if (whiteDayTime > 0) {
+    setTimeout(() => {
+        const json = JSON.parse(fs.readFileSync(valentineFile));
+        for (let i = 0; i < json.length; i++) {
+            const user = json[i];
+            setTimeout(() => {
+                sendText({
+                    text: messages.food.white_day(user.count.get),
+                    visibility: 'specified',
+                    user_id: [ user.userId ],
+                    ignoreNG: true
+                });
+            }, 1000 * i);
+        }
+    }, whiteDayTime);
+}
 
 function sendChart() {
     const query = {
