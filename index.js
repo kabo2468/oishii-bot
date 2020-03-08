@@ -601,6 +601,7 @@ setInterval(() => {
 
 // ホワイトデー
 const whiteDayTime = new Date(2020, 2, 14, 9, 0, 0, 0).getTime() - Date.now();
+console.log(`White day time: ${whiteDayTime}`);
 if (whiteDayTime > 0) {
     setTimeout(() => {
         const json = JSON.parse(fs.readFileSync(valentineFile));
@@ -608,7 +609,7 @@ if (whiteDayTime > 0) {
             const user = json[i];
             setTimeout(() => {
                 sendText({
-                    text: messages.food.white_day(user.count.get),
+                    text: messages.food.white_day(user.userId, user.count.get),
                     visibility: 'specified',
                     user_id: [ user.userId ],
                     ignoreNG: true

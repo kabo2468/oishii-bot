@@ -59,7 +59,7 @@ module.exports = {
                 `これあげる！ ${food}`,
                 `食べて！ ${food}`
             ],
-            white_day: num => `この前のお返しあげる！${'🍫'.repeat(num)}`
+            white_day: (userId, num) => `@${userId} この前のお返しあげる！${'🍫'.repeat(num)}`
         }
     },
     variables: {
