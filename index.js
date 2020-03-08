@@ -608,17 +608,18 @@ if (whiteDayTime > 0) {
         for (let i = 0; i < json.length; i++) {
             const user = json[i];
             const username = (async () => {
-                const getUser = await request.post({
+                let _ret = '';
+                await request.post({
                     url: `https://${process.env.MISSKEY_URL}/api/users/show`,
                     body: {
                         i: process.env.API_KEY,
                         userId: user.userId
                     },
                     json: true
+                }).then(res => {
+                    _ret = res.username;
                 });
-                getUser.then(res => {
-                    return res.username;
-                });
+                return _ret;
             })();
             setTimeout(() => {
                 sendText({
