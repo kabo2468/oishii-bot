@@ -607,9 +607,22 @@ if (whiteDayTime > 0) {
         const json = JSON.parse(fs.readFileSync(valentineFile));
         for (let i = 0; i < json.length; i++) {
             const user = json[i];
+            const username = (async () => {
+                const getUser = await request.post({
+                    url: `https://${process.env.MISSKEY_URL}/api/users/show`,
+                    body: {
+                        i: process.env.API_KEY,
+                        userId: user.userId
+                    },
+                    json: true
+                });
+                getUser.then(res => {
+                    return res.username;
+                });
+            })();
             setTimeout(() => {
                 sendText({
-                    text: messages.food.white_day(user.userId, user.count.get),
+                    text: messages.food.white_day(username, user.count.get),
                     visibility: 'specified',
                     user_id: [ user.userId ],
                     ignoreNG: true
