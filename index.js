@@ -606,26 +606,27 @@ if (whiteDayTime > 0) {
     setTimeout(() => {
         const json = JSON.parse(fs.readFileSync(valentineFile));
         for (let i = 0; i < json.length; i++) {
-            (async () => {
-                const user = json[i];
-                await request.post({
-                    url: `https://${process.env.MISSKEY_URL}/api/users/show`,
-                    body: {
-                        i: process.env.API_KEY,
-                        userId: user.userId
-                    },
-                    json: true
-                }).then(res => {
-                    setTimeout(() => {
-                        sendText({
-                            text: messages.food.white_day(res.username, user.count.get),
-                            visibility: 'specified',
-                            user_id: [ user.userId ],
-                            ignoreNG: true
-                        });
-                    }, 1000 * i);
-                });
-            })();
+        (async () => {
+            const user = json[i];
+            await request.post({
+                url: `https://${process.env.MISSKEY_URL}/api/users/show`,
+                body: {
+                    i: process.env.API_KEY,
+                    userId: user.userId
+                },
+                json: true
+            }).then(res => {
+                setTimeout(() => {
+                    console.log(`Send in return for Valentine's Day to ${res.username} (Count: ${user.count.get})`);
+                    sendText({
+                        text: messages.food.white_day(res.username, user.count.get),
+                        visibility: 'specified',
+                        user_id: [ user.userId ],
+                        ignoreNG: true
+                    });
+                }, 1000 * i);
+            });
+        })();
         }
     }, whiteDayTime);
 }
