@@ -608,6 +608,7 @@ if (whiteDayTime > 0) {
         for (let i = 0; i < json.length; i++) {
         (async () => {
             const user = json[i];
+            if (user.count.get === 0) return;
             await request.post({
                 url: `https://${process.env.MISSKEY_URL}/api/users/show`,
                 body: {
@@ -617,9 +618,10 @@ if (whiteDayTime > 0) {
                 json: true
             }).then(res => {
                 setTimeout(() => {
-                    console.log(`Send in return for Valentine's Day to ${res.username} (Count: ${user.count.get})`);
+                    const num = user.count.get + Math.floor(Math.random() * 3) + 1;
+                    console.log(`Send in return for Valentine's Day to ${res.username} (Count: ${user.count.get}/ Send: ${num})`);
                     sendText({
-                        text: messages.food.white_day(res.username, user.count.get),
+                        text: messages.food.white_day(res.username, num),
                         visibility: 'specified',
                         user_id: [ user.userId ],
                         ignoreNG: true
