@@ -619,9 +619,13 @@ if (whiteDayTime > 0) {
             }).then(res => {
                 setTimeout(() => {
                     const num = user.count.get + Math.floor(Math.random() * 3) + 1;
-                    console.log(`Send chocolates in return for Valentine's Day to ${res.username} (Count: ${user.count.get} / Send: ${num})`);
+                    console.log(`Send presents in return for Valentine's Day to ${res.username} (Count: ${user.count.get} / Send: ${num})`);
+                    let presents = '';
+                    for (let i = 0; i < num; i++) {
+                        presents += getWord(variables.food.food);
+                    }
                     sendText({
-                        text: messages.food.white_day(res.username, num),
+                        text: messages.food.white_day(res.username, presents),
                         visibility: 'specified',
                         user_id: [ user.userId ],
                         ignoreNG: true
