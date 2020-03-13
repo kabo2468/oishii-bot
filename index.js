@@ -624,8 +624,9 @@ if (whiteDayTime > 0) {
                     for (let i = 0; i < num; i++) {
                         presents += getWord(variables.food.food);
                     }
+                    const username = res.host ? `${res.username}@${res.host}` : res.username;
                     sendText({
-                        text: messages.food.white_day(res.username, presents),
+                        text: messages.food.white_day(username, presents),
                         visibility: 'specified',
                         user_id: [ user.userId ],
                         ignoreNG: true
