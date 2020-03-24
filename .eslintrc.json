@@ -26,8 +26,7 @@
         "prefer-exponentiation-operator": "error",
         "camelcase": "error",
         "comma-spacing": "error",
-        "space-infix-ops": "error",
-        "max-depth": ["error", 3]
+        "space-infix-ops": "error"
     },
     "ignorePatterns": [
         "*.js"

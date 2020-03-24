@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2019",
-    "module": "commonjs",
+    "module": "CommonJS",
+    "baseUrl": "./",
     "outDir": "./built",
     "rootDir": "./src",
     "strict": true,
