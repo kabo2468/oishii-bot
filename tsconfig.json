@@ -2,11 +2,13 @@
   "compilerOptions": {
     "target": "ES2019",
     "module": "CommonJS",
-    "baseUrl": "./",
     "outDir": "./built",
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
-  }
+    "forceConsistentCasingInFileNames": true,
+  },
+  "exclude": [
+    "test/**/*"
+  ]
 }
