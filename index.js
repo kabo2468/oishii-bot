@@ -97,14 +97,15 @@ const commandPost = {
 ws.addEventListener('open', function() {
     ws.send(JSON.stringify(timelineData));
     ws.send(JSON.stringify(mainData));
-    console.log('Connected!');
     ws.send(JSON.stringify(followSendData));
+    console.log('Connected!');
 });
 ws.addEventListener('close', function() {
     console.log('Disconnected.');
 });
 ws.addEventListener('error', function(e) {
     console.log('WebSocket error: ', e);
+    ws.reconnect();
 });
 
 ws.addEventListener('message', function(data){
