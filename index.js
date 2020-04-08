@@ -103,6 +103,9 @@ ws.addEventListener('open', function() {
 ws.addEventListener('close', function() {
     console.log('Disconnected.');
 });
+ws.addEventListener('error', function(e) {
+    console.log('WebSocket error: ', e);
+});
 
 ws.addEventListener('message', function(data){
     const json = JSON.parse(data.data);
