@@ -150,8 +150,6 @@ ws.addEventListener('message', function(data){
     }
 
     if (json.body.id === '1803ad27-a839-4eb6-ac74-97677ee0a055') { //Timeline
-        // console.dir(json);
-
         if (json.body.body.userId === process.env.USER_ID) return;
         let text = json.body.body.text;
         if (text === null) return;
@@ -186,25 +184,21 @@ ws.addEventListener('message', function(data){
                 return token.pos === '名詞' && token.pos_detail_1 !== 'サ変接続' ? token.surface_form : null;
             });
             const nouns = pos_arr.filter(n => n !== null);
-            // console.log(`nouns: ${nouns}`);
             //もし何もなかったら
             if (nouns.length < 1) return;
 
             //1文字の英数字、ひらがな、カタカナ、数字を消す
             const output = nouns.filter(n => n.search(/^([A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]|[ー～]+)$/));
-            // console.log(`output: ${output}`);
             //もし何もなかったら
             if (output.length < 1) return;
 
             //どれか1つ選ぶ
             const add_name = output[Math.floor(Math.random() * output.length)];
-            // console.log(`add_name: ${add_name}`);
 
             //被り
             getExists(add_name)
             .then(res => {
                 if (res === true) {
-                    // console.log(`if: ${res}`);
                     throw `${add_name} is skipped.`;
                 }
             }).then(() => {
@@ -241,7 +235,6 @@ ws.addEventListener('message', function(data){
         if (json.body.type === 'readAllUnreadSpecifiedNotes') return;
 
         if (json.body.type === 'followed') { //follow back
-            // console.dir(json);
             ws.send(JSON.stringify({
                 type: 'api',
                 body: {
@@ -257,8 +250,6 @@ ws.addEventListener('message', function(data){
         }
 
         if (json.body.type === 'mention') {
-            // console.dir(json);
-
             // Bot属性を無視
             if (json.body.body.user.isBot === true) return;
 
@@ -453,7 +444,6 @@ ws.addEventListener('message', function(data){
                     };
                     psql.query(query)
                     .then(res => {
-                        // console.dir(res);
                         if (res.rowCount < 1) {
                             isNoun(text).then(is_noun => {
                                 if (is_noun) {
@@ -485,10 +475,7 @@ ws.addEventListener('message', function(data){
 
                     psql.query(search_query)
                         .then(res => {
-                            // console.dir(res);
                             const row = res.rows[0];
-                            // console.dir(row);
-                            // const igt = is_good ? messages.food.good : messages.food.bad;
                             console.log(`SEARCH: ${row.name} (${is_good})`);
                             sendText({text: messages.food.search(row.name, is_good), reply_id: note_id, visibility});
                         })
@@ -594,7 +581,6 @@ setInterval(() => {
 }, ms(`${(process.env.INTERVAL_MIN || 60)}m`));
 
 setInterval(() => {
-    // console.log(limit);
     limit = 0;
 }, ms(`${variables.post.rateLimitSec}s`));
 
@@ -602,45 +588,6 @@ setInterval(() => {
 setInterval(() => {
     ws.send(JSON.stringify(followSendData));
 }, ms('1h'));
-
-// ホワイトデー
-const whiteDayTime = new Date(2020, 2, 14, 9, 0, 0, 0).getTime() - Date.now();
-console.log(`White day time: ${whiteDayTime}`);
-if (whiteDayTime > 0) {
-    setTimeout(() => {
-        const json = JSON.parse(fs.readFileSync(valentineFile));
-        for (let i = 0; i < json.length; i++) {
-        (async () => {
-            const user = json[i];
-            if (user.count.get === 0) return;
-            await request.post({
-                url: `https://${process.env.MISSKEY_URL}/api/users/show`,
-                body: {
-                    i: process.env.API_KEY,
-                    userId: user.userId
-                },
-                json: true
-            }).then(res => {
-                setTimeout(() => {
-                    const num = user.count.get + Math.floor(Math.random() * 3) + 1;
-                    console.log(`Send presents in return for Valentine's Day to ${res.username} (Count: ${user.count.get} / Send: ${num})`);
-                    let presents = '';
-                    for (let i = 0; i < num; i++) {
-                        presents += getWord(variables.food.food);
-                    }
-                    const username = res.host ? `${res.username}@${res.host}` : res.username;
-                    sendText({
-                        text: messages.food.white_day(username, presents),
-                        visibility: 'specified',
-                        user_id: [ user.userId ],
-                        ignoreNG: true
-                    });
-                }, 1000 * i);
-            });
-        })();
-        }
-    }, whiteDayTime);
-}
 
 function sendChart() {
     const query = {
