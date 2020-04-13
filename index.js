@@ -297,12 +297,28 @@ ws.addEventListener('message', function(data){
             if (m) { // C: info
                 console.log('COMMAND: info');
                 psql.query('SELECT learned, count(learned) FROM oishii_table GROUP BY learned').then(res => {
+                    const text = [];
+                    // records
                     const fl = res.rows[0].count;
                     const tl = res.rows[1].count;
                     const all = Number(fl) + Number(tl);
-                    const text = `Records: ${all.toString()} (Learned: ${tl})`;
-                    console.log(`INFO: [ ${text} ]`);
-                    sendText({text, reply_id: note_id, visibility, ignoreNG: true});
+                    const recordsText = `Records: ${all} (Learned: ${tl})`;
+                    console.log(`INFO: [ ${recordsText} ]`);
+                    text.push(recordsText);
+                    // commit hash
+                    const rev = fs.readFileSync('.git/HEAD').toString();
+                    let hash = '';
+                    if (rev.indexOf(':') === -1) {
+                        hash = rev;
+                    } else {
+                        hash = fs.readFileSync('.git/' + rev.substring(5)).toString();
+                    }
+                    text.push(`Commit hash: ${hash}`);
+                    // uptime
+                    const uptime = process.uptime();
+                    const time = ms(uptime * 1000);
+                    text.push(`Uptime: ${time}`);
+                    sendText({text: text.join('\n'), reply_id: note_id, visibility, ignoreNG: true});
                 });
                 return;
             }
@@ -395,7 +411,7 @@ ws.addEventListener('message', function(data){
                         text: 'SELECT count(*) FROM oishii_table WHERE name ~ \'[\u3041-\u3096]+\''
                     };
                     psql.query(query).then(res => {
-                        console.log(`hiragana: ${res.rows[0].count}`);
+                        sendText({text: `hiragana: ${res.rows[0].count}`, reply_id: note_id, visibility: 'specified', ignoreNG: true});
                     });
                 }
                 return;
@@ -408,7 +424,7 @@ ws.addEventListener('message', function(data){
                         text: 'SELECT count(*) FROM oishii_table WHERE name ~ \'^(?!.*[ぁぃぅぇぉゕゖっゃゅょゎァィゥェォヵヶッャュョヮ]+).*(?=[ぁ-ん]+).*$\''
                     };
                     psql.query(query).then(res => {
-                        console.log(`hiragana--: ${res.rows[0].count}`);
+                        sendText({text: `hiragana--: ${res.rows[0].count}`, reply_id: note_id, visibility: 'specified', ignoreNG: true});
                     });
                 }
                 return;
@@ -421,7 +437,7 @@ ws.addEventListener('message', function(data){
                         text: 'SELECT count(*) FROM oishii_table WHERE name ~ \'[\u30A1-\u30FA]+\''
                     };
                     psql.query(query).then(res => {
-                        console.log(`katakana: ${res.rows[0].count}`);
+                        sendText({text: `katakana: ${res.rows[0].count}`, reply_id: note_id, visibility: 'specified', ignoreNG: true});
                     });
                 }
                 return;
