@@ -313,7 +313,7 @@ ws.addEventListener('message', function(data){
                     } else {
                         hash = fs.readFileSync('.git/' + rev.substring(5)).toString();
                     }
-                    text.push(`Commit hash: ${hash}`);
+                    text.push(`Commit hash: ${hash.substring(0, 7)}`);
                     // uptime
                     const uptime = process.uptime();
                     const time = ms(uptime * 1000);
