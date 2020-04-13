@@ -311,7 +311,7 @@ ws.addEventListener('message', function(data){
                     if (rev.indexOf(':') === -1) {
                         hash = rev;
                     } else {
-                        hash = fs.readFileSync('.git/' + rev.substring(5)).toString();
+                        hash = fs.readFileSync('.git/' + rev.substring(5).trim()).toString().trim();
                     }
                     text.push(`Commit hash: ${hash.substring(0, 7)}`);
                     // uptime
