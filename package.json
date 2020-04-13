@@ -5,16 +5,16 @@
   "main": "index.js",
   "dependencies": {
     "chart.js": "^2.9.3",
-    "chartjs-node-canvas": "^2.4.2",
+    "chartjs-node-canvas": "^3.0.6",
     "kuromoji": "^0.1.2",
     "moji": "^0.5.1",
     "ms": "^2.1.2",
-    "pg": "^7.18.1",
-    "reconnecting-websocket": "^4.2.0",
-    "request": "^2.88.0",
+    "pg": "^8.0.2",
+    "reconnecting-websocket": "^4.4.0",
+    "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
-    "uuid": "^3.4.0",
-    "ws": "^7.2.1"
+    "uuid": "^7.0.3",
+    "ws": "^7.2.3"
   },
   "license": "MIT",
   "private": true,
