@@ -45,6 +45,7 @@ rl.on('line', line => {
     if (/^-/.test(word)) {
         ExcludedWords.push(word.substring(1));
     } else {
+        if (/な/.test(word)) NGWords.push(word.replace(/な/g, 'にゃ'));
         NGWords.push(word);
     }
 });
