@@ -10,7 +10,7 @@ if (error.length > 0) {
 
 const fs = require('fs');
 const readline = require('readline');
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuid } = require('uuid');
 const kuromoji = require('kuromoji');
 const moji = require('moji');
 const ms = require('ms');
@@ -239,7 +239,7 @@ ws.addEventListener('message', function(data){
             ws.send(JSON.stringify({
                 type: 'api',
                 body: {
-                    id: uuidv4(),
+                    id: uuid(),
                     endpoint: 'following/create',
                     data: {
                         userId: json.body.body.id
@@ -265,7 +265,7 @@ ws.addEventListener('message', function(data){
             const reactionData = {
                 type: 'api',
                 body: {
-                    id: uuidv4(),
+                    id: uuid(),
                     endpoint: 'notes/reactions/create',
                     data: {
                         noteId: note_id,
@@ -663,7 +663,7 @@ function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = fa
     const sendData = {
         type: 'api',
         body: {
-            id: uuidv4(),
+            id: uuid(),
             endpoint: 'notes/create',
             data: {
                 visibility: visibility,
