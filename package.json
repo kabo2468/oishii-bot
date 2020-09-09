@@ -9,17 +9,17 @@
     "kuromoji": "^0.1.2",
     "moji": "^0.5.1",
     "ms": "^2.1.2",
-    "pg": "^8.2.1",
+    "pg": "^8.3.3",
     "reconnecting-websocket": "^4.4.0",
     "request": "^2.88.2",
-    "request-promise-native": "^1.0.8",
-    "uuid": "^8.1.0",
-    "ws": "^7.3.0"
+    "request-promise-native": "^1.0.9",
+    "uuid": "^8.3.0",
+    "ws": "^7.3.1"
   },
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "eslint": "^7.2.0"
+    "eslint": "^7.8.1"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.1",
