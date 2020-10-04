@@ -10,16 +10,16 @@ if (error.length > 0) {
 
 const fs = require('fs');
 const readline = require('readline');
-const { v4: uuid } = require('uuid');
+const {v4: uuid} = require('uuid');
 const kuromoji = require('kuromoji');
 const moji = require('moji');
 const ms = require('ms');
 const ReconnectingWebSocket = require('reconnecting-websocket');
 const ws_const = require('ws');
-const { Client } = require('pg');
-const request = require('request-promise-native');
-const { messages, variables, getWord } = require('./config.js');
-const { genChart } = require('./chart.js');
+const {Client} = require('pg');
+const {post} = require('request-promise-native');
+const {messages, variables, getWord} = require('./config.js');
+const {genChart} = require('./chart.js');
 const psql = new Client({
     ssl: false,
     connectionString: process.env.DATABASE_URL
@@ -62,7 +62,7 @@ psql.connect();
 const ws = new ReconnectingWebSocket(`wss://${process.env.MISSKEY_URL}/streaming?i=${process.env.API_KEY}`, [], {
     WebSocket: ws_const
 });
-const builder = kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" });
+const builder = kuromoji.builder({dicPath: "node_modules/kuromoji/dict"});
 
 const timelineData = {
     type: "connect",
@@ -95,21 +95,21 @@ const commandPost = {
     visibility: ''
 };
 
-ws.addEventListener('open', function() {
+ws.addEventListener('open', function () {
     ws.send(JSON.stringify(timelineData));
     ws.send(JSON.stringify(mainData));
     ws.send(JSON.stringify(followSendData));
     console.log('Connected!');
 });
-ws.addEventListener('close', function() {
+ws.addEventListener('close', function () {
     console.log('Disconnected.');
 });
-ws.addEventListener('error', function(e) {
+ws.addEventListener('error', function (e) {
     console.log('WebSocket error: ', e);
     ws.reconnect();
 });
 
-ws.addEventListener('message', function(data){
+ws.addEventListener('message', function (data) {
     const json = JSON.parse(data.data);
 
     if (json.type === 'api:7e5f734f-920c-43e2-ae2c-3dcff866f2f6') { // Follow Count
@@ -119,7 +119,7 @@ ws.addEventListener('message', function(data){
     }
 
     if (json.type === 'api:ae2a63d4-7e17-41e1-b58c-f960becaab03') { // Follow Command
-        let _t = '';
+        let _t;
         if ('res' in json.body) {
             _t = messages.commands.follow.done;
         } else {
@@ -135,7 +135,7 @@ ws.addEventListener('message', function(data){
     }
 
     if (json.type === 'api:8a06d0ae-b801-483b-9dc5-540865b348c9') { // Unfollow Command
-        let _t = '';
+        let _t;
         if ('res' in json.body) {
             _t = messages.commands.unfollow.done;
         } else {
@@ -189,7 +189,7 @@ ws.addEventListener('message', function(data){
             if (nouns.length < 1) return;
 
             //1文字の英数字、ひらがな、カタカナ、数字を消す
-            const output = nouns.filter(n => n.search(/^([A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]|[ー～]+)$/));
+            const output = nouns.filter(n => !(/^([A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]|[ー～]+)$/.test(n) || /^[ぁぃぅぇぉゕゖっゃゅょゎァィゥェォヵヶッャュョヮ]/.test(n)));
             //もし何もなかったら
             if (output.length < 1) return;
 
@@ -198,20 +198,20 @@ ws.addEventListener('message', function(data){
 
             //被り
             getExists(add_name)
-            .then(res => {
-                if (res === true) {
-                    throw `${add_name} is skipped.`;
-                }
-            }).then(() => {
+                .then(res => {
+                    if (res === true) {
+                        throw `${add_name} is skipped.`;
+                    }
+                }).then(() => {
                 //Add DB
                 const is_good = Math.random() < 0.8 ? 'true' : 'false';
                 const add_query = {
                     text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
-                    values: [ add_name, is_good ]
+                    values: [add_name, is_good]
                 };
                 psql.query(add_query)
-                .then(() => console.log(`INSERT: ${add_name} (${is_good})`))
-                .catch(e => console.error(e.stack));
+                    .then(() => console.log(`INSERT: ${add_name} (${is_good})`))
+                    .catch(e => console.error(e.stack));
             }).catch(e => console.log(e));
 
             // n投稿毎、p確率で sayFood
@@ -308,7 +308,7 @@ ws.addEventListener('message', function(data){
                     text.push(recordsText);
                     // commit hash
                     const rev = fs.readFileSync('.git/HEAD').toString();
-                    let hash = '';
+                    let hash;
                     if (rev.indexOf(':') === -1) {
                         hash = rev;
                     } else {
@@ -380,15 +380,15 @@ ws.addEventListener('message', function(data){
                         values: [m[1]]
                     };
                     psql.query(query)
-                    .then(res => {
-                        if (res.rowCount > 0) {
-                            sendText({text: messages.commands.delete.done(res.rowCount), reply_id: note_id, visibility, ignoreNG: true});
-                            console.log(`DELETE: ${m[1]}`);
-                        } else {
-                            sendText({text: messages.commands.delete.notFound, reply_id: note_id, visibility, ignoreNG: true});
-                            console.log('DELETE: NOT FOUND.');
-                        }
-                    });
+                        .then(res => {
+                            if (res.rowCount > 0) {
+                                sendText({text: messages.commands.delete.done(res.rowCount), reply_id: note_id, visibility, ignoreNG: true});
+                                console.log(`DELETE: ${m[1]}`);
+                            } else {
+                                sendText({text: messages.commands.delete.notFound, reply_id: note_id, visibility, ignoreNG: true});
+                                console.log('DELETE: NOT FOUND.');
+                            }
+                        });
                 } else {
                     sendText({text: messages.commands.denied, reply_id: note_id, visibility, ignoreNG: true});
                 }
@@ -443,6 +443,17 @@ ws.addEventListener('message', function(data){
                 }
                 return;
             }
+            m = text.match(/^\/word$/);
+            if (m) { // C: word
+                console.log('COMMAND: word');
+                const query = {
+                    text: 'SELECT name FROM oishii_table ORDER BY RANDOM() LIMIT 1'
+                };
+                psql.query(query).then(res => {
+                    sendText({text: res.rows[0].name, reply_id: note_id, visibility, ignoreNG: true});
+                });
+                return;
+            }
 
             // Text
             m = text.match(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})の?[？?]+`);
@@ -460,30 +471,30 @@ ws.addEventListener('message', function(data){
                         values: [text]
                     };
                     psql.query(query)
-                    .then(res => {
-                        if (res.rowCount < 1) {
-                            isNoun(text).then(is_noun => {
-                                if (is_noun) {
-                                    sendText({text: messages.food.idk, reply_id: note_id, visibility, ignoreNG: true});
-                                } else {
-                                    sendText({text: messages.food.canEat, reply_id: note_id, visibility, ignoreNG: true});
-                                }
-                            });
-                            return;
-                        }
-                        const isGood = res.rows[0].good;
-                        const goodS = isGood ? messages.food.good : messages.food.bad;
-                        console.log(`CHECK: ${text}`);
-                        sendText({text: goodS, reply_id: note_id, visibility, ignoreNG: true});
-                    })
-                    .catch(e => console.log(e));
+                        .then(res => {
+                            if (res.rowCount < 1) {
+                                isNoun(text).then(is_noun => {
+                                    if (is_noun) {
+                                        sendText({text: messages.food.idk, reply_id: note_id, visibility, ignoreNG: true});
+                                    } else {
+                                        sendText({text: messages.food.canEat, reply_id: note_id, visibility, ignoreNG: true});
+                                    }
+                                });
+                                return;
+                            }
+                            const isGood = res.rows[0].good;
+                            const goodS = isGood ? messages.food.good : messages.food.bad;
+                            console.log(`CHECK: ${text}`);
+                            sendText({text: goodS, reply_id: note_id, visibility, ignoreNG: true});
+                        })
+                        .catch(e => console.log(e));
                 })();
                 return;
             }
             m = text.match(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?`);
             if (m) { // search
                 (async () => {
-                    const is_good = m[3].match(`${variables.food.good}`) ? true : false;
+                    const is_good = !!m[3].match(`${variables.food.good}`);
                     const search_query = {
                         text: 'SELECT name FROM oishii_table WHERE good=$1 ORDER BY RANDOM() LIMIT 1',
                         values: [is_good]
@@ -510,7 +521,7 @@ ws.addEventListener('message', function(data){
                         console.log(`NG WORD: ${findNGWord(text)}`);
                         return;
                     }
-                    const is_good = m[2].match(`${variables.food.good}`) ? true : false;
+                    const is_good = !!m[2].match(`${variables.food.good}`);
                     const isExists = await getExists(text);
                     if (isExists) {
                         const update_query = {
@@ -547,7 +558,7 @@ ws.addEventListener('message', function(data){
                             console.log(`row: ${row}`);
                             const re = /\((.+),([tf])\)/;
                             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
-                            const good = row.match(re)[2] === 't' ? true : false;
+                            const good = row.match(re)[2] === 't';
                             console.log(`HUNGRY: ${name} (${good})`);
                             sendText({text: messages.food.hungry(name, good), reply_id: note_id, visibility});
                         })
@@ -587,7 +598,7 @@ ws.addEventListener('message', function(data){
             if (m) { // nullpo
                 console.log('COMMAND: NULLPO');
                 sendText({text: messages.commands.nullpo, reply_id: note_id, visibility, ignoreNG: true});
-                return;
+
             }
         }
     }
@@ -625,9 +636,9 @@ function sendChart() {
         return fileUpload(image, `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`, 'image/png');
     }).then(res => {
         console.log('Send Chart.');
-        sendText({text: messages.commands.chart, ignoreNG: true, files: [ res.id ]});
+        sendText({text: messages.commands.chart, ignoreNG: true, files: [res.id]});
     });
-    return;
+
 }
 
 function sayFood() {
@@ -643,7 +654,7 @@ function sayFood() {
             console.log(`row: ${row}`);
             const re = /\((.+),([tf])\)/;
             const name = row.match(re)[1].replace(/"(.+)"/, '$1');
-            const good = row.match(re)[2] === 't' ? true : false;
+            const good = row.match(re)[2] === 't';
             const text = messages.food.say(name, good);
             console.log(`POST: ${text}`);
             sendText({text});
@@ -688,7 +699,7 @@ function sendText({text, reply_id, visibility = 'public', user_id, ignoreNG = fa
 }
 
 async function fileUpload(file, filename, contentType) {
-    const res = await request.post({
+    return await post({
         url: `https://${process.env.MISSKEY_URL}/api/drive/files/create`,
         formData: {
             i: process.env.API_KEY,
@@ -702,21 +713,20 @@ async function fileUpload(file, filename, contentType) {
         },
         json: true
     });
-    return res;
 }
 
 function getExists(text) {
     return new Promise(resolve => {
         const query = {
             text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1))',
-            values: [ text ]
+            values: [text]
         };
         psql.query(query)
-        .then(res => {
-            // console.log(`func: ${res.rows[0].exists}`);
-            resolve(res.rows[0].exists);
-        })
-        .catch(e => console.error(e.stack));
+            .then(res => {
+                // console.log(`func: ${res.rows[0].exists}`);
+                resolve(res.rows[0].exists);
+            })
+            .catch(e => console.error(e.stack));
     });
 }
 
