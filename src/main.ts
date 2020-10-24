@@ -19,6 +19,7 @@ import HelpCommandModule from './modules/commands/help';
 import PingCommandModule from './modules/commands/ping';
 import SayCommandModule from './modules/commands/say';
 import InfoCommandModule from './modules/commands/info';
+import DeleteCommandModule from './modules/commands/delete';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -39,6 +40,7 @@ const modules: Module[] = [
     new PingCommandModule(),
     new SayCommandModule(),
     new InfoCommandModule(),
+    new DeleteCommandModule(),
 ];
 
 export default function (bot: Bot): void {
