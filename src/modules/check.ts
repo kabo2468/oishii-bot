@@ -1,9 +1,9 @@
-import Module from '../module';
-import { Note } from '../misskey/note';
 import { Bot } from '../bot';
-import variables from '../variables';
-import { TextProcess } from '../utils/text-process';
 import messages from '../messages';
+import { Note } from '../misskey/note';
+import Module from '../module';
+import { TextProcess } from '../utils/text-process';
+import variables from '../variables';
 
 export default class extends Module {
     Name = 'Check';

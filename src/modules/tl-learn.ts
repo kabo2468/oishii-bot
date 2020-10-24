@@ -1,5 +1,5 @@
-import Module from '../module';
 import { Bot } from '../bot';
+import Module from '../module';
 import { TextProcess } from '../utils/text-process';
 
 export default class extends Module {

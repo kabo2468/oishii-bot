@@ -1,7 +1,7 @@
-import Module from '../module';
-import { Note } from '../misskey/note';
 import { Bot } from '../bot';
 import messages, { arrToStr } from '../messages';
+import { Note } from '../misskey/note';
+import Module from '../module';
 import variables from '../variables';
 
 export default class extends Module {
