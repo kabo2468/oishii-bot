@@ -6,10 +6,17 @@ import { isNote, Note } from './misskey/note';
 
 import TLPizzaModule from './modules/tl-pizza';
 import TLLearnModule from './modules/tl-learn';
+import CheckModule from './modules/check';
+
 const tlModules = {
     pizza: new TLPizzaModule(),
     learn: new TLLearnModule(),
 };
+// prettier-ignore
+const modules: Module[] = [
+    new CheckModule(),
+];
+
 export default function (bot: Bot): void {
     const channels = [
         {
@@ -99,6 +106,10 @@ export default function (bot: Bot): void {
 
             if (isNote(json.body.body)) {
                 const note = new Note(json.body.body);
+                const mod = modules.find((module) => module.Regex.test(note.note.text));
+                if (mod) {
+                    mod.Run(bot, note);
+                }
             } else {
                 // TODO: メッセージ対応
                 // const msg = new Message(json.body.body);
