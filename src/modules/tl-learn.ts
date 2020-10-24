@@ -15,6 +15,7 @@ export default class extends Module {
         if (isExists) {
             const good = Math.random() < 0.8;
             bot.addFood(food, good);
+            this.log('INSERT:', `${food} (${good})`);
         } else {
             this.log(food, 'is skipped.');
         }
