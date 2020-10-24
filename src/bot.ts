@@ -40,7 +40,11 @@ export class Bot {
         console.log(text, ...arg);
     }
 
-    async existsWord(text: string): Promise<boolean> {
+    async runQuery<T>(query: { text: string; values?: (string | boolean)[] }): Promise<Res<T>> {
+        return await this.db.query(query);
+    }
+
+    async existsFood(text: string): Promise<boolean> {
         return new Promise((resolve) => {
             const query = {
                 text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1))',
@@ -52,11 +56,7 @@ export class Bot {
         });
     }
 
-    async runQuery<T>(query: { text: string; values?: (string | boolean)[] }): Promise<Res<T>> {
-        return await this.db.query(query);
-    }
-
-    async addWord(food: string, good: boolean): Promise<void> {
+    async addFood(food: string, good: boolean): Promise<void> {
         const query = {
             text: 'INSERT INTO oishii_table ( name, good ) VALUES ( $1, $2 )',
             values: [food, good],

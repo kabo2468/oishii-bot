@@ -97,7 +97,7 @@ export default function (bot: Bot): void {
                 return;
             }
 
-            void tlModules.learn.Run(bot, note.note.text);
+            void tlModules.learn.Run(bot, note);
 
             // TODO: 自動投稿
         }

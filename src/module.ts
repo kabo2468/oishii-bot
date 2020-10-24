@@ -5,7 +5,7 @@ export default abstract class Module {
     abstract readonly Name: string;
     abstract readonly Regex: RegExp;
 
-    abstract Run(bot: Bot, context?: Note | string): void;
+    abstract Run(bot: Bot, note?: Note): void;
 
     About(): void {
         console.log(`Name: ${this.Name}`);
