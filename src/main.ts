@@ -9,6 +9,7 @@ import TLLearnModule from './modules/tl-learn';
 import KawaiiModule from './modules/kawaii';
 import LearnModule from './modules/learn';
 import CheckModule from './modules/check';
+import SearchModule from './modules/search';
 import HungryModule from './modules/hungry';
 import FoodModule from './modules/food';
 import SushiModule from './modules/sushi';
@@ -27,6 +28,7 @@ const tlModules = {
 const modules: Module[] = [
     new LearnModule(),
     new CheckModule(),
+    new SearchModule(),
     new HungryModule(),
     new FoodModule(),
     new SushiModule(),
