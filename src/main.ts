@@ -13,6 +13,7 @@ import FoodModule from './modules/food';
 import SushiModule from './modules/sushi';
 import FollowCommandModule from './modules/commands/follow';
 import HelpCommandModule from './modules/commands/help';
+import PingCommandModule from './modules/commands/ping';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -27,6 +28,7 @@ const modules: Module[] = [
     new KawaiiModule(),
     new FollowCommandModule(),
     new HelpCommandModule(),
+    new PingCommandModule(),
 ];
 
 export default function (bot: Bot): void {
