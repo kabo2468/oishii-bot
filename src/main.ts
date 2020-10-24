@@ -4,6 +4,12 @@ import Module from './module';
 import API, { Streaming } from './misskey/api';
 import { isNote, Note } from './misskey/note';
 
+import TLPizzaModule from './modules/tl-pizza';
+import TLLearnModule from './modules/tl-learn';
+const tlModules = {
+    pizza: new TLPizzaModule(),
+    learn: new TLLearnModule(),
+};
 export default function (bot: Bot): void {
     const channels = [
         {
@@ -58,6 +64,13 @@ export default function (bot: Bot): void {
                 bot.log('SKIP(NG WORD):', note.findNGWord(bot.ngWords));
                 return;
             }
+
+            if (tlModules.pizza.Regex.test(note.note.text)) {
+                tlModules.pizza.Run(bot, note);
+                return;
+            }
+
+            void tlModules.learn.Run(bot, note.note.text);
 
             // TODO: 自動投稿
         }
