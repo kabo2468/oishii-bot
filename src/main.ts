@@ -7,6 +7,7 @@ import { isNote, Note } from './misskey/note';
 import TLPizzaModule from './modules/tl-pizza';
 import TLLearnModule from './modules/tl-learn';
 import CheckModule from './modules/check';
+import HungryModule from './modules/hungry';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -15,6 +16,7 @@ const tlModules = {
 // prettier-ignore
 const modules: Module[] = [
     new CheckModule(),
+    new HungryModule(),
 ];
 
 export default function (bot: Bot): void {
