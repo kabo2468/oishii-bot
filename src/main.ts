@@ -11,6 +11,7 @@ import CheckModule from './modules/check';
 import HungryModule from './modules/hungry';
 import FoodModule from './modules/food';
 import SushiModule from './modules/sushi';
+import FollowCommandModule from './modules/commands/follow';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -23,6 +24,7 @@ const modules: Module[] = [
     new FoodModule(),
     new SushiModule(),
     new KawaiiModule(),
+    new FollowCommandModule(),
 ];
 
 export default function (bot: Bot): void {
