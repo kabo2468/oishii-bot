@@ -6,6 +6,7 @@ import { isNote, Note } from './misskey/note';
 
 import TLPizzaModule from './modules/tl-pizza';
 import TLLearnModule from './modules/tl-learn';
+import KawaiiModule from './modules/kawaii';
 import CheckModule from './modules/check';
 import HungryModule from './modules/hungry';
 import FoodModule from './modules/food';
@@ -21,6 +22,7 @@ const modules: Module[] = [
     new HungryModule(),
     new FoodModule(),
     new SushiModule(),
+    new KawaiiModule(),
 ];
 
 export default function (bot: Bot): void {
