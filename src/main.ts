@@ -8,6 +8,7 @@ import TLPizzaModule from './modules/tl-pizza';
 import TLLearnModule from './modules/tl-learn';
 import CheckModule from './modules/check';
 import HungryModule from './modules/hungry';
+import FoodModule from './modules/food';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -17,6 +18,7 @@ const tlModules = {
 const modules: Module[] = [
     new CheckModule(),
     new HungryModule(),
+    new FoodModule(),
 ];
 
 export default function (bot: Bot): void {
