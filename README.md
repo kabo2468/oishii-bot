@@ -8,15 +8,14 @@
     "apiKey": "",
     "databaseUrl": "postgresql://USER:PASSWORD@HOST:PORT/DATABASE",
     "dbSSL": false,
-    // Exclude @
     "ownerUsername": "",
-    // Minutes
+    // 分 / minutes
     "autoPostInterval": 60
 }
 ```
 
 ## NG Words
 
-参照元
+参考元
 
 <https://github.com/Xeltica/Citrine/blob/master/Citrine.Core/Resources/ngwords.txt>
