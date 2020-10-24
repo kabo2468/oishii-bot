@@ -12,6 +12,7 @@ import HungryModule from './modules/hungry';
 import FoodModule from './modules/food';
 import SushiModule from './modules/sushi';
 import FollowCommandModule from './modules/commands/follow';
+import UnfollowCommandModule from './modules/commands/unfollow';
 import HelpCommandModule from './modules/commands/help';
 import PingCommandModule from './modules/commands/ping';
 
@@ -27,6 +28,7 @@ const modules: Module[] = [
     new SushiModule(),
     new KawaiiModule(),
     new FollowCommandModule(),
+    new UnfollowCommandModule(),
     new HelpCommandModule(),
     new PingCommandModule(),
 ];
