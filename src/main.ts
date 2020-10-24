@@ -7,6 +7,7 @@ import { isNote, Note } from './misskey/note';
 import TLPizzaModule from './modules/tl-pizza';
 import TLLearnModule from './modules/tl-learn';
 import KawaiiModule from './modules/kawaii';
+import LearnModule from './modules/learn';
 import CheckModule from './modules/check';
 import HungryModule from './modules/hungry';
 import FoodModule from './modules/food';
@@ -24,6 +25,7 @@ const tlModules = {
 };
 // prettier-ignore
 const modules: Module[] = [
+    new LearnModule(),
     new CheckModule(),
     new HungryModule(),
     new FoodModule(),

@@ -62,7 +62,14 @@ export class Bot {
             values: [food, good],
         };
         await this.runQuery(query);
-        console.log(`INSERT: ${food} (${String(good)})`);
+    }
+
+    async learnFood(food: string, good: boolean): Promise<void> {
+        const query = {
+            text: 'UPDATE oishii_table SET good=$1, learned=true WHERE LOWER(name) = LOWER($2)',
+            values: [good, food],
+        };
+        await this.runQuery(query);
     }
 
     async sayFood(): Promise<void> {
@@ -71,9 +78,7 @@ export class Bot {
             text: `SELECT (name, good) FROM oishii_table ${rnd}ORDER BY RANDOM() LIMIT 1`,
         };
         const res = await this.runQuery<string>(query);
-
         const row = res.rows[0].row;
-        this.log(`row: ${row}`);
 
         const match = row.match(/\((.+),([tf])\)/);
         if (!match) return;
