@@ -26,6 +26,7 @@ export default async function loadConfig(): Promise<Config> {
     const json = readFileSync('./config.json', { encoding: 'utf-8' });
     const jsonConfig = JSON.parse(json) as JsonConfig;
     if (jsonConfig.url.endsWith('/')) jsonConfig.url.slice(0, -1);
+    if (jsonConfig.ownerUsername.startsWith('@')) jsonConfig.url.slice(1);
 
     const errors: string[] = [];
     const keys: JsonConfig = {
