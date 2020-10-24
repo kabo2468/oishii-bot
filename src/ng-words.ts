@@ -44,6 +44,16 @@ export default class NGWord {
         }
     }
 
+    removeNGWord(str: string): boolean {
+        const word = toHiragana(str.trim().toLowerCase());
+        if (this.ngWords.some((ng) => word.includes(ng))) {
+            this.ngWords = this.ngWords.filter((ng) => ng !== word);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     addExcludedWord(str: string): boolean {
         const word = toHiragana(str.trim().toLowerCase());
         if (this.excludedWords.some((ng) => word.includes(ng))) {
@@ -51,6 +61,16 @@ export default class NGWord {
         } else {
             this.excludedWords.push(word);
             return true;
+        }
+    }
+
+    removeExcludedWord(str: string): boolean {
+        const word = toHiragana(str.trim().toLowerCase());
+        if (this.excludedWords.some((ng) => word.includes(ng))) {
+            this.excludedWords = this.excludedWords.filter((e) => e !== word);
+            return true;
+        } else {
+            return false;
         }
     }
 }

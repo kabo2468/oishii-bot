@@ -9,12 +9,13 @@ export default {
         help: [
             '/help: コマンドリストを表示する。',
             '/ping: 生存確認する。',
-            '/info: (今のところは)DBのレコード数を表示する。',
-            '/say: なにか言わせる。(オーナーのみ)',
+            '/info: DBのレコード数やCommit Hash、稼働時間を表示する。',
             '/follow: フォローする。',
             '/unfollow: フォローを解除する。',
+            '/say: なにか言わせる。(オーナーのみ)',
             '/delete: 削除する。（オーナーのみ）',
-            '/chart: DBのレコード数をチャートにする。（オーナーのみ）',
+            // '/chart: DBのレコード数をチャートにする。（オーナーのみ）',
+            '/ng (a|b): NGワードを追加/削除する。（オーナーのみ）',
         ],
         ping: 'ぽん！',
         nullpo: 'ガッ',
@@ -33,6 +34,10 @@ export default {
             cant: 'フォロー解除できませんでした。',
         },
         chart: 'DBのレコード数です。',
+        ngWord: {
+            add: (ng: boolean, ex: boolean): string => `追加しました。(NG: ${ng}, Exclude: ${ex})`,
+            remove: (ng: boolean, ex: boolean): string => `削除しました。(NG: ${ng}, Exclude: ${ex})`,
+        },
     },
     pizza: {
         text: [
