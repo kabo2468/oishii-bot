@@ -1,9 +1,10 @@
-import { Config } from './config';
-import NGWord from './ng-words';
 import { Pool } from 'pg';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-
 import wsConst from 'ws';
+import { Config } from './config';
+import messages from './messages';
+import API from './misskey/api';
+import NGWord from './ng-words';
 
 type Res<T> = {
     rows: Record<string, T>[];
@@ -62,5 +63,26 @@ export class Bot {
         };
         await this.runQuery(query);
         console.log(`INSERT: ${food} (${String(good)})`);
+    }
+
+    async sayFood(): Promise<void> {
+        const rnd = Math.random() < 0.2 ? 'WHERE learned=true' : '';
+        const query = {
+            text: `SELECT (name, good) FROM oishii_table ${rnd}ORDER BY RANDOM() LIMIT 1`,
+        };
+        const res = await this.runQuery<string>(query);
+
+        const row = res.rows[0].row;
+        this.log(`row: ${row}`);
+
+        const match = row.match(/\((.+),([tf])\)/);
+        if (!match) return;
+
+        const food = match[1].replace(/"(.+)"/, '$1');
+        const good = match[2] === 't' ? true : false;
+        this.log(`sayFood: ${food} (${good})`);
+
+        const text = messages.food.say(name, good);
+        API.postText(text);
     }
 }

@@ -15,6 +15,7 @@ import FollowCommandModule from './modules/commands/follow';
 import UnfollowCommandModule from './modules/commands/unfollow';
 import HelpCommandModule from './modules/commands/help';
 import PingCommandModule from './modules/commands/ping';
+import SayCommandModule from './modules/commands/say';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -31,6 +32,7 @@ const modules: Module[] = [
     new UnfollowCommandModule(),
     new HelpCommandModule(),
     new PingCommandModule(),
+    new SayCommandModule(),
 ];
 
 export default function (bot: Bot): void {
