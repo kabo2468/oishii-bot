@@ -25,10 +25,6 @@ export class Bot {
             ssl: config.dbSSL,
             connectionString: config.databaseUrl,
         });
-        psql.on('error', (err) => {
-            console.error('Unexpected error:', err);
-            process.exit(1);
-        });
         this.db = psql;
 
         this.ws = new ReconnectingWebSocket(`${config.wsUrl}/streaming?i=${config.apiKey}`, [], {
@@ -41,7 +37,10 @@ export class Bot {
     }
 
     async runQuery<T>(query: { text: string; values?: (string | boolean)[] }): Promise<Res<T>> {
-        return await this.db.query(query);
+        return this.db.query(query).catch((err) => {
+            console.error(err);
+            process.exit(1);
+        });
     }
 
     async existsFood(text: string): Promise<boolean> {
