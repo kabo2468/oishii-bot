@@ -1,8 +1,0 @@
-{
-    "url": "https://misskey.io",
-    "apiKey": "",
-    "databaseUrl": "postgresql://USER:PASSWORD@HOST:PORT/DATABASE",
-    "dbSSL": false,
-    "ownerUsername": "",
-    "autoPostInterval": 60
-}

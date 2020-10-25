@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { readFileSync } from 'fs';
+import JSON5 from 'json5';
 
 type JsonConfig = {
     [key: string]: string | boolean | number;
@@ -23,8 +24,8 @@ export type Config = {
 };
 
 export default async function loadConfig(): Promise<Config> {
-    const json = readFileSync('./config.json', { encoding: 'utf-8' });
-    const jsonConfig = JSON.parse(json) as JsonConfig;
+    const json = readFileSync('./config.json5', { encoding: 'utf-8' });
+    const jsonConfig = JSON5.parse(json) as JsonConfig;
     if (jsonConfig.url.endsWith('/')) jsonConfig.url.slice(0, -1);
     if (jsonConfig.ownerUsername.startsWith('@')) jsonConfig.url.slice(1);
 
