@@ -33,7 +33,7 @@ export class Bot {
     }
 
     log(text?: string, ...arg: unknown[]): void {
-        console.log(text, ...arg);
+        console.log('[Bot]:', text, ...arg);
     }
 
     async runQuery<T>(query: { text: string; values?: (string | boolean)[] }): Promise<Res<T>> {
