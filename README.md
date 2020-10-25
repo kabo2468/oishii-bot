@@ -1,21 +1,59 @@
 # oishii-bot
 
+## 使い方
+
+### `example.json5` をコピーして `config.json5` を作る
+
+```shell
+cp example.json5 config.json5
+```
+
+### `config.json5` を[下にある](#config.json)ように編集する
+
+```shell
+vi config.json5
+# OR
+emacs config.json5
+# OR
+nano config.json5
+# ...etc
+```
+
+### ビルドする
+
+```shell
+npm i
+npm run build
+```
+
+### 終わり
+
+```shell
+npm start
+```
+
 ## config.json
 
-```json
+```json5
 {
-    "url": "https://misskey.io",
-    "apiKey": "",
-    "databaseUrl": "postgresql://USER:PASSWORD@HOST:PORT/DATABASE",
-    "dbSSL": false,
-    "ownerUsername": "",
-    // 分 / minutes
-    "autoPostInterval": 60
+    // MisskeyのURL
+    url: 'https://misskey.io',
+    // 多分アクセストークンでも行ける（未検証）
+    // アクセストークンでやる場合は、すべての権限をオンにしたほうが楽かも
+    apiKey: '',
+    // 大文字のところを書き換える
+    databaseUrl: 'postgresql://USER:PASSWORD@HOST:PORT/DATABASE',
+    // DBのSSL
+    dbSSL: false,
+    // オーナーのUsername オーナーのみが使えるコマンドを使う人を指定する
+    ownerUsername: 'kabo',
+    // 何分毎に投稿するか
+    autoPostInterval: 60,
 }
 ```
 
 ## NG Words
 
-参考元
+Xeltica さんの Citrine から参考にさせていただきました。
 
-<https://github.com/Xeltica/Citrine/blob/master/Citrine.Core/Resources/ngwords.txt>
+<https://github.com/Xeltica/Citrine/blob/master/Resources/ngwords.txt>
