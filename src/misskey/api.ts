@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
-import { CreatedNote, Note } from './note';
-import { CreatedMessage, Message } from './message';
 import loadConfig from '../config';
+import { CreatedMessage, Message } from './message';
+import { CreatedNote, Note } from './note';
 
 export interface User {
     id: string;
@@ -50,7 +50,7 @@ export default class API {
                 return res.ok;
             })
             .catch((err) => {
-                throw err;
+                throw new Error(err);
             });
     }
 
@@ -73,7 +73,7 @@ export default class API {
             })
             .then((json: { createdNote: CreatedNote }) => new Note(json.createdNote))
             .catch((err) => {
-                throw err;
+                throw new Error(err);
             });
     }
 
@@ -87,7 +87,11 @@ export default class API {
             method: 'post',
             body: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' },
-        }).then((res) => res.ok);
+        })
+            .then((res) => res.ok)
+            .catch((err) => {
+                throw new Error(err);
+            });
     }
 
     static async sendMessage(text: string, userId: string, groupId?: string): Promise<Message> {
@@ -104,7 +108,10 @@ export default class API {
             headers: { 'Content-Type': 'application/json' },
         })
             .then((res) => res.json())
-            .then((json) => new Message(json));
+            .then((json) => new Message(json))
+            .catch((err) => {
+                throw new Error(err);
+            });
     }
 }
 

@@ -55,13 +55,9 @@ export class Note {
     }
 
     reply(text: string, visibility: Visibilities = this.note.visibility): void {
-        API.postText(text, visibility, this.note.id)
-            .then((res) => {
-                console.dir(res, { depth: null });
-            })
-            .catch((err) => {
-                throw err;
-            });
+        API.postText(text, visibility, this.note.id).catch((err) => {
+            throw new Error(err);
+        });
     }
 
     reaction(reaction = '🍮'): void {
@@ -70,7 +66,7 @@ export class Note {
                 console.log(res);
             })
             .catch((err) => {
-                throw err;
+                throw new Error(err);
             });
     }
 }

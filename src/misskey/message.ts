@@ -47,7 +47,7 @@ export class Message extends TextProcess {
                 console.dir(res, { depth: null });
             })
             .catch((err) => {
-                throw err;
+                throw new Error(err);
             });
     }
 }

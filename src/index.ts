@@ -12,5 +12,6 @@ loadConfig()
         main(_m);
     })
     .catch((err) => {
-        throw err;
+        console.error(err);
+        process.exit(1);
     });
