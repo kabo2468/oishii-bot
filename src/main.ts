@@ -110,11 +110,6 @@ export default function (bot: Bot): void {
         }
 
         if (json.body.id === 'streamingMainId') {
-            // if (json.body.type === 'readAllUnreadMentions') return;
-            // if (json.body.type === 'readAllUnreadSpecifiedNotes') return;
-            // if (json.body.type === 'readAntenna') return;
-            // if (json.body.type === 'readAllAntennas') return;
-            // if (json.body.type === 'readAllNotifications') return;
             const type = json.body.type;
             const allowTypes = ['note', 'messagingMessage', 'followed'];
             if (!allowTypes.includes(type)) return;

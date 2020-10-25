@@ -61,13 +61,9 @@ export class Note {
     }
 
     reaction(reaction = '🍮'): void {
-        API.reactionToNote(this.note.id, reaction)
-            .then((res) => {
-                console.log(res);
-            })
-            .catch((err) => {
-                throw new Error(err);
-            });
+        API.reactionToNote(this.note.id, reaction).catch((err) => {
+            throw new Error(err);
+        });
     }
 }
 

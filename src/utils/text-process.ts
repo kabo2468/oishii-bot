@@ -34,6 +34,7 @@ export class TextProcess {
         return new Promise((resolve) => {
             builder({ dicPath: 'node_modules/kuromoji/dict' }).build(function (err, tokenizer) {
                 if (err) throw err;
+
                 const tokens = tokenizer.tokenize(text);
 
                 //名詞のみ
