@@ -7,10 +7,11 @@ export default class extends Module {
     Name = 'Unfollow';
     Regex = /^\/unfollow|フォロー解除$/i;
 
-    Run(bot: Bot, note: Note): void {
+    async Run(bot: Bot, note: Note): Promise<void> {
         this.log(`${note.note.user.username} (${note.note.userId})`);
-        void API.api('/following/delete', {
+        const ok = await API.api('/following/delete', {
             userId: note.note.userId,
         });
+        this.log('OK:', String(ok));
     }
 }

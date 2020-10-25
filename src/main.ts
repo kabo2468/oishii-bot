@@ -117,12 +117,18 @@ export default function (bot: Bot): void {
             if (json.body.body.user?.isBot === true) return;
 
             if (type === 'followed') {
+                const user: {
+                    id: string;
+                    username: string;
+                    host: string;
+                } = JSON.parse(data.data).body.body;
+
                 const done = API.api('/following/create', {
                     userId: json.body.body.id,
                 }).catch((err) => console.error(err));
 
-                const logPrefix = done ? 'Follow' : 'Failed to follow';
-                bot.log(`${logPrefix} ${json.body.body.user.username} (${json.body.body.userId})`);
+                const logPrefix = done ? 'Followed' : 'Failed to follow';
+                bot.log(`${logPrefix} @${user.username}@${user.host} (${user.id})`);
                 return;
             }
 

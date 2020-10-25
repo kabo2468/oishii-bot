@@ -7,10 +7,11 @@ export default class extends Module {
     Name = 'Follow';
     Regex = /^\/follow|フォロー|フォロバ$/i;
 
-    Run(bot: Bot, note: Note): void {
+    async Run(bot: Bot, note: Note): Promise<void> {
         this.log(`${note.note.user.username} (${note.note.userId})`);
-        void API.api('/following/create', {
+        const ok = await API.api('/following/create', {
             userId: note.note.userId,
         });
+        this.log('OK:', String(ok));
     }
 }
