@@ -86,7 +86,7 @@ export class Bot {
         const good = match[2] === 't' ? true : false;
         this.log(`sayFood: ${food} (${good})`);
 
-        const text = messages.food.say(name, good);
+        const text = messages.food.say(food, good);
         API.postText(text);
     }
 }
