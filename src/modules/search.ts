@@ -10,6 +10,7 @@ export default class extends Module {
 
     async Run(bot: Bot, note: Note): Promise<void> {
         const match = note.note.text.match(this.Regex);
+        if (!match) return;
 
         const good = !!match[3].match(variables.food.good);
         const addText = match[1] ? 'AND learned=true ' : '';
