@@ -134,8 +134,12 @@ export default function (bot: Bot): void {
 
             if (isNote(json.body.body)) {
                 const note = new Note(json.body.body);
+                note.removeURLs().removeMentionToMe();
+                bot.log('Text:', note.note.text);
                 const mod = modules.find((module) => module.Regex.test(note.note.text));
                 if (mod) {
+                    bot.log('Module:', mod.Name);
+                    note.reaction();
                     mod.Run(bot, note);
                 }
             } else {
