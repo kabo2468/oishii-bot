@@ -11,6 +11,7 @@ export interface User {
     avatarUrl: string;
     avatarColor: string;
     isCat: boolean;
+    isBot: boolean;
     emojis: string[];
 }
 
@@ -57,7 +58,7 @@ export default class API {
     static async postText(text: string, visibility: 'public' | 'home' | 'followers' | 'specified' = 'public', replyId?: string): Promise<Note> {
         const config = await loadConfig();
         const data = {
-            i: process.env.API_KEY,
+            i: config.apiKey,
             text,
             visibility,
             replyId,
@@ -80,6 +81,7 @@ export default class API {
     static async reactionToNote(noteId: string, reaction: string): Promise<boolean> {
         const config = await loadConfig();
         const data = {
+            i: config.apiKey,
             noteId,
             reaction,
         };
@@ -97,7 +99,7 @@ export default class API {
     static async sendMessage(text: string, userId: string, groupId?: string): Promise<Message> {
         const config = await loadConfig();
         const data = {
-            i: process.env.API_KEY,
+            i: config.apiKey,
             text,
             userId,
             groupId,

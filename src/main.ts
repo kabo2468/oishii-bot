@@ -119,6 +119,8 @@ export default function (bot: Bot): void {
             const allowTypes = ['note', 'messagingMessage', 'followed'];
             if (!allowTypes.includes(type)) return;
 
+            if (json.body.body.user?.isBot === true) return;
+
             if (type === 'followed') {
                 const done = API.api('/following/create', {
                     userId: json.body.body.id,
