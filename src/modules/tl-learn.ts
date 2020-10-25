@@ -9,6 +9,7 @@ export default class extends Module {
 
     async Run(bot: Bot, note: Note): Promise<void> {
         const nouns = await TextProcess.getNouns(note.note.text);
+        if (nouns.length < 1) return;
         const food = nouns[Math.floor(Math.random() * nouns.length)].surface_form;
 
         const isExists = await bot.existsFood(food);
