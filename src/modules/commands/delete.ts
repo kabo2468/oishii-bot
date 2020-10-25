@@ -8,7 +8,7 @@ export default class extends Module {
     Regex = /^\/delete (.+)$/i;
 
     async Run(bot: Bot, note: Note): Promise<void> {
-        if (note.note.userId !== bot.config.ownerUsername) {
+        if (note.note.userId !== bot.config.ownerId) {
             note.reply(messages.commands.denied);
             return;
         }

@@ -19,7 +19,7 @@ export type Config = {
     databaseUrl: string;
     dbSSL: boolean;
     userId: string;
-    ownerUsername: string;
+    ownerId: string;
     autoPostInterval: number;
 };
 
@@ -67,11 +67,23 @@ export default async function loadConfig(): Promise<Config> {
     })
         .then((res) => res.json())
         .then((json: Record<string, string>) => json.id);
+    const ownerId = await fetch(`${apiUrl}/users/show`, {
+        method: 'post',
+        body: JSON.stringify({
+            i: jsonConfig.apiKey,
+            username: jsonConfig.ownerUsername,
+            host: null,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+    })
+        .then((res) => res.json())
+        .then((json: Record<string, string>) => json.id);
 
     return {
         ...config,
         wsUrl,
         apiUrl,
         userId,
+        ownerId,
     };
 }
