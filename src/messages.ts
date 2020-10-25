@@ -59,9 +59,9 @@ export default {
             },
         ],
         toText(): string {
-            let pizzaText = '';
-            this.text.forEach((shop) => (pizzaText += `?[${shop.name}](${shop.url})`));
-            return pizzaText;
+            const pizzaText: string[] = [];
+            this.text.forEach((shop) => pizzaText.push(`?[${shop.name}](${shop.url})`));
+            return pizzaText.join('\n');
         },
     },
     food: {
