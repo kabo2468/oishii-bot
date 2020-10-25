@@ -26,19 +26,20 @@ export default class extends Module {
             values: [text],
         };
         const res = await bot.runQuery(query);
-
         if (!res) return;
 
-        void isNoun(text).then((isNoun) => {
-            if (isNoun) {
+        if (res.rowCount < 1) {
+            const noun = await isNoun(text);
+            if (noun) {
                 note.reply(messages.food.idk);
             } else {
                 note.reply(messages.food.canEat);
             }
-        });
+            return;
+        }
 
         const isGood = res.rows[0].good;
-        const goodText = isGood ? 'good' : 'bad';
+        const goodText = isGood ? messages.food.good : messages.food.bad;
         note.reply(goodText);
     }
 }
