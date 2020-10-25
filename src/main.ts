@@ -111,7 +111,7 @@ export default function (bot: Bot): void {
 
         if (json.body.id === 'streamingMainId') {
             const type = json.body.type;
-            const allowTypes = ['note', 'messagingMessage', 'followed'];
+            const allowTypes = ['mention', 'messagingMessage', 'followed'];
             if (!allowTypes.includes(type)) return;
 
             if (json.body.body.user?.isBot === true) return;
