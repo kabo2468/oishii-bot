@@ -9,7 +9,7 @@ export default class extends Module {
 
     Run(bot: Bot, note: Note): void {
         this.log(`${note.note.user.username} (${note.note.userId})`);
-        void API.api('following/delete', {
+        void API.api('/following/delete', {
             userId: note.note.userId,
         });
     }

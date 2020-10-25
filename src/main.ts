@@ -121,14 +121,12 @@ export default function (bot: Bot): void {
             if (!allowTypes.includes(type)) return;
 
             if (type === 'followed') {
-                API.api('following/create', {
+                const done = API.api('/following/create', {
                     userId: json.body.body.id,
-                })
-                    .then((ok) => {
-                        const logPrefix = ok ? 'Follow' : 'Failed to follow';
-                        bot.log(`${logPrefix} ${json.body.body.id}`);
-                    })
-                    .catch((err) => console.error(err));
+                }).catch((err) => console.error(err));
+
+                const logPrefix = done ? 'Follow' : 'Failed to follow';
+                bot.log(`${logPrefix} ${json.body.body.user.username} (${json.body.body.userId})`);
                 return;
             }
 
