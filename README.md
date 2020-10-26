@@ -26,6 +26,12 @@ npm i
 npm run build
 ```
 
+### Table を作る
+
+```shell
+npm run migration
+```
+
 ### 終わり
 
 ```shell

@@ -12,7 +12,8 @@
     "check": "tsc --noEmit",
     "tsc": "tsc",
     "build": "npm run clean && npm run tsc",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "migration": "node built/migration.js"
   },
   "dependencies": {
     "json5": "^2.1.3",
