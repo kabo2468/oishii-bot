@@ -13,14 +13,18 @@ export default class extends Module {
         if (!match) return;
 
         const good = !!match[3].match(variables.food.good);
-        const addText = match[1] ? 'AND learned=true ' : '';
+        const addText = match[1] ? 'AND learned=true' : '';
         const query = {
-            text: `SELECT name FROM oishii_table WHERE good=$1 ${addText}ORDER BY RANDOM() LIMIT 1`,
+            text: `SELECT name FROM oishii_table WHERE good=$1 ${addText} ORDER BY RANDOM() LIMIT 1`,
             values: [good],
         };
 
-        const res = await bot.runQuery<string>(query);
+        const res = await bot.runQuery(query);
         const food = res.rows[0].name;
+        if (!food) {
+            note.reply(messages.food.idk);
+            return;
+        }
         this.log(`${food} (${good})`);
         note.reply(messages.food.search(food, good));
     }

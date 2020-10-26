@@ -7,8 +7,16 @@ import messages from './messages';
 import API from './misskey/api';
 import NGWord from './ng-words';
 
-type Res<T> = {
-    rows: Record<string, T>[];
+type Rows = {
+    name: string;
+    good: boolean;
+    learned: boolean;
+    exists: boolean;
+    count: string;
+};
+
+type Res = {
+    rows: Partial<Rows>[];
     rowCount: number;
 };
 
@@ -47,7 +55,7 @@ export class Bot {
         console.log('[Bot]:', text, ...arg);
     }
 
-    async runQuery<T>(query: { text: string; values?: (string | boolean)[] }): Promise<Res<T>> {
+    async runQuery(query: { text: string; values?: (string | boolean)[] }): Promise<Res> {
         return this.db.query(query).catch((err) => {
             console.error(err);
             process.exit(1);
@@ -60,7 +68,7 @@ export class Bot {
                 text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1))',
                 values: [text],
             };
-            this.runQuery<boolean>(query).then((res) => {
+            this.runQuery(query).then((res) => {
                 resolve(res.rows[0].exists);
             });
         });
@@ -87,16 +95,14 @@ export class Bot {
 
         const rnd = Math.random() < 0.2 ? 'WHERE learned=true' : '';
         const query = {
-            text: `SELECT (name, good) FROM oishii_table ${rnd}ORDER BY RANDOM() LIMIT 1`,
+            text: `SELECT name, good FROM oishii_table ${rnd} ORDER BY RANDOM() LIMIT 1`,
         };
-        const res = await this.runQuery<string>(query);
-        const row = res.rows[0].row;
+        const res = await this.runQuery(query);
 
-        const match = row.match(/\((.+),([tf])\)/);
-        if (!match) return;
-
-        const food = match[1].replace(/"(.+)"/, '$1');
-        const good = match[2] === 't' ? true : false;
+        const food = res.rows[0].name;
+        const good = res.rows[0].good;
+        if (!food) return;
+        if (!good) return;
         this.log(`sayFood: ${food} (${good})`);
 
         const text = messages.food.say(food, good);

@@ -11,7 +11,7 @@ export default class extends Module {
     async Run(bot: Bot, note: Note): Promise<void> {
         const text: string[] = [];
 
-        const res = await bot.runQuery<string>({ text: 'SELECT learned, count(learned) FROM oishii_table GROUP BY learned' });
+        const res = await bot.runQuery({ text: 'SELECT learned, count(learned) FROM oishii_table GROUP BY learned' });
 
         // Records
         const fl = res.rows[0].count;

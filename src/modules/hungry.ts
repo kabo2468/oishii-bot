@@ -9,19 +9,15 @@ export default class extends Module {
 
     Run(bot: Bot, note: Note): void {
         const _g = Math.random() < 0.4 ? 'true' : 'false';
-        const query = `SELECT (name, good) FROM oishii_table WHERE good=${_g} ORDER BY RANDOM() LIMIT 1`;
+        const query = `SELECT name, good FROM oishii_table WHERE good=${_g} ORDER BY RANDOM() LIMIT 1`;
 
-        bot.runQuery<string>({ text: query }).then((res) => {
-            const row = res.rows[0].row;
-            this.log(`row: ${row}`);
-
-            const match = row.match(/\((.+),([tf])\)/);
-            if (!match) {
-                // TODO: 何かあったほうが良いかも
+        bot.runQuery({ text: query }).then((res) => {
+            const food = res.rows[0].name;
+            const good = res.rows[0].good;
+            if (!food || !good) {
+                note.reply(messages.food.idk);
                 return;
             }
-            const food = match[1].replace(/"(.+)"/, '$1');
-            const good = match[2] === 't' ? true : false;
             this.log(`Food: ${food} (${good})`);
 
             note.reply(messages.food.hungry(food, good));
