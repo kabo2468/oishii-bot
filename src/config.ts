@@ -2,14 +2,22 @@ import fetch from 'node-fetch';
 import { readFileSync } from 'fs';
 import JSON5 from 'json5';
 
+type Post = {
+    [key: string]: number;
+    autoPostInterval: number;
+    tlPostProbability: number;
+    rateLimitSec: number;
+    rateLimitPost: number;
+};
+
 type JsonConfig = {
-    [key: string]: string | boolean | number;
+    [key: string]: string | boolean | number | Post;
     url: string;
     apiKey: string;
     databaseUrl: string;
     dbSSL: boolean;
     ownerUsername: string;
-    autoPostInterval: number;
+    post: Post;
 };
 
 export type Config = {
@@ -20,7 +28,8 @@ export type Config = {
     dbSSL: boolean;
     userId: string;
     ownerId: string;
-    autoPostInterval: number;
+    post: Post;
+    followings: number;
 };
 
 export default async function loadConfig(): Promise<Config> {
@@ -32,20 +41,32 @@ export default async function loadConfig(): Promise<Config> {
     const errors: string[] = [];
     const keys: JsonConfig = {
         apiKey: '',
-        autoPostInterval: 0,
         databaseUrl: '',
         dbSSL: false,
         ownerUsername: '',
         url: '',
+        post: {
+            autoPostInterval: 0,
+            rateLimitPost: 0,
+            rateLimitSec: 0,
+            tlPostProbability: 0,
+        },
     };
     for (const key of Object.keys(keys)) {
         const _v = jsonConfig[key];
-        if (typeof _v === 'boolean') {
-            if (_v !== undefined) continue;
+        if (key === 'post') {
+            for (const pKey of Object.keys(keys.post)) {
+                if (jsonConfig.post[pKey]) continue;
+                errors.push(`post.${pKey}`);
+            }
         } else {
-            if (_v) continue;
+            if (typeof _v === 'boolean') {
+                if (_v !== undefined) continue;
+            } else {
+                if (_v) continue;
+            }
+            errors.push(key);
         }
-        errors.push(key);
     }
     if (errors.length > 0) {
         for (const idx in errors) console.error(`[Config]: ${errors[idx]} is not set.`);
@@ -58,7 +79,7 @@ export default async function loadConfig(): Promise<Config> {
 
     const wsUrl = url.replace('http', 'ws');
     const apiUrl = url + '/api';
-    const userId = await fetch(`${apiUrl}/i`, {
+    const [userId, follows] = await fetch(`${apiUrl}/i`, {
         method: 'post',
         body: JSON.stringify({
             i: jsonConfig.apiKey,
@@ -66,7 +87,7 @@ export default async function loadConfig(): Promise<Config> {
         headers: { 'Content-Type': 'application/json' },
     })
         .then((res) => res.json())
-        .then((json: Record<string, string>) => json.id);
+        .then((json: Record<string, string>) => [json.id, json.followingCount]);
     const ownerId = await fetch(`${apiUrl}/users/show`, {
         method: 'post',
         body: JSON.stringify({
@@ -85,5 +106,6 @@ export default async function loadConfig(): Promise<Config> {
         apiUrl,
         userId,
         ownerId,
+        followings: Number(follows),
     };
 }

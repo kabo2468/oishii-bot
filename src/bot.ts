@@ -1,3 +1,4 @@
+import ms from 'ms';
 import { Pool } from 'pg';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import wsConst from 'ws';
@@ -16,10 +17,12 @@ export class Bot {
     public ngWords: NGWord;
     public ws: ReconnectingWebSocket;
     private db: Pool;
+    private rateLimit: number;
 
     constructor(config: Config, ngWords: NGWord) {
         this.config = config;
         this.ngWords = ngWords;
+        this.rateLimit = 0;
 
         const psql = new Pool({
             ssl: config.dbSSL,
@@ -30,6 +33,14 @@ export class Bot {
         this.ws = new ReconnectingWebSocket(`${config.wsUrl}/streaming?i=${config.apiKey}`, [], {
             WebSocket: wsConst,
         });
+
+        setInterval(() => {
+            this.rateLimit = 0;
+        }, ms(`${config.post.rateLimitSec}s`));
+
+        setInterval(() => {
+            this.sayFood();
+        }, ms(`${config.post.autoPostInterval}m`));
     }
 
     log(text?: string, ...arg: unknown[]): void {
@@ -72,6 +83,8 @@ export class Bot {
     }
 
     async sayFood(): Promise<void> {
+        if (this.rateLimit > this.config.post.rateLimitPost) return;
+
         const rnd = Math.random() < 0.2 ? 'WHERE learned=true' : '';
         const query = {
             text: `SELECT (name, good) FROM oishii_table ${rnd}ORDER BY RANDOM() LIMIT 1`,
@@ -88,5 +101,7 @@ export class Bot {
 
         const text = messages.food.say(food, good);
         API.postText(text);
+
+        this.rateLimit++;
     }
 }

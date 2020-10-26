@@ -47,8 +47,16 @@ npm start
     dbSSL: false,
     // オーナーのUsername オーナーのみが使えるコマンドを使う人を指定する
     ownerUsername: 'kabo',
-    // 何分毎に投稿するか
-    autoPostInterval: 60,
+    post: {
+        // 何分毎に投稿するか
+        autoPostInterval: 60,
+        // TLに(フォロー / 3)数流れてきたときに食べ物を言う確率
+        tlPostProbability: 0.4,
+        // レートリミットの解除秒数
+        rateLimitSec: 60,
+        // レートリミットの最大数
+        rateLimitPost: 5,
+    },
 }
 ```
 

@@ -45,6 +45,8 @@ const modules: Module[] = [
     new NGWordCommandModule(),
 ];
 
+let tlCount = 0;
+
 export default function (bot: Bot): void {
     const channels = [
         {
@@ -106,7 +108,13 @@ export default function (bot: Bot): void {
 
             void tlModules.learn.Run(bot, note);
 
-            // TODO: 自動投稿
+            tlCount++;
+            if (tlCount > bot.config.followings / 3) {
+                if (Math.random() < bot.config.post.tlPostProbability) {
+                    bot.sayFood();
+                    tlCount = 0;
+                }
+            }
         }
 
         if (json.body.id === 'streamingMainId') {
