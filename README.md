@@ -2,6 +2,10 @@
 
 ## 使い方
 
+### Node.js, npm, PostgreSQL をインストールする
+
+OS によってインストール方法が異なるので、各自調べてください
+
 ### `example.json5` をコピーして `config.json5` を作る
 
 ```shell
