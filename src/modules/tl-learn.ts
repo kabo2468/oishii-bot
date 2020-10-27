@@ -8,9 +8,12 @@ export default class extends Module {
     Regex = new RegExp(/.+/);
 
     async Run(bot: Bot, note: Note): Promise<void> {
-        this.log('Run');
+        this.log('Text:', note.note.text);
         const nouns = await TextProcess.getNouns(note.note.text);
-        if (nouns.length < 1) return;
+        if (nouns.length < 1) {
+            this.log('Nouns not found.');
+            return;
+        }
         const food = nouns[Math.floor(Math.random() * nouns.length)].surface_form;
 
         const isExists = await bot.existsFood(food);

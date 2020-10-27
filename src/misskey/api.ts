@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import loadConfig from '../config';
+import messages from '../messages';
 import { CreatedMessage, Message } from './message';
 import { CreatedNote, Note } from './note';
 
@@ -62,6 +63,7 @@ export default class API {
             text,
             visibility,
             replyId,
+            ...(text.length > 100 ? { cw: messages.food.long } : {}),
         };
         return fetch(`${config.apiUrl}/notes/create`, {
             method: 'post',
