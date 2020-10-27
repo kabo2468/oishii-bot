@@ -14,10 +14,10 @@ export default class extends Module {
         const res = await bot.runQuery({ text: 'SELECT learned, count(learned) FROM oishii_table GROUP BY learned' });
 
         // Records
-        const fl = res.rows[0].count;
-        const tl = res.rows[1].count;
-        const all = Number(fl) + Number(fl);
-        const recordText = `Records: ${all.toString()} (Learned: ${tl})`;
+        const fl = Number(res.rows[0].count);
+        const tl = Number(res.rows[1].count);
+        const all = fl + tl;
+        const recordText = `Records: ${all} (Learned: ${tl})`;
         this.log(recordText);
         text.push(recordText);
 
