@@ -10,6 +10,8 @@ loadConfig()
         const client = await pool.connect();
 
         try {
+            console.log('Migration Start.');
+
             await client.query('BEGIN');
 
             // CREATE TABLE
@@ -23,6 +25,7 @@ loadConfig()
             await client.query('ROLLBACK');
             throw e;
         } finally {
+            console.log('Migration End.');
             client.release();
         }
     })

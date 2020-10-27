@@ -45,7 +45,7 @@ export default class extends Module {
 }
 
 async function isNoun(text: string): Promise<boolean> {
-    console.log(`is_noun text: ${text}`);
+    console.log('Check noun:', text);
     const nouns = await TextProcess.getNouns(text);
     return nouns ? true : false;
 }

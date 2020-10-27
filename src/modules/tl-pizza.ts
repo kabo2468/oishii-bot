@@ -8,8 +8,8 @@ export default class extends Module {
     Regex = new RegExp(/^[@＠](ピザ|ぴざ)$/);
 
     Run(bot: Bot, note: Note): void {
+        this.log('Run');
         if (note.note.replyId !== null) return;
-        console.log('TL: PIZZA');
         const visibility = note.note.visibility !== 'public' ? note.note.visibility : 'home';
         note.reply(messages.pizza.toText(), visibility);
         return;

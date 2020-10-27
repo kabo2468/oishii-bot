@@ -69,7 +69,6 @@ export default class API {
             headers: { 'Content-Type': 'application/json' },
         })
             .then((res) => {
-                // console.dir(res, {depth:null});
                 return res.json();
             })
             .then((json: { createdNote: CreatedNote }) => new Note(json.createdNote))

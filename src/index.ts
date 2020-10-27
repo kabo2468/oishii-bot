@@ -7,7 +7,6 @@ process.on('unhandledRejection', console.dir);
 
 loadConfig()
     .then((config) => {
-        console.dir(config);
         const _m = new Bot(config, new NGWord());
         main(_m);
     })

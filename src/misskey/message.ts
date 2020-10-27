@@ -42,12 +42,8 @@ export class Message extends TextProcess {
     }
 
     reply(text: string): void {
-        API.sendMessage(text, this.message.userId)
-            .then((res) => {
-                console.dir(res, { depth: null });
-            })
-            .catch((err) => {
-                throw new Error(err);
-            });
+        API.sendMessage(text, this.message.userId).catch((err) => {
+            throw new Error(err);
+        });
     }
 }
