@@ -14,7 +14,7 @@ export default class extends Module {
         bot.runQuery({ text: query }).then((res) => {
             const food = res.rows[0].name;
             const good = res.rows[0].good;
-            if (!food || !good) {
+            if (!food || good === undefined) {
                 note.reply(messages.food.idk);
                 return;
             }
