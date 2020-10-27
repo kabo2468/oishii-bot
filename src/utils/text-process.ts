@@ -42,7 +42,7 @@ export class TextProcess {
                 if (nouns.length < 1) resolve([]);
 
                 //1文字と小文字から始まるものを消す
-                const output = nouns.filter((n) => /^[A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]$|^[ぁぃぅぇぉゕゖっゃゅょゎァィゥェォヵヶッャュョヮ]/.test(n.surface_form));
+                const output = nouns.filter((n) => !/^[A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]$|^[ぁぃぅぇぉゕゖっゃゅょゎァィゥェォヵヶッャュョヮ]/.test(n.surface_form));
                 if (output.length < 1) resolve([]);
 
                 resolve(output);
