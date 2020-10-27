@@ -15,11 +15,11 @@ export default class extends Module {
 
         const isExists = await bot.existsFood(food);
         if (isExists) {
+            this.log(food, 'is skipped.');
+        } else {
             const good = Math.random() < 0.8;
             bot.addFood(food, good);
             this.log('INSERT:', `${food} (${good})`);
-        } else {
-            this.log(food, 'is skipped.');
         }
     }
 }

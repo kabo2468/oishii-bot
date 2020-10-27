@@ -29,7 +29,7 @@ export default class extends Module {
             await bot.learnFood(food, isGood);
             this.log('UPDATE:', `${food} (${goodText})`);
         } else {
-            await bot.addFood(food, isGood);
+            await bot.addFood(food, isGood, true);
             this.log('INSERT:', `${food} (${goodText})`);
         }
         note.reply(messages.food.learn(food, goodText));
