@@ -7,7 +7,7 @@ import variables from '../variables';
 
 export default class extends Module {
     Name = 'Learn';
-    Regex = new RegExp(`(.+)(${variables.food.good}|${variables.food.bad})よ?`);
+    Regex = new RegExp(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?`);
 
     async Run(bot: Bot, note: Note): Promise<void> {
         const ng = note.findNGWord(bot.ngWords);
