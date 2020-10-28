@@ -19,19 +19,16 @@ export default class extends Module {
         const match = note.note.text.match(this.Regex);
         if (!match) return;
         const food = TextProcess.removeSpace(match[1]);
-        const good = match[2].match(variables.food.good);
-        if (!good) return;
-        const isGood = !!good;
-        const goodText = good[0];
+        const good = new RegExp(variables.food.good).test(match[2]);
 
         const isExists = await bot.existsFood(food);
         if (isExists) {
-            await bot.learnFood(food, isGood);
-            this.log('UPDATE:', `${food} (${goodText})`);
+            await bot.learnFood(food, good);
+            this.log('UPDATE:', `${food} (${good})`);
         } else {
-            await bot.addFood(food, isGood, true);
-            this.log('INSERT:', `${food} (${goodText})`);
+            await bot.addFood(food, good, true);
+            this.log('INSERT:', `${food} (${good})`);
         }
-        note.reply(messages.food.learn(food, goodText));
+        note.reply(messages.food.learn(food, match[2]));
     }
 }

@@ -76,7 +76,7 @@ export class Bot {
         });
     }
 
-    async addFood(food: string, good: boolean, learned: boolean = false): Promise<void> {
+    async addFood(food: string, good: boolean, learned = false): Promise<void> {
         const query = {
             text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, $3 )',
             values: [food, good, learned],
