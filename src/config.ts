@@ -79,26 +79,23 @@ export default async function loadConfig(): Promise<Config> {
 
     const wsUrl = url.replace('http', 'ws');
     const apiUrl = url + '/api';
-    const [userId, follows] = await fetch(`${apiUrl}/i`, {
-        method: 'post',
-        body: JSON.stringify({
-            i: jsonConfig.apiKey,
-        }),
-        headers: { 'Content-Type': 'application/json' },
-    })
-        .then((res) => res.json())
-        .then((json: Record<string, string>) => [json.id, json.followingCount]);
-    const ownerId = await fetch(`${apiUrl}/users/show`, {
-        method: 'post',
-        body: JSON.stringify({
-            i: jsonConfig.apiKey,
-            username: jsonConfig.ownerUsername,
-            host: null,
-        }),
-        headers: { 'Content-Type': 'application/json' },
-    })
-        .then((res) => res.json())
-        .then((json: Record<string, string>) => json.id);
+
+    const api = async (endpoint: string, data: Record<string, unknown>): Promise<Record<string, string>> => {
+        return await fetch(`${apiUrl}${endpoint}`, {
+            method: 'post',
+            body: JSON.stringify({
+                i: jsonConfig.apiKey,
+                ...data,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+        }).then((res) => res.json());
+    };
+
+    const [userId, follows] = await api('/i', {}).then((json) => [json.id, json.followingCount]);
+    const ownerId = await api('/users/show', {
+        username: jsonConfig.ownerUsername,
+        host: null,
+    }).then((json) => json.id);
 
     return {
         ...config,
