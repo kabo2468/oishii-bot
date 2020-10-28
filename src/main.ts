@@ -96,8 +96,9 @@ export default function (bot: Bot): void {
 
             note.removeURLs().removeMentions();
 
-            if (note.hasNGWord(bot.ngWords)) {
-                bot.log('SKIP(NG WORD):', note.findNGWord(bot.ngWords));
+            const ng = note.findNGWord(bot.ngWords);
+            if (ng) {
+                bot.log('SKIP(NG WORD):', ng);
                 return;
             }
 

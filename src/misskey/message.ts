@@ -33,10 +33,6 @@ export class Message extends TextProcess {
         return this;
     }
 
-    hasNGWord(ngWord: NGWord): boolean {
-        return TextProcess.hasNGWord(ngWord, this.message.text);
-    }
-
     findNGWord(ngWord: NGWord): string | undefined {
         return TextProcess.findNGWord(ngWord, this.message.text);
     }

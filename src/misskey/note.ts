@@ -46,10 +46,6 @@ export class Note {
         return this;
     }
 
-    hasNGWord(ngWord: NGWord): boolean {
-        return TextProcess.hasNGWord(ngWord, this.note.text);
-    }
-
     findNGWord(ngWord: NGWord): string | undefined {
         return TextProcess.findNGWord(ngWord, this.note.text);
     }

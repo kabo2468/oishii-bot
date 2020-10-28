@@ -14,12 +14,6 @@ export class TextProcess {
         return text.replace(/@oishiibot(@misskey\.io)?\s/, '').trim();
     }
 
-    static hasNGWord(ngWord: NGWord, text: string): boolean {
-        const _t = ngWord.excludeNGWord(text);
-        const ngWords = ngWord.get;
-        return ngWords.some((ng) => new RegExp(ng).exec(_t));
-    }
-
     static findNGWord(ngWord: NGWord, text: string): string | undefined {
         const _t = ngWord.excludeNGWord(text);
         const ngWords = ngWord.get;
