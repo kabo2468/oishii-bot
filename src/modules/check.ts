@@ -29,7 +29,7 @@ export default class extends Module {
         if (!res) return;
 
         if (res.rowCount < 1) {
-            const noun = await isNoun(text);
+            const noun = await this.isNoun(text);
             if (noun) {
                 note.reply(messages.food.idk);
             } else {
@@ -42,10 +42,10 @@ export default class extends Module {
         const goodText = isGood ? messages.food.good : messages.food.bad;
         note.reply(goodText);
     }
-}
 
-async function isNoun(text: string): Promise<boolean> {
-    console.log('Check noun:', text);
-    const nouns = await TextProcess.getNouns(text);
-    return nouns ? true : false;
+    private async isNoun(text: string): Promise<boolean> {
+        this.log('Check noun:', text);
+        const nouns = await TextProcess.getNouns(text);
+        return nouns ? true : false;
+    }
 }

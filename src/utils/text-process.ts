@@ -43,4 +43,8 @@ export class TextProcess {
             });
         });
     }
+
+    static omitText(text: string, length = 100): string {
+        return (text.length > length ? text.substr(0, length) : text).replace(/\n/g, '\\n');
+    }
 }

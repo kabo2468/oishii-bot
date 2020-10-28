@@ -42,6 +42,8 @@ export class Bot {
             WebSocket: wsConst,
         });
 
+        this.log('Followings:', config.followings);
+
         setInterval(() => {
             this.rateLimit = 0;
         }, ms(`${config.post.rateLimitSec}s`));
@@ -52,7 +54,7 @@ export class Bot {
     }
 
     log(text?: string, ...arg: unknown[]): void {
-        console.log('[Bot]:', text, ...arg);
+        console.log('[Bot]', text, ...arg);
     }
 
     async runQuery(query: { text: string; values?: (string | boolean)[] }): Promise<Res> {

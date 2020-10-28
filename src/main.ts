@@ -21,6 +21,7 @@ import SayCommandModule from './modules/commands/say';
 import InfoCommandModule from './modules/commands/info';
 import DeleteCommandModule from './modules/commands/delete';
 import NGWordCommandModule from './modules/commands/ngword';
+import { TextProcess } from './utils/text-process';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -96,6 +97,8 @@ export default function (bot: Bot): void {
 
             note.removeURLs().removeMentions();
 
+            bot.log('Text:', TextProcess.omitText(note.note.text));
+
             const ng = note.findNGWord(bot.ngWords);
             if (ng) {
                 bot.log('SKIP(NG WORD):', ng);
@@ -137,7 +140,7 @@ export default function (bot: Bot): void {
                 }).catch((err) => console.error(err));
 
                 const logPrefix = done ? 'Followed' : 'Failed to follow';
-                bot.log(`${logPrefix} @${user.username}@${user.host} (${user.id})`);
+                bot.log(`${logPrefix} @${user.username}${user.host ? `@${user.host}` : ''} (ID: ${user.id})`);
                 return;
             }
 

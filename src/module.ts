@@ -13,6 +13,6 @@ export default abstract class Module {
     }
 
     protected log(text?: string, ...arg: string[]): void {
-        console.log(`[${this.Name}]:`, text, ...arg);
+        console.log(`[${this.Name}]`, text, ...arg);
     }
 }
