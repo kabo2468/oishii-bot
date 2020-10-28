@@ -8,6 +8,8 @@ export default class extends Module {
     Regex = /^\/help$/i;
 
     Run(bot: Bot, note: Note): void {
+        note.reaction();
+
         const _t = messages.commands.help.join('\n');
         note.reply(`\`\`\`\n${_t}\n\`\`\``);
     }

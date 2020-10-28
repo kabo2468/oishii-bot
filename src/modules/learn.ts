@@ -10,6 +10,8 @@ export default class extends Module {
     Regex = new RegExp(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?`);
 
     async Run(bot: Bot, note: Note): Promise<void> {
+        note.reaction();
+
         const ng = note.findNGWord(bot.ngWords);
         if (ng) {
             note.reply(messages.food.ngWord);

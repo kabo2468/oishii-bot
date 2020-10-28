@@ -8,6 +8,7 @@ export default class extends Module {
     Regex = /^\/ping$/i;
 
     Run(bot: Bot, note: Note): void {
+        note.reaction();
         note.reply(messages.commands.ping);
     }
 }

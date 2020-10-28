@@ -9,6 +9,8 @@ export default class extends Module {
     Regex = /^\/info$/i;
 
     async Run(bot: Bot, note: Note): Promise<void> {
+        note.reaction();
+
         const text: string[] = [];
 
         const res = await bot.runQuery({ text: 'SELECT learned, count(learned) FROM oishii_table GROUP BY learned' });

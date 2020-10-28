@@ -8,6 +8,8 @@ export default class extends Module {
     Regex = /^\/follow|フォロー|フォロバ$/i;
 
     async Run(bot: Bot, note: Note): Promise<void> {
+        note.reaction();
+
         this.log(`${note.note.user.username} (${note.note.userId})`);
         const ok = await API.api('/following/create', {
             userId: note.note.userId,

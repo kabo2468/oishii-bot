@@ -8,6 +8,8 @@ export default class extends Module {
     Regex = /^\/ng (a|r) (.+)$/i;
 
     async Run(bot: Bot, note: Note): Promise<void> {
+        note.reaction();
+
         if (note.note.userId !== bot.config.ownerId) {
             note.reply(messages.commands.denied);
             return;

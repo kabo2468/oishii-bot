@@ -151,8 +151,9 @@ export default function (bot: Bot): void {
                 const mod = modules.find((module) => module.Regex.test(note.note.text));
                 if (mod) {
                     bot.log('Module:', mod.Name);
-                    note.reaction();
-                    mod.Run(bot, note);
+                    setTimeout(() => {
+                        mod.Run(bot, note);
+                    }, 1000);
                 }
             } else {
                 // TODO: メッセージ対応

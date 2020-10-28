@@ -10,7 +10,9 @@ export default class extends Module {
     Regex = new RegExp(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})の?[？?]+`);
 
     async Run(bot: Bot, note: Note): Promise<void> {
-        const match = this.Regex.exec(note.note.text);
+        note.reaction();
+
+        const match = note.note.text.match(this.Regex);
         if (!match) return;
         const text = TextProcess.removeSpace(match[1]);
 

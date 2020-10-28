@@ -9,6 +9,8 @@ export default class extends Module {
     Regex = new RegExp(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?`);
 
     async Run(bot: Bot, note: Note): Promise<void> {
+        note.reaction();
+
         const match = note.note.text.match(this.Regex);
         if (!match) return;
 

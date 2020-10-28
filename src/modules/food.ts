@@ -9,6 +9,8 @@ export default class extends Module {
     Regex = /^\s*((何|(な|にゃ)に|(な|にゃ)ん)か)?[食た]べる?(物|もの)(くれ|ちょうだい|頂戴|ください)/;
 
     Run(bot: Bot, note: Note): void {
+        note.reaction();
+
         // 1 ~ 5
         const num = Math.floor(Math.random() * 5) + 1;
         this.log('Count:', String(num));

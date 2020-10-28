@@ -8,6 +8,8 @@ export default class extends Module {
     Regex = /^\/unfollow|フォロー解除$/i;
 
     async Run(bot: Bot, note: Note): Promise<void> {
+        note.reaction();
+
         this.log(`${note.note.user.username} (${note.note.userId})`);
         const ok = await API.api('/following/delete', {
             userId: note.note.userId,

@@ -8,6 +8,8 @@ export default class extends Module {
     Regex = /^\/say$/i;
 
     Run(bot: Bot, note: Note): void {
+        note.reaction();
+
         if (note.note.userId === bot.config.ownerId) {
             bot.sayFood();
         } else {
