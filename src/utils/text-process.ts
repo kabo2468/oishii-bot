@@ -11,7 +11,7 @@ export class TextProcess {
     }
 
     static removeMentionToMe(text: string): string {
-        return text.replace(/@oishiibot(@misskey\.io)?\s/, '').trim();
+        return text.replace(/@oishiibot(@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,})?\s/, '').trim();
     }
 
     static findNGWord(ngWord: NGWord, text: string): string | undefined {
