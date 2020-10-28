@@ -28,13 +28,6 @@ const tlModules = {
 };
 // prettier-ignore
 const modules: Module[] = [
-    new CheckModule(),
-    new SearchModule(),
-    new LearnModule(),
-    new HungryModule(),
-    new FoodModule(),
-    new SushiModule(),
-    new KawaiiModule(),
     new FollowCommandModule(),
     new UnfollowCommandModule(),
     new HelpCommandModule(),
@@ -43,6 +36,13 @@ const modules: Module[] = [
     new InfoCommandModule(),
     new DeleteCommandModule(),
     new NGWordCommandModule(),
+    new CheckModule(),
+    new SearchModule(),
+    new LearnModule(),
+    new HungryModule(),
+    new FoodModule(),
+    new SushiModule(),
+    new KawaiiModule(),
 ];
 
 let tlCount = 0;
