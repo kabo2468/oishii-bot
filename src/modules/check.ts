@@ -14,7 +14,7 @@ export default class extends Module {
 
         const match = note.note.text.match(this.Regex);
         if (!match) return;
-        const text = TextProcess.removeSpace(match[1]);
+        const food = TextProcess.removeSpace(match[1]);
 
         const ng = note.findNGWord(bot.ngWords);
         if (ng) {
@@ -25,13 +25,13 @@ export default class extends Module {
 
         const query = {
             text: 'SELECT good FROM oishii_table WHERE LOWER(name) = LOWER($1)',
-            values: [text],
+            values: [food],
         };
         const res = await bot.runQuery(query);
         if (!res) return;
 
         if (res.rowCount < 1) {
-            const noun = await this.isNoun(text);
+            const noun = await this.isNoun(food);
             if (noun) {
                 note.reply(messages.food.idk);
             } else {
