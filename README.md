@@ -2,6 +2,10 @@
 
 ## 使い方
 
+### Misskey で @oishiibot を作る
+
+この ID じゃないと動きません
+
 ### Node.js, npm, PostgreSQL をインストールする
 
 OS によってインストール方法が異なるので、各自調べてください
