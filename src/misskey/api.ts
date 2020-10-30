@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import fetch, { Response } from 'node-fetch';
 import loadConfig from '../config';
 import messages from '../messages';
 import { CreatedMessage, Message } from './message';
@@ -37,7 +37,7 @@ export interface Group {
 }
 
 export default class API {
-    static async api(endpoint: string, body: Record<string, unknown>): Promise<boolean> {
+    static async api(endpoint: string, body: Record<string, unknown>): Promise<Response> {
         const config = await loadConfig();
         const postBody = {
             ...body,
@@ -47,32 +47,20 @@ export default class API {
             method: 'post',
             body: JSON.stringify(postBody),
             headers: { 'Content-Type': 'application/json' },
-        })
-            .then((res) => {
-                return res.ok;
-            })
-            .catch((err) => {
-                throw new Error(err);
-            });
+        }).catch((err) => {
+            throw new Error(err);
+        });
     }
 
     static async postText(text: string, visibility: 'public' | 'home' | 'followers' | 'specified' = 'public', replyId?: string): Promise<Note> {
-        const config = await loadConfig();
         const data = {
-            i: config.apiKey,
             text,
             visibility,
             replyId,
             ...(text.length > 100 ? { cw: messages.food.long } : {}),
         };
-        return fetch(`${config.apiUrl}/notes/create`, {
-            method: 'post',
-            body: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then((res) => {
-                return res.json();
-            })
+        return this.api('/notes/create', data)
+            .then((res) => res.json())
             .then((json: { createdNote: CreatedNote }) => new Note(json.createdNote))
             .catch((err) => {
                 throw new Error(err);
@@ -80,36 +68,20 @@ export default class API {
     }
 
     static async reactionToNote(noteId: string, reaction: string): Promise<boolean> {
-        const config = await loadConfig();
         const data = {
-            i: config.apiKey,
             noteId,
             reaction,
         };
-        return fetch(`${config.apiUrl}/notes/reactions/create`, {
-            method: 'post',
-            body: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then((res) => res.ok)
-            .catch((err) => {
-                throw new Error(err);
-            });
+        return (await this.api('/notes/reactions/create', data)).ok;
     }
 
     static async sendMessage(text: string, userId: string, groupId?: string): Promise<Message> {
-        const config = await loadConfig();
         const data = {
-            i: config.apiKey,
             text,
             userId,
             groupId,
         };
-        return fetch(`${config.apiUrl}/messaging/messages/create`, {
-            method: 'post',
-            body: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' },
-        })
+        return this.api('/messaging/messages/create', data)
             .then((res) => res.json())
             .then((json) => new Message(json))
             .catch((err) => {
