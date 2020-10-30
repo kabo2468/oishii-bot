@@ -51,6 +51,10 @@ export class Bot {
         setInterval(() => {
             this.sayFood();
         }, ms(`${config.post.autoPostInterval}m`));
+
+        setInterval(() => {
+            this.ws.reconnect();
+        }, ms('1h'));
     }
 
     log(text?: string, ...arg: unknown[]): void {
