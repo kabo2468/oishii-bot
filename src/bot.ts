@@ -103,8 +103,7 @@ export class Bot {
 
         const food = res.rows[0].name;
         const good = res.rows[0].good;
-        if (!food) return;
-        if (!good) return;
+        if (!food || good === undefined) return;
         this.log(`sayFood: ${food} (${good})`);
 
         const text = messages.food.say(food, good);
