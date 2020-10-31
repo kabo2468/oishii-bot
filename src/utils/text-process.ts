@@ -56,7 +56,7 @@ export class TextProcess {
     }
 
     omitText(length = 100): TextProcess {
-        this.text.length > length ? this.text.substr(0, length) : this.text;
+        this.text.length > length ? `${this.text.substr(0, length)}...` : this.text;
         return this;
     }
 
