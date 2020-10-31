@@ -8,6 +8,8 @@
 
 ### Node.js, npm, PostgreSQL をインストールする
 
+Node.js のバージョンは v14 以上にしてください
+
 OS によってインストール方法が異なるので、各自調べてください
 
 ### `example.json5` をコピーして `config.json5` を作る
