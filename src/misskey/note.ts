@@ -29,25 +29,28 @@ export interface CreatedNote {
 }
 
 export class Note {
-    constructor(public note: CreatedNote) {}
+    private tp: TextProcess;
+    constructor(public note: CreatedNote) {
+        this.tp = new TextProcess(note.text);
+    }
 
     removeURLs(): Note {
-        this.note.text = TextProcess.removeURLs(this.note.text);
+        this.note.text = this.tp.removeURLs().toString();
         return this;
     }
 
     removeMentions(): Note {
-        this.note.text = TextProcess.removeMentions(this.note.text);
+        this.note.text = this.tp.removeMentions().toString();
         return this;
     }
 
     removeMentionToMe(): Note {
-        this.note.text = TextProcess.removeMentionToMe(this.note.text);
+        this.note.text = this.tp.removeMentionToMe().toString();
         return this;
     }
 
     findNGWord(ngWord: NGWord): string | undefined {
-        return TextProcess.findNGWord(ngWord, this.note.text);
+        return this.tp.findNGWord(ngWord);
     }
 
     reply(text: string, visibility: Visibilities = this.note.visibility): void {

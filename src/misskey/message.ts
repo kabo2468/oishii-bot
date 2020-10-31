@@ -1,6 +1,6 @@
-import API, { File, Group, User } from './api';
 import NGWord from '../ng-words';
 import { TextProcess } from '../utils/text-process';
+import API, { File, Group, User } from './api';
 
 export type CreatedMessage = {
     id: string;
@@ -18,23 +18,24 @@ export type CreatedMessage = {
     reads: string[];
 };
 
-export class Message extends TextProcess {
+export class Message {
+    private tp: TextProcess;
     constructor(public message: CreatedMessage) {
-        super();
+        this.tp = new TextProcess(message.text);
     }
 
     removeURLs(): Message {
-        this.message.text = TextProcess.removeURLs(this.message.text);
+        this.message.text = this.tp.removeURLs().toString();
         return this;
     }
 
     removeMentions(): Message {
-        this.message.text = TextProcess.removeMentions(this.message.text);
+        this.message.text = this.tp.removeMentions().toString();
         return this;
     }
 
     findNGWord(ngWord: NGWord): string | undefined {
-        return TextProcess.findNGWord(ngWord, this.message.text);
+        return this.tp.findNGWord(ngWord);
     }
 
     reply(text: string): void {

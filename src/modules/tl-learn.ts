@@ -8,8 +8,10 @@ export default class extends Module {
     Regex = new RegExp(/.+/);
 
     async Run(bot: Bot, note: Note): Promise<void> {
-        this.log('Text:', note.note.text);
-        const nouns = await TextProcess.getNouns(note.note.text);
+        const text = new TextProcess(note.note.text);
+        this.log('Text:', text.replaceNewLineToText().toString());
+
+        const nouns = await text.getNouns();
         if (nouns.length < 1) {
             this.log('Nouns not found.');
             return;

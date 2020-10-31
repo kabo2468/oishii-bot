@@ -14,7 +14,7 @@ export default class extends Module {
 
         const match = note.note.text.match(this.Regex);
         if (!match) return;
-        const food = TextProcess.removeSpace(match[1]);
+        const food = new TextProcess(match[1]).removeSpace().toString();
 
         const ng = note.findNGWord(bot.ngWords);
         if (ng) {
@@ -47,7 +47,7 @@ export default class extends Module {
 
     private async isNoun(text: string): Promise<boolean> {
         this.log('Check noun:', text);
-        const nouns = await TextProcess.getNouns(text);
+        const nouns = await new TextProcess(text).getNouns();
         return nouns ? true : false;
     }
 }

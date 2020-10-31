@@ -20,7 +20,7 @@ export default class extends Module {
 
         const match = note.note.text.match(this.Regex);
         if (!match) return;
-        const food = TextProcess.removeSpace(match[1]);
+        const food = new TextProcess(match[1]).removeSpace().toString();
         const good = new RegExp(variables.food.good).test(match[2]);
 
         const isExists = await bot.existsFood(food);

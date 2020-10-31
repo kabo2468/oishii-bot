@@ -2,29 +2,40 @@ import { builder, IpadicFeatures } from 'kuromoji';
 import NGWord from '../ng-words';
 
 export class TextProcess {
-    static removeURLs(text: string): string {
-        return text.replace(/<?http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?>?/g, '').trim();
+    constructor(private text: string) {}
+
+    toString(): string {
+        return this.text;
     }
 
-    static removeMentions(text: string): string {
-        return text.replace(/@\w+@?[\w.-]*\s+/g, '').trim();
+    removeURLs(): TextProcess {
+        this.text.replace(/<?http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?>?/g, '').trim();
+        return this;
     }
 
-    static removeMentionToMe(text: string): string {
-        return text.replace(/@oishiibot(@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,})?\s/, '').trim();
+    removeMentions(): TextProcess {
+        this.text.replace(/@\w+@?[\w.-]*\s+/g, '').trim();
+        return this;
     }
 
-    static findNGWord(ngWord: NGWord, text: string): string | undefined {
-        const _t = ngWord.excludeNGWord(text);
+    removeMentionToMe(): TextProcess {
+        this.text.replace(/@oishiibot(@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,})?\s/, '').trim();
+        return this;
+    }
+
+    findNGWord(ngWord: NGWord): string | undefined {
+        const _t = ngWord.excludeNGWord(this.text);
         const ngWords = ngWord.get;
         return ngWords.find((ng) => new RegExp(ng).exec(_t));
     }
 
-    static removeSpace(text: string): string {
-        return text.replace(/^\s+|\s+$/g, '');
+    removeSpace(): TextProcess {
+        this.text.replace(/^\s+|\s+$/g, '');
+        return this;
     }
 
-    static async getNouns(text: string): Promise<IpadicFeatures[]> {
+    async getNouns(): Promise<IpadicFeatures[]> {
+        const text = this.text;
         return new Promise((resolve) => {
             builder({ dicPath: 'node_modules/kuromoji/dict' }).build(function (err, tokenizer) {
                 if (err) throw err;
@@ -44,7 +55,13 @@ export class TextProcess {
         });
     }
 
-    static omitText(text: string, length = 100): string {
-        return (text.length > length ? text.substr(0, length) : text).replace(/\n/g, '\\n');
+    omitText(length = 100): TextProcess {
+        this.text.length > length ? this.text.substr(0, length) : this.text;
+        return this;
+    }
+
+    replaceNewLineToText(): TextProcess {
+        this.text.replace(/\n/g, '\\n');
+        return this;
     }
 }

@@ -97,7 +97,7 @@ export default function (bot: Bot): void {
 
             note.removeURLs().removeMentions();
 
-            bot.log('Text:', TextProcess.omitText(note.note.text));
+            bot.log('Text:', new TextProcess(note.note.text).omitText().replaceNewLineToText().toString());
 
             const ng = note.findNGWord(bot.ngWords);
             if (ng) {
@@ -147,7 +147,7 @@ export default function (bot: Bot): void {
             if (isNote(json.body.body)) {
                 const note = new Note(json.body.body);
                 note.removeURLs().removeMentionToMe();
-                bot.log('Text:', note.note.text);
+                bot.log('Text:', new TextProcess(note.note.text).replaceNewLineToText().toString());
                 const mod = modules.find((module) => module.Regex.test(note.note.text));
                 if (mod) {
                     bot.log('Module:', mod.Name);
