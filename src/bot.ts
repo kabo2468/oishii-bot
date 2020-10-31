@@ -25,12 +25,11 @@ export class Bot {
     public ngWords: NGWord;
     public ws: ReconnectingWebSocket;
     private db: Pool;
-    private rateLimit: number;
+    private rateLimit = 0;
 
     constructor(config: Config, ngWords: NGWord) {
         this.config = config;
         this.ngWords = ngWords;
-        this.rateLimit = 0;
 
         const psql = new Pool({
             ssl: config.dbSSL,
