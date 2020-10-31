@@ -9,17 +9,17 @@ export class TextProcess {
     }
 
     removeURLs(): TextProcess {
-        this.text.replace(/<?http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?>?/g, '').trim();
+        this.text = this.text.replace(/<?http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=@]*)?>?/g, '').trim();
         return this;
     }
 
     removeMentions(): TextProcess {
-        this.text.replace(/@\w+@?[\w.-]*\s+/g, '').trim();
+        this.text = this.text.replace(/@\w+@?[\w.-]*\s+/g, '').trim();
         return this;
     }
 
     removeMentionToMe(): TextProcess {
-        this.text.replace(/@oishiibot(@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,})?\s/, '').trim();
+        this.text = this.text.replace(/@oishiibot(@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,})?\s/, '').trim();
         return this;
     }
 
@@ -30,7 +30,7 @@ export class TextProcess {
     }
 
     removeSpace(): TextProcess {
-        this.text.replace(/^\s+|\s+$/g, '');
+        this.text = this.text.replace(/^\s+|\s+$/g, '');
         return this;
     }
 
@@ -56,12 +56,12 @@ export class TextProcess {
     }
 
     omitText(length = 100): TextProcess {
-        this.text.length > length ? `${this.text.substr(0, length)}...` : this.text;
+        this.text = this.text.length > length ? `${this.text.substr(0, length)}...` : this.text;
         return this;
     }
 
     replaceNewLineToText(): TextProcess {
-        this.text.replace(/\n/g, '\\n');
+        this.text = this.text.replace(/\n/g, '\\n');
         return this;
     }
 }
