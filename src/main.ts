@@ -148,13 +148,16 @@ export default function (bot: Bot): void {
                 const note = new Note(json.body.body);
                 note.removeURLs().removeMentionToMe();
                 bot.log('Text:', new TextProcess(note.note.text).replaceNewLineToText().toString());
+
                 const mod = modules.find((module) => module.Regex.test(note.note.text));
                 if (mod) {
                     bot.log('Module:', mod.Name);
                     setTimeout(() => {
                         mod.Run(bot, note);
                     }, 1000);
+                    return;
                 }
+                note.reaction();
             } else {
                 // TODO: メッセージ対応
                 // const msg = new Message(json.body.body);
