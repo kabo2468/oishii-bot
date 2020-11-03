@@ -1,8 +1,9 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { Bot } from './bot';
 import Module from './module';
-import API, { Streaming } from './misskey/api';
+import { Streaming } from './misskey/api';
 import { isNote, Note } from './misskey/note';
+import { TextProcess } from './utils/text-process';
 
 import TLPizzaModule from './modules/tl-pizza';
 import TLLearnModule from './modules/tl-learn';
@@ -21,7 +22,6 @@ import SayCommandModule from './modules/commands/say';
 import InfoCommandModule from './modules/commands/info';
 import DeleteCommandModule from './modules/commands/delete';
 import NGWordCommandModule from './modules/commands/ngword';
-import { TextProcess } from './utils/text-process';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -87,7 +87,7 @@ export default function (bot: Bot): void {
 
         if (json.body.id === 'streamingTLId') {
             if (!isNote(json.body.body)) return;
-            const note = new Note(json.body.body);
+            const note = new Note(bot, json.body.body);
 
             if (note.note.userId === bot.config.userId) return;
             if (note.note.text === null) return;
@@ -135,9 +135,11 @@ export default function (bot: Bot): void {
                     host: string;
                 } = JSON.parse(data.data).body.body;
 
-                const done = API.api('/following/create', {
-                    userId: json.body.body.id,
-                }).catch((err) => console.error(err));
+                const done = bot.api
+                    .call('/following/create', {
+                        userId: json.body.body.id,
+                    })
+                    .catch((err) => console.error(err));
 
                 const logPrefix = done ? 'Followed' : 'Failed to follow';
                 bot.log(`${logPrefix} @${user.username}${user.host ? `@${user.host}` : ''} (ID: ${user.id})`);
@@ -145,7 +147,7 @@ export default function (bot: Bot): void {
             }
 
             if (isNote(json.body.body)) {
-                const note = new Note(json.body.body);
+                const note = new Note(bot, json.body.body);
                 note.removeURLs().removeMentionToMe();
                 bot.log('Text:', new TextProcess(note.note.text).replaceNewLineToText().toString());
 
@@ -160,7 +162,7 @@ export default function (bot: Bot): void {
                 note.reaction();
             } else {
                 // TODO: メッセージ対応
-                // const msg = new Message(json.body.body);
+                // const msg = new Message(bot, json.body.body);
             }
         }
     });

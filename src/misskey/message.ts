@@ -1,6 +1,7 @@
+import { Bot } from '../bot';
 import NGWord from '../ng-words';
 import { TextProcess } from '../utils/text-process';
-import API, { File, Group, User } from './api';
+import { File, Group, User } from './api';
 
 export type CreatedMessage = {
     id: string;
@@ -19,8 +20,12 @@ export type CreatedMessage = {
 };
 
 export class Message {
+    private bot: Bot;
+    public message: CreatedMessage;
     private tp: TextProcess;
-    constructor(public message: CreatedMessage) {
+    constructor(bot: Bot, message: CreatedMessage) {
+        this.bot = bot;
+        this.message = message;
         this.tp = new TextProcess(message.text);
     }
 
@@ -39,7 +44,7 @@ export class Message {
     }
 
     reply(text: string): void {
-        API.sendMessage(text, this.message.userId).catch((err) => {
+        this.bot.api.sendMessage(text, this.message.userId).catch((err) => {
             throw new Error(err);
         });
     }

@@ -26,6 +26,7 @@ export class Bot {
     public ws: ReconnectingWebSocket;
     private db: Pool;
     private rateLimit = 0;
+    public api: API;
 
     constructor(config: Config, ngWords: NGWord) {
         this.config = config;
@@ -42,6 +43,8 @@ export class Bot {
         });
 
         this.log('Followings:', config.followings);
+
+        this.api = new API(this);
 
         setInterval(() => {
             this.rateLimit = 0;
@@ -110,7 +113,7 @@ export class Bot {
         this.log(`sayFood: ${food} (${good})`);
 
         const text = messages.food.say(food, good);
-        API.postText(text);
+        this.api.postText(text);
 
         this.rateLimit++;
     }

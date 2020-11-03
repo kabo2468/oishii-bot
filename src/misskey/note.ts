@@ -1,6 +1,7 @@
-import API, { User } from './api';
+import { Bot } from '../bot';
 import NGWord from '../ng-words';
 import { TextProcess } from '../utils/text-process';
+import { User } from './api';
 
 export interface Reactions {
     [key: string]: number;
@@ -29,8 +30,12 @@ export interface CreatedNote {
 }
 
 export class Note {
+    private bot: Bot;
+    public note: CreatedNote;
     private tp: TextProcess;
-    constructor(public note: CreatedNote) {
+    constructor(bot: Bot, note: CreatedNote) {
+        this.bot = bot;
+        this.note = note;
         this.tp = new TextProcess(note.text);
     }
 
@@ -54,13 +59,13 @@ export class Note {
     }
 
     reply(text: string, visibility: Visibilities = this.note.visibility): void {
-        API.postText(text, visibility, this.note.id).catch((err) => {
+        this.bot.api.postText(text, visibility, this.note.id).catch((err) => {
             throw new Error(err);
         });
     }
 
     reaction(reaction = '🍮'): void {
-        API.reactionToNote(this.note.id, reaction).catch((err) => {
+        this.bot.api.reactionToNote(this.note.id, reaction).catch((err) => {
             throw new Error(err);
         });
     }

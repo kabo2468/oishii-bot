@@ -1,5 +1,5 @@
 import fetch, { Response } from 'node-fetch';
-import loadConfig from '../config';
+import { Bot } from '../bot';
 import messages from '../messages';
 import { CreatedMessage, Message } from './message';
 import { CreatedNote, Note } from './note';
@@ -37,13 +37,14 @@ export interface Group {
 }
 
 export default class API {
-    static async api(endpoint: string, body: Record<string, unknown>): Promise<Response> {
-        const config = await loadConfig();
+    constructor(private bot: Bot) {}
+
+    async call(endpoint: string, body: Record<string, unknown>): Promise<Response> {
         const postBody = {
             ...body,
-            i: config.apiKey,
+            i: this.bot.config.apiKey,
         };
-        return fetch(`${config.apiUrl}${endpoint}`, {
+        return fetch(`${this.bot.config.apiUrl}${endpoint}`, {
             method: 'post',
             body: JSON.stringify(postBody),
             headers: { 'Content-Type': 'application/json' },
@@ -52,38 +53,38 @@ export default class API {
         });
     }
 
-    static async postText(text: string, visibility: 'public' | 'home' | 'followers' | 'specified' = 'public', replyId?: string): Promise<Note> {
+    async postText(text: string, visibility: 'public' | 'home' | 'followers' | 'specified' = 'public', replyId?: string): Promise<Note> {
         const data = {
             text,
             visibility,
             replyId,
             ...(text.length > 100 ? { cw: messages.food.long } : {}),
         };
-        return this.api('/notes/create', data)
+        return this.call('/notes/create', data)
             .then((res) => res.json())
-            .then((json: { createdNote: CreatedNote }) => new Note(json.createdNote))
+            .then((json: { createdNote: CreatedNote }) => new Note(this.bot, json.createdNote))
             .catch((err) => {
                 throw new Error(err);
             });
     }
 
-    static async reactionToNote(noteId: string, reaction: string): Promise<boolean> {
+    async reactionToNote(noteId: string, reaction: string): Promise<boolean> {
         const data = {
             noteId,
             reaction,
         };
-        return (await this.api('/notes/reactions/create', data)).ok;
+        return (await this.call('/notes/reactions/create', data)).ok;
     }
 
-    static async sendMessage(text: string, userId: string, groupId?: string): Promise<Message> {
+    async sendMessage(text: string, userId: string, groupId?: string): Promise<Message> {
         const data = {
             text,
             userId,
             groupId,
         };
-        return this.api('/messaging/messages/create', data)
+        return this.call('/messaging/messages/create', data)
             .then((res) => res.json())
-            .then((json) => new Message(json))
+            .then((json) => new Message(this.bot, json))
             .catch((err) => {
                 throw new Error(err);
             });
