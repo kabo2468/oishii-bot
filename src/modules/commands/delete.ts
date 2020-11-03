@@ -10,7 +10,7 @@ export default class extends Module {
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
 
-        if (note.note.userId !== bot.config.ownerId) {
+        if (!bot.config.ownerIds.includes(note.note.userId)) {
             note.reply(messages.commands.denied);
             return;
         }

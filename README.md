@@ -61,8 +61,8 @@ npm start
     databaseUrl: 'postgresql://USER:PASSWORD@HOST:PORT/DATABASE',
     // DBのSSL
     dbSSL: false,
-    // オーナーのUsername オーナーのみが使えるコマンドを使う人を指定する
-    ownerUsername: 'kabo',
+    // オーナーのUsername オーナーのみが使えるコマンドを使う人を配列で指定する
+    ownerUsernames: ['kabo'],
     post: {
         // 何分毎に投稿するか
         autoPostInterval: 60,

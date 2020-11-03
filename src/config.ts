@@ -1,6 +1,6 @@
-import fetch from 'node-fetch';
 import { readFileSync } from 'fs';
 import JSON5 from 'json5';
+import fetch from 'node-fetch';
 
 type Post = {
     [key: string]: number;
@@ -11,12 +11,12 @@ type Post = {
 };
 
 type JsonConfig = {
-    [key: string]: string | boolean | number | Post;
+    [key: string]: string | string[] | boolean | number | Post;
     url: string;
     apiKey: string;
     databaseUrl: string;
     dbSSL: boolean;
-    ownerUsername: string;
+    ownerUsernames: string[];
     post: Post;
 };
 
@@ -27,7 +27,7 @@ export type Config = {
     databaseUrl: string;
     dbSSL: boolean;
     userId: string;
-    ownerId: string;
+    ownerIds: string[];
     post: Post;
     followings: number;
 };
@@ -36,14 +36,16 @@ export default async function loadConfig(): Promise<Config> {
     const json = readFileSync('./config.json5', { encoding: 'utf-8' });
     const jsonConfig = JSON5.parse(json) as JsonConfig;
     if (jsonConfig.url.endsWith('/')) jsonConfig.url.slice(0, -1);
-    if (jsonConfig.ownerUsername.startsWith('@')) jsonConfig.url.slice(1);
+    jsonConfig.ownerUsernames.forEach((username) => {
+        if (username.startsWith('@')) username.slice(1);
+    });
 
     const errors: string[] = [];
     const keys: JsonConfig = {
         apiKey: '',
         databaseUrl: '',
         dbSSL: false,
-        ownerUsername: '',
+        ownerUsernames: [''],
         url: '',
         post: {
             autoPostInterval: 0,
@@ -62,6 +64,8 @@ export default async function loadConfig(): Promise<Config> {
         } else {
             if (typeof _v === 'boolean') {
                 if (_v !== undefined) continue;
+            } else if (Array.isArray(_v)) {
+                if (_v.length) continue;
             } else {
                 if (_v) continue;
             }
@@ -92,17 +96,23 @@ export default async function loadConfig(): Promise<Config> {
     };
 
     const [userId, follows] = await api('/i', {}).then((json) => [json.id, json.followingCount]);
-    const ownerId = await api('/users/show', {
-        username: jsonConfig.ownerUsername,
-        host: null,
-    }).then((json) => json.id);
+    const getOwners = Array.from(jsonConfig.ownerUsernames, async (username) => {
+        return await api('/users/show', {
+            username,
+            host: null,
+        }).then((json) => json.id);
+    });
+    const ownerIds = await Promise.all(getOwners);
 
     return {
-        ...config,
-        wsUrl,
+        apiKey: config.apiKey,
         apiUrl,
+        wsUrl,
+        databaseUrl: config.databaseUrl,
+        dbSSL: config.dbSSL,
         userId,
-        ownerId,
+        ownerIds,
+        post: config.post,
         followings: Number(follows),
     };
 }

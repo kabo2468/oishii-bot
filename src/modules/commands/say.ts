@@ -10,7 +10,7 @@ export default class extends Module {
     Run(bot: Bot, note: Note): void {
         note.reaction();
 
-        if (note.note.userId === bot.config.ownerId) {
+        if (bot.config.ownerIds.includes(note.note.userId)) {
             bot.sayFood();
         } else {
             note.reply(messages.commands.denied);
