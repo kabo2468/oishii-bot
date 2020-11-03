@@ -9,8 +9,8 @@
     "start": "node built/index.js",
     "dev": "ts-node src/index.ts",
     "clean": "rimraf built/*",
-    "check": "tsc --noEmit",
     "tsc": "tsc",
+    "tsc:check": "tsc --noEmit",
     "build": "npm run clean && npm run tsc",
     "lint": "eslint . --ext .ts",
     "migration": "node built/migration.js"
