@@ -1,5 +1,11 @@
 # oishii-bot
 
+## なにこれ
+
+Misskey で動く日本語Botです。
+
+TLから言葉を学び、それをおいしいかまずいか決めて、投稿するBotです。
+
 ## 使い方
 
 ### Misskey で @oishiibot を作る
