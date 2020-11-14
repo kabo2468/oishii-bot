@@ -136,7 +136,7 @@ export default function (bot: Bot): void {
                 } = JSON.parse(data.data).body.body;
 
                 const done = bot.api
-                    .call('/following/create', {
+                    .call('following/create', {
                         userId: json.body.body.id,
                     })
                     .catch((err) => console.error(err));

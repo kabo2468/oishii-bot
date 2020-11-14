@@ -39,12 +39,12 @@ export interface Group {
 export default class API {
     constructor(private bot: Bot) {}
 
-    async call(endpoint: string, body: Record<string, unknown>): Promise<Response> {
+    async call(endpoint: string, body?: Record<string, unknown>): Promise<Response> {
         const postBody = {
             ...body,
             i: this.bot.config.apiKey,
         };
-        return fetch(`${this.bot.config.apiUrl}${endpoint}`, {
+        return fetch(`${this.bot.config.apiUrl}/${endpoint}`, {
             method: 'post',
             body: JSON.stringify(postBody),
             headers: { 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ export default class API {
             replyId,
             ...(text.length > 100 ? { cw: messages.food.long } : {}),
         };
-        return this.call('/notes/create', data)
+        return this.call('notes/create', data)
             .then((res) => res.json())
             .then((json: { createdNote: CreatedNote }) => new Note(this.bot, json.createdNote))
             .catch((err) => {
@@ -73,7 +73,7 @@ export default class API {
             noteId,
             reaction,
         };
-        return (await this.call('/notes/reactions/create', data)).ok;
+        return (await this.call('notes/reactions/create', data)).ok;
     }
 
     async sendMessage(text: string, userId: string, groupId?: string): Promise<Message> {
@@ -82,7 +82,7 @@ export default class API {
             userId,
             groupId,
         };
-        return this.call('/messaging/messages/create', data)
+        return this.call('messaging/messages/create', data)
             .then((res) => res.json())
             .then((json) => new Message(this.bot, json))
             .catch((err) => {

@@ -85,7 +85,7 @@ export default async function loadConfig(): Promise<Config> {
     const apiUrl = url + '/api';
 
     const api = async (endpoint: string, data: Record<string, unknown>): Promise<Record<string, string>> => {
-        return await fetch(`${apiUrl}${endpoint}`, {
+        return await fetch(`${apiUrl}/${endpoint}`, {
             method: 'post',
             body: JSON.stringify({
                 i: jsonConfig.apiKey,
@@ -95,9 +95,9 @@ export default async function loadConfig(): Promise<Config> {
         }).then((res) => res.json());
     };
 
-    const [userId, follows] = await api('/i', {}).then((json) => [json.id, json.followingCount]);
+    const [userId, follows] = await api('i', {}).then((json) => [json.id, json.followingCount]);
     const getOwners = Array.from(jsonConfig.ownerUsernames, async (username) => {
-        return await api('/users/show', {
+        return await api('users/show', {
             username,
             host: null,
         }).then((json) => json.id);
