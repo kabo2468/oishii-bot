@@ -5,7 +5,7 @@ import Module from '../module';
 
 export default class extends Module {
     Name = 'Sushi';
-    Regex = /^\s*お?(寿司|すし)を?(握|にぎ)(って|れ)/;
+    Regex = /\s*お?(寿司|すし)を?(握|にぎ)(って|れ)/;
     LogName = 'SUSH';
 
     Run(bot: Bot, note: Note): void {
