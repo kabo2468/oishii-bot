@@ -10,7 +10,7 @@ export default class extends Module {
 
     async Run(bot: Bot, note: Note): Promise<void> {
         const text = new TextProcess(note.note.text);
-        this.log('Text:', text.replaceNewLineToText().toString());
+        this.log('Text:', new TextProcess(note.note.text).replaceNewLineToText().toString());
 
         const nouns = await text.getNouns();
         if (nouns.length < 1) {

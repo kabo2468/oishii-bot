@@ -97,8 +97,6 @@ export default function (bot: Bot): void {
 
             note.removeURLs().removeMentions();
 
-            bot.log('Text:', new TextProcess(note.note.text).omitText().replaceNewLineToText().toString());
-
             const ng = note.findNGWord(bot.ngWords);
             if (ng) {
                 bot.log('SKIP(NG WORD):', ng);
