@@ -6,6 +6,7 @@ import Module from '../../module';
 export default class extends Module {
     Name = 'Delete';
     Regex = /^\/delete (.+)$/i;
+    LogName = 'DELT';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();

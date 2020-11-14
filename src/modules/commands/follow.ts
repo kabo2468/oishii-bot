@@ -5,6 +5,7 @@ import Module from '../../module';
 export default class extends Module {
     Name = 'Follow';
     Regex = /^\/follow|フォロー|フォロバ$/i;
+    LogName = 'FOLW';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();

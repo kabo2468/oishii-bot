@@ -7,6 +7,7 @@ import variables from '../variables';
 export default class extends Module {
     Name = 'Search';
     Regex = new RegExp(`(みん(な|にゃ)の)?(${variables.food.good}|${variables.food.bad})(もの|物|の)は?(何|(な|にゃ)に)?`);
+    LogName = 'SECH';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();

@@ -6,6 +6,7 @@ import Module from '../module';
 export default class extends Module {
     Name = 'TL Pizza';
     Regex = new RegExp(/^[@＠](ピザ|ぴざ)$/);
+    LogName = 'TLPZ';
 
     Run(bot: Bot, note: Note): void {
         this.log('Run');

@@ -60,7 +60,7 @@ export class Bot {
     }
 
     log(text?: string, ...arg: unknown[]): void {
-        console.log('[Bot]', text, ...arg);
+        console.log('[MAIN]', text, ...arg);
     }
 
     async runQuery(query: { text: string; values?: (string | boolean)[] }): Promise<Res> {

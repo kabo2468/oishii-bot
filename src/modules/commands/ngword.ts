@@ -6,6 +6,7 @@ import Module from '../../module';
 export default class extends Module {
     Name = 'NG Word';
     Regex = /^\/ng (a|r) (.+)$/i;
+    LogName = 'NGWD';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();

@@ -6,6 +6,7 @@ import Module from '../module';
 export default class extends Module {
     Name = 'Hungry';
     Regex = /お?(腹|(な|にゃ)か|はら)が?([空すあ]い|([減へ][っり]))た?/;
+    LogName = 'HNGR';
 
     Run(bot: Bot, note: Note): void {
         note.reaction();

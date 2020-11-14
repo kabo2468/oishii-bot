@@ -5,6 +5,7 @@ import Module from '../../module';
 export default class extends Module {
     Name = 'Unfollow';
     Regex = /^\/unfollow|フォロー解除$/i;
+    LogName = 'UNFL';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();

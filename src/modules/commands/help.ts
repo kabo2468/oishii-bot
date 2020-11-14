@@ -6,6 +6,7 @@ import Module from '../../module';
 export default class extends Module {
     Name = 'Help';
     Regex = /^\/help$/i;
+    LogName = 'HELP';
 
     Run(bot: Bot, note: Note): void {
         note.reaction();
