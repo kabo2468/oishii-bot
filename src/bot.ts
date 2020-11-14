@@ -54,8 +54,13 @@ export class Bot {
             this.sayFood();
         }, ms(`${config.post.autoPostInterval}m`));
 
-        setInterval(() => {
+        setInterval(async () => {
             this.ws.reconnect();
+            const newFollow: string = await this.api
+                .call('i')
+                .then((res) => res.json())
+                .then((json) => json.followingCount);
+            this.config.followings = Number(newFollow);
         }, ms('1h'));
     }
 
