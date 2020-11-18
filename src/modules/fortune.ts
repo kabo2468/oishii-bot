@@ -2,6 +2,7 @@ import { Bot } from '../bot';
 import messages from '../messages';
 import { Note } from '../misskey/note';
 import Module from '../module';
+import { TextProcess } from '../utils/text-process';
 
 export default class extends Module {
     Name = 'Fortune';
@@ -14,6 +15,8 @@ export default class extends Module {
         const food = (await bot.getFood()).rows[0].name;
         if (!food) return;
 
-        note.reply(messages.fortune(food));
+        const msg = messages.fortune(food);
+        this.log(new TextProcess(msg).replaceNewLineToText().toString());
+        note.reply(msg);
     }
 }
