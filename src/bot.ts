@@ -103,6 +103,17 @@ export class Bot {
         await this.runQuery(query);
     }
 
+    async getFood(good?: boolean, learned?: boolean): Promise<Res> {
+        const options = [];
+        if (good !== undefined) options.push(`good=${good}`);
+        if (learned !== undefined) options.push(`learned=${learned}`);
+        const query = {
+            text: `SELECT name, good FROM oishii_table ${options.length ? `WHERE ${options.join(', ')}` : ''} ORDER BY RANDOM() LIMIT 1`,
+        };
+        const res = await this.runQuery(query);
+        return res;
+    }
+
     async sayFood(): Promise<void> {
         if (this.rateLimit > this.config.post.rateLimitPost) return;
 
