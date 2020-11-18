@@ -103,12 +103,14 @@ export class Bot {
         await this.runQuery(query);
     }
 
-    async getFood(good?: boolean, learned?: boolean): Promise<Res> {
+    async getFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<Res> {
         const options = [];
         if (good !== undefined) options.push(`good=${good}`);
         if (learned !== undefined) options.push(`learned=${learned}`);
+
+        const option = options.length ? `WHERE ${options.join(' AND ')}` : '';
         const query = {
-            text: `SELECT name, good FROM oishii_table ${options.length ? `WHERE ${options.join(', ')}` : ''} ORDER BY RANDOM() LIMIT 1`,
+            text: `SELECT name, good FROM oishii_table ${option} ORDER BY RANDOM() LIMIT 1`,
         };
         const res = await this.runQuery(query);
         return res;
@@ -117,11 +119,8 @@ export class Bot {
     async sayFood(): Promise<void> {
         if (this.rateLimit > this.config.post.rateLimitPost) return;
 
-        const rnd = Math.random() < 0.2 ? 'WHERE learned=true' : '';
-        const query = {
-            text: `SELECT name, good FROM oishii_table ${rnd} ORDER BY RANDOM() LIMIT 1`,
-        };
-        const res = await this.runQuery(query);
+        const learned = Math.random() < 0.2;
+        const res = await this.getFood({ learned });
 
         const food = res.rows[0].name;
         const good = res.rows[0].good;
