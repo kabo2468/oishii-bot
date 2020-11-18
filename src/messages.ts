@@ -84,8 +84,8 @@ export default {
             return `${arrToStr(text)} ${food}`;
         },
     },
-    fortune: (food: string): string => {
+    fortune: (food: string, good: boolean): string => {
         const fortune = ['兆吉', '超吉', '大吉', '吉', '中吉', '末吉', '凶'];
-        return `今日の運勢は${arrToStr(fortune)}！\nラッキーフードは ${food} です！`;
+        return `今日の運勢は${arrToStr(fortune)}！\nラッキーフードは ${good ? goodText : badText} ${food} です！`;
     },
 };
