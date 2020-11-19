@@ -68,7 +68,7 @@ export class Bot {
         console.log('[MAIN]', text, ...arg);
     }
 
-    async runQuery(query: { text: string; values?: (string | boolean)[] }): Promise<Res> {
+    async runQuery(query: { text: string; values?: (string | number | boolean)[] }): Promise<Res> {
         return this.db.query(query).catch((err) => {
             console.error(err);
             process.exit(1);
