@@ -68,6 +68,19 @@ export class Bot {
         console.log('[MAIN]', text, ...arg);
     }
 
+    connectChannel(channel: string, id: string, params?: Record<string, unknown>): void {
+        const json = JSON.stringify({
+            type: 'connect',
+            body: {
+                channel,
+                id,
+                params,
+            },
+        });
+        console.log(json);
+        this.ws.send(json);
+    }
+
     async runQuery(query: { text: string; values?: (string | number | boolean)[] }): Promise<Res> {
         return this.db.query(query).catch((err) => {
             console.error(err);
