@@ -15,6 +15,7 @@ import HungryModule from './modules/hungry';
 import FoodModule from './modules/food';
 import SushiModule from './modules/sushi';
 import FortuneModule from './modules/fortune';
+import NullpoModule from './modules/nullpo';
 import ReversiModule from './modules/reversi';
 import Reversi from './modules/reversi/reversi';
 import FollowCommandModule from './modules/commands/follow';
@@ -48,6 +49,7 @@ const modules: Module[] = [
     new SushiModule(),
     new KawaiiModule(),
     new FortuneModule(),
+    new NullpoModule(),
     new ReversiModule(),
 ];
 
