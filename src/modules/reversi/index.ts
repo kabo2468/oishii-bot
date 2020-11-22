@@ -8,9 +8,12 @@ export default class extends Module {
     Regex = /リバーシ|オセロ|reversi|othello/i;
     LogName = 'RVRS';
 
-    Run(bot: Bot, note: Note): void {
+    async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction('👌');
         this.log('User:', note.note.userId);
+        await bot.api.call('games/reversi/match', {
+            userId: note.note.userId,
+        });
         Reversi(bot, note.note.userId);
     }
 }

@@ -1,4 +1,4 @@
-import Reversi, { Color, Options } from 'misskey-reversi';
+import Reversi, { Color } from 'misskey-reversi';
 import { User } from '../../misskey/api';
 
 interface Mes {
@@ -11,8 +11,6 @@ type Body = Record<string, any>;
 
 class Back {
     private _game!: Body;
-    private _map!: string[];
-    private _options!: Options;
     private _engine!: Reversi;
     private _botColor!: Color;
     private _account!: User;
@@ -46,13 +44,14 @@ class Back {
     }
 
     onInit(body: Body) {
-        this._map = body.map;
-        this._options = body.options;
         this._game = body.game;
         this._account = body.account;
     }
 
     onStarted(body: Body) {
+        const inviter = body.game.user1Id === this._account.id ? body.game.user2Id : body.game.user1Id;
+        this.log(`Match Started. (${inviter})`);
+
         this._game = body.game;
 
         this._engine = new Reversi(this._game.map, {

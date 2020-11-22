@@ -1,21 +1,15 @@
 import { fork } from 'child_process';
 import { Bot } from '../../bot';
-import { Options } from 'misskey-reversi';
 
 export default async function (bot: Bot, userId: string): Promise<void> {
     const game = await bot.api
         .call('games/reversi/match', {
             userId,
         })
-        .then((res) => res.json())
-        .then((json) => json);
-
-    let map = game.map;
-    const options: Options = {
-        canPutEverywhere: game.canPutEverywhere,
-        isLlotheo: game.isLlotheo,
-        loopedBoard: game.loopedBoard,
-    };
+        .then((res) => {
+            console.log(res);
+            return res.json();
+        });
 
     const channelId = `reversiMatch-${userId}-${Date.now()}`;
     bot.connectChannel('gamesReversiGame', channelId, {
@@ -32,20 +26,6 @@ export default async function (bot: Bot, userId: string): Promise<void> {
         if (json.body.type === 'watchers') return;
 
         if (json.body.type === 'updateSettings') {
-            switch (json.body.body.key) {
-                case 'canPutEverywhere':
-                    options.canPutEverywhere = json.body.body.value;
-                    break;
-                case 'isLlotheo':
-                    options.isLlotheo = json.body.body.value;
-                    break;
-                case 'loopedBoard':
-                    options.loopedBoard = json.body.body.value;
-                    break;
-                case 'map':
-                    map = json.body.body.value;
-                    break;
-            }
             log(`UpdateSetting: ${json.body.body.key} = ${json.body.body.value}`);
         }
 
@@ -79,12 +59,9 @@ export default async function (bot: Bot, userId: string): Promise<void> {
         type: 'init',
         body: {
             game,
-            map,
-            options,
             account: bot.account,
         },
     });
-    log(`Match Started. (${userId})`);
 
     back.on('message', (message: Record<string, unknown>) => {
         if (message.type == 'put') {

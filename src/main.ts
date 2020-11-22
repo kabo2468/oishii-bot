@@ -49,7 +49,7 @@ const modules: Module[] = [
     new KawaiiModule(),
     new FortuneModule(),
     new NullpoModule(),
-    new ReversiModule(),
+    // new ReversiModule(),
 ];
 
 let tlCount = 0;
