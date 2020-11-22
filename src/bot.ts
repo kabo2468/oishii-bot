@@ -76,14 +76,12 @@ export class Bot {
     }
 
     async existsFood(text: string): Promise<boolean> {
-        return new Promise((resolve) => {
-            const query = {
-                text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1))',
-                values: [text],
-            };
-            this.runQuery(query).then((res) => {
-                resolve(res.rows[0].exists);
-            });
+        const query = {
+            text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1))',
+            values: [text],
+        };
+        return await this.runQuery(query).then((res) => {
+            return !!res.rows[0].exists;
         });
     }
 
