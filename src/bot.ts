@@ -4,7 +4,7 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import wsConst from 'ws';
 import { Config } from './config';
 import messages from './messages';
-import API from './misskey/api';
+import API, { User } from './misskey/api';
 import NGWord from './ng-words';
 
 type Rows = {
@@ -27,6 +27,7 @@ export class Bot {
     private db: Pool;
     private rateLimit = 0;
     public api: API;
+    public account!: User;
 
     constructor(config: Config, ngWords: NGWord) {
         this.config = config;
@@ -46,6 +47,8 @@ export class Bot {
 
         this.api = new API(this);
 
+        this.getAccount();
+
         setInterval(() => {
             this.rateLimit = 0;
         }, ms(`${config.post.rateLimitSec}s`));
@@ -61,7 +64,12 @@ export class Bot {
                 .then((res) => res.json())
                 .then((json) => json.followingCount);
             this.config.followings = Number(newFollow);
+            this.log('Followings:', newFollow);
         }, ms('1h'));
+    }
+
+    private async getAccount() {
+        this.account = await this.api.call('i');
     }
 
     log(text?: string, ...arg: unknown[]): void {
@@ -75,6 +83,17 @@ export class Bot {
                 channel,
                 id,
                 params,
+            },
+        });
+        console.log(json);
+        this.ws.send(json);
+    }
+
+    disconnectChannel(id: string): void {
+        const json = JSON.stringify({
+            type: 'disconnect',
+            body: {
+                id,
             },
         });
         console.log(json);

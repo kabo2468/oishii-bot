@@ -15,7 +15,8 @@ import HungryModule from './modules/hungry';
 import FoodModule from './modules/food';
 import SushiModule from './modules/sushi';
 import FortuneModule from './modules/fortune';
-import ReversiModule from './modules/reversi/reversi';
+import ReversiModule from './modules/reversi';
+import Reversi from './modules/reversi/reversi';
 import FollowCommandModule from './modules/commands/follow';
 import UnfollowCommandModule from './modules/commands/unfollow';
 import HelpCommandModule from './modules/commands/help';
@@ -47,6 +48,7 @@ const modules: Module[] = [
     new SushiModule(),
     new KawaiiModule(),
     new FortuneModule(),
+    new ReversiModule(),
 ];
 
 let tlCount = 0;
@@ -74,8 +76,6 @@ export default function (bot: Bot): void {
     });
 
     bot.ws.addEventListener('message', function (data) {
-        console.log(data.data);
-
         const json = JSON.parse(data.data) as Streaming;
 
         if (json.body.id === 'streamingTLId') {
@@ -139,7 +139,7 @@ export default function (bot: Bot): void {
 
             if (type === 'reversiInvited') {
                 if (!('parentId' in json.body.body)) return;
-                new ReversiModule().Run(bot, json.body.body.parentId);
+                Reversi(bot, json.body.body.parentId);
             }
 
             if (isNote(json.body.body)) {
