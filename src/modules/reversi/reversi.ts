@@ -2,16 +2,13 @@ import { fork } from 'child_process';
 import { Bot } from '../../bot';
 import { Options } from 'misskey-reversi';
 
-export default async function Ready(bot: Bot, userId: string): Promise<void> {
+export default async function (bot: Bot, userId: string): Promise<void> {
     const game = await bot.api
         .call('games/reversi/match', {
             userId,
         })
         .then((res) => res.json())
-        .then((json) => {
-            console.log(json);
-            return json;
-        });
+        .then((json) => json);
 
     let map = game.map;
     const options: Options = {
@@ -20,38 +17,63 @@ export default async function Ready(bot: Bot, userId: string): Promise<void> {
         loopedBoard: game.loopedBoard,
     };
 
-    const channelId = `reversiMatch-${userId}`;
+    const channelId = `reversiMatch-${userId}-${Date.now()}`;
     bot.connectChannel('gamesReversiGame', channelId, {
         gameId: game.id,
     });
     setTimeout(() => {
         wsSend('accept');
-    }, 3000);
+    }, 1000);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const matchListener = (data: MessageEvent<any>): void => {
-        console.log(data.data);
-
         const json = JSON.parse(data.data) as Res;
-        // console.log(json.body.body);
 
-        switch (json.body.body.key) {
-            case 'bw':
-                break;
-            case 'canPutEverywhere':
-                options.canPutEverywhere = json.body.body.value;
-                break;
-            case 'isLlotheo':
-                options.isLlotheo = json.body.body.value;
-                break;
-            case 'loopedBoard':
-                options.loopedBoard = json.body.body.value;
-                break;
-            case 'map':
-                map = json.body.body.value;
-                break;
+        if (json.body.type === 'watchers') return;
+
+        if (json.body.type === 'updateSettings') {
+            switch (json.body.body.key) {
+                case 'canPutEverywhere':
+                    options.canPutEverywhere = json.body.body.value;
+                    break;
+                case 'isLlotheo':
+                    options.isLlotheo = json.body.body.value;
+                    break;
+                case 'loopedBoard':
+                    options.loopedBoard = json.body.body.value;
+                    break;
+                case 'map':
+                    map = json.body.body.value;
+                    break;
+            }
+            log(`UpdateSetting: ${json.body.body.key} = ${json.body.body.value}`);
+        }
+
+        if (json.body.type === 'started') {
+            back.send({
+                type: 'started',
+                body: {
+                    game: json.body.body,
+                },
+            });
+        }
+
+        if (json.body.type === 'set') {
+            back.send({
+                type: 'set',
+                body: json.body.body,
+            });
+        }
+
+        if (json.body.type === 'ended') {
+            back.send({
+                type: 'ended',
+            });
         }
     };
+
     bot.ws.addEventListener('message', matchListener);
+
     const back = fork(`${__dirname}/back`);
     back.send({
         type: 'init',
@@ -59,8 +81,10 @@ export default async function Ready(bot: Bot, userId: string): Promise<void> {
             game,
             map,
             options,
+            account: bot.account,
         },
     });
+    log(`Match Started. (${userId})`);
 
     back.on('message', (message: Record<string, unknown>) => {
         if (message.type == 'put') {
@@ -68,8 +92,9 @@ export default async function Ready(bot: Bot, userId: string): Promise<void> {
                 pos: message.pos,
             });
         } else if (message.type == 'ended') {
+            log(`Match Ended. (${userId})`);
             bot.ws.removeEventListener('message', matchListener);
-            bot.disconnectChannel('gamesReversiGame');
+            bot.disconnectChannel(channelId);
         }
     });
 
@@ -84,6 +109,10 @@ export default async function Ready(bot: Bot, userId: string): Promise<void> {
                 },
             })
         );
+    }
+
+    function log(text?: string, ...arg: string[]): void {
+        console.log('[RVST]', text, ...arg);
     }
 }
 

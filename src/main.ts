@@ -1,4 +1,3 @@
-import ReconnectingWebSocket from 'reconnecting-websocket';
 import { Bot } from './bot';
 import Module from './module';
 import { Streaming } from './misskey/api';

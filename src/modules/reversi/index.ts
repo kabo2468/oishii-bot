@@ -10,6 +10,7 @@ export default class extends Module {
 
     Run(bot: Bot, note: Note): void {
         note.reaction('👌');
+        this.log('User:', note.note.userId);
         Reversi(bot, note.note.userId);
     }
 }

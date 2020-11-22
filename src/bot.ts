@@ -69,7 +69,7 @@ export class Bot {
     }
 
     private async getAccount() {
-        this.account = await this.api.call('i');
+        this.account = await this.api.call('i').then((res) => res.json());
     }
 
     log(text?: string, ...arg: unknown[]): void {
@@ -77,27 +77,27 @@ export class Bot {
     }
 
     connectChannel(channel: string, id: string, params?: Record<string, unknown>): void {
-        const json = JSON.stringify({
-            type: 'connect',
-            body: {
-                channel,
-                id,
-                params,
-            },
-        });
-        console.log(json);
-        this.ws.send(json);
+        this.ws.send(
+            JSON.stringify({
+                type: 'connect',
+                body: {
+                    channel,
+                    id,
+                    params,
+                },
+            })
+        );
     }
 
     disconnectChannel(id: string): void {
-        const json = JSON.stringify({
-            type: 'disconnect',
-            body: {
-                id,
-            },
-        });
-        console.log(json);
-        this.ws.send(json);
+        this.ws.send(
+            JSON.stringify({
+                type: 'disconnect',
+                body: {
+                    id,
+                },
+            })
+        );
     }
 
     async runQuery(query: { text: string; values?: (string | number | boolean)[] }): Promise<Res> {
