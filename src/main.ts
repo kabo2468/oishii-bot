@@ -15,6 +15,7 @@ import HungryModule from './modules/hungry';
 import FoodModule from './modules/food';
 import SushiModule from './modules/sushi';
 import FortuneModule from './modules/fortune';
+import NullpoModule from './modules/nullpo';
 import FollowCommandModule from './modules/commands/follow';
 import UnfollowCommandModule from './modules/commands/unfollow';
 import HelpCommandModule from './modules/commands/help';
@@ -46,6 +47,7 @@ const modules: Module[] = [
     new SushiModule(),
     new KawaiiModule(),
     new FortuneModule(),
+    new NullpoModule(),
 ];
 
 let tlCount = 0;
