@@ -6,7 +6,7 @@ export default abstract class Module {
     abstract readonly Regex: RegExp;
     abstract readonly LogName: string;
 
-    abstract Run(bot: Bot, note?: Note): void;
+    abstract Run(bot: Bot, note?: Note | string): void;
 
     protected log(text?: string, ...arg: string[]): void {
         console.log(`[${this.LogName}]`, text, ...arg);

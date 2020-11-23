@@ -1,4 +1,3 @@
-import ReconnectingWebSocket from 'reconnecting-websocket';
 import { Bot } from './bot';
 import Module from './module';
 import { Streaming } from './misskey/api';
@@ -16,6 +15,8 @@ import FoodModule from './modules/food';
 import SushiModule from './modules/sushi';
 import FortuneModule from './modules/fortune';
 import NullpoModule from './modules/nullpo';
+import ReversiModule from './modules/reversi';
+import Reversi from './modules/reversi/reversi';
 import FollowCommandModule from './modules/commands/follow';
 import UnfollowCommandModule from './modules/commands/unfollow';
 import HelpCommandModule from './modules/commands/help';
@@ -48,6 +49,7 @@ const modules: Module[] = [
     new KawaiiModule(),
     new FortuneModule(),
     new NullpoModule(),
+    // new ReversiModule(),
 ];
 
 let tlCount = 0;
@@ -64,23 +66,11 @@ export default function (bot: Bot): void {
         },
     ];
 
-    const wsConnectChannel = function (ws: ReconnectingWebSocket) {
+    bot.ws.addEventListener('open', function () {
         channels.forEach((channel) => {
-            ws.send(
-                JSON.stringify({
-                    type: 'connect',
-                    body: {
-                        channel: channel.channel,
-                        id: channel.id,
-                    },
-                })
-            );
+            bot.connectChannel(channel.channel, channel.id);
         });
         bot.log('Connected!');
-    };
-
-    bot.ws.addEventListener('open', function () {
-        wsConnectChannel(bot.ws);
     });
     bot.ws.addEventListener('close', function () {
         bot.log('Disconnected.');
@@ -125,10 +115,10 @@ export default function (bot: Bot): void {
 
         if (json.body.id === 'streamingMainId') {
             const type = json.body.type;
-            const allowTypes = ['mention', 'messagingMessage', 'followed'];
+            const allowTypes = ['mention', 'messagingMessage', 'followed', 'reversiInvited'];
             if (!allowTypes.includes(type)) return;
 
-            if (json.body.body.user?.isBot === true) return;
+            if (!('parentId' in json.body.body) && json.body.body.user?.isBot === true) return;
 
             if (type === 'followed') {
                 const user: {
@@ -146,6 +136,11 @@ export default function (bot: Bot): void {
                 const logPrefix = done ? 'Followed' : 'Failed to follow';
                 bot.log(`${logPrefix} @${user.username}${user.host ? `@${user.host}` : ''} (ID: ${user.id})`);
                 return;
+            }
+
+            if (type === 'reversiInvited') {
+                if (!('parentId' in json.body.body)) return;
+                Reversi(bot, json.body.body.parentId);
             }
 
             if (isNote(json.body.body)) {
