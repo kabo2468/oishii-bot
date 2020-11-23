@@ -72,6 +72,7 @@ class Back {
     onInit(body: Body) {
         this._game = body.game;
         this._account = body.account;
+        this.log(`Booted. (PID: ${process.pid})`);
     }
 
     onStarted(body: Body) {
@@ -101,6 +102,7 @@ class Back {
             type: 'ended',
         });
 
+        this.log(`End. (PID: ${process.pid})`);
         process.exit();
     }
 
