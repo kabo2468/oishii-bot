@@ -6,10 +6,7 @@ export default async function (bot: Bot, userId: string): Promise<void> {
         .call('games/reversi/match', {
             userId,
         })
-        .then((res) => {
-            console.log(res);
-            return res.json();
-        });
+        .then((res) => res.json());
 
     const channelId = `reversiMatch-${userId}-${Date.now()}`;
     bot.connectChannel('gamesReversiGame', channelId, {
@@ -18,41 +15,43 @@ export default async function (bot: Bot, userId: string): Promise<void> {
     setTimeout(() => {
         wsSend('accept');
     }, 1000);
+    log(`Invited. (userId: ${userId})`);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const matchListener = (data: MessageEvent<any>): void => {
-        const json = JSON.parse(data.data) as Res;
+    const genListener = (channelId: string) => {
+        return function fn(data: { data: string }) {
+            const json = JSON.parse(data.data) as Res;
 
-        if (json.body.type === 'watchers') return;
+            if (json.body.id !== channelId) return;
 
-        if (json.body.type === 'updateSettings') {
-            log(`UpdateSetting: ${json.body.body.key} = ${json.body.body.value}`);
-        }
+            if (json.body.type === 'watchers') return;
 
-        if (json.body.type === 'started') {
-            back.send({
-                type: 'started',
-                body: {
-                    game: json.body.body,
-                },
-            });
-        }
+            if (json.body.type === 'started') {
+                back.send({
+                    type: 'started',
+                    body: {
+                        game: json.body.body,
+                    },
+                });
+            }
 
-        if (json.body.type === 'set') {
-            back.send({
-                type: 'set',
-                body: json.body.body,
-            });
-        }
+            if (json.body.type === 'set') {
+                back.send({
+                    type: 'set',
+                    body: json.body.body,
+                });
+            }
 
-        if (json.body.type === 'ended') {
-            back.send({
-                type: 'ended',
-            });
-        }
+            if (json.body.type === 'ended') {
+                back.send({
+                    type: 'ended',
+                });
+                bot.ws.removeEventListener('message', fn);
+            }
+        };
     };
 
-    bot.ws.addEventListener('message', matchListener);
+    const listener = genListener(channelId);
+    bot.ws.addEventListener('message', listener);
 
     const back = fork(`${__dirname}/back`);
     back.send({
@@ -69,8 +68,7 @@ export default async function (bot: Bot, userId: string): Promise<void> {
                 pos: message.pos,
             });
         } else if (message.type == 'ended') {
-            log(`Match Ended. (${userId})`);
-            bot.ws.removeEventListener('message', matchListener);
+            log(`Match Ended. (userId: ${userId})`);
             bot.disconnectChannel(channelId);
         }
     });
@@ -96,37 +94,15 @@ export default async function (bot: Bot, userId: string): Promise<void> {
 interface Res {
     type: string;
     body: Body;
-    user1: boolean;
-    user2: boolean;
 }
 
 interface Body {
     id: string;
     type: string;
-    body: MapSetting | BWSetting | LlotheoSetting | LoopedBoardSetting | CanPutEverywhereSetting;
+    body: Setting;
 }
 
-interface MapSetting {
-    key: 'map';
-    value: string[];
-}
-
-interface BWSetting {
-    key: 'bw';
-    value: string;
-}
-
-interface LlotheoSetting {
-    key: 'isLlotheo';
-    value: boolean;
-}
-
-interface LoopedBoardSetting {
-    key: 'loopedBoard';
-    value: boolean;
-}
-
-interface CanPutEverywhereSetting {
-    key: 'canPutEverywhere';
-    value: boolean;
+interface Setting {
+    key: string;
+    value: string | string[] | boolean;
 }

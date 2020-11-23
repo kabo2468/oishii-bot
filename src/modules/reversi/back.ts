@@ -9,8 +9,34 @@ interface Mes {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Body = Record<string, any>;
 
+interface Game {
+    id: string;
+    createdAt: string;
+    startedAt: string;
+    isStarted: boolean;
+    isEnded: boolean;
+    form1: null;
+    form2: null;
+    user1Accepted: boolean;
+    user2Accepted: boolean;
+    user1Id: string;
+    user2Id: string;
+    user1: User;
+    user2: User;
+    winnerId: null;
+    winner: null;
+    surrendered: null;
+    black: number;
+    bw: string;
+    isLlotheo: boolean;
+    canPutEverywhere: boolean;
+    loopedBoard: boolean;
+    logs: string[];
+    map: string[];
+}
+
 class Back {
-    private _game!: Body;
+    private _game!: Game;
     private _engine!: Reversi;
     private _botColor!: Color;
     private _account!: User;
@@ -40,7 +66,7 @@ class Back {
     }
 
     log(text?: string, ...arg: string[]): void {
-        console.log('[RVBC]', text, ...arg);
+        console.log(`[RVBC] (${this._game.id})`, text, ...arg);
     }
 
     onInit(body: Body) {
@@ -49,8 +75,8 @@ class Back {
     }
 
     onStarted(body: Body) {
-        const inviter = body.game.user1Id === this._account.id ? body.game.user2Id : body.game.user1Id;
-        this.log(`Match Started. (${inviter})`);
+        const inviter = this._game.user1Id === this._account.id ? this._game.user2Id : this._game.user1Id;
+        this.log(`Match Started. (userId: ${inviter})`);
 
         this._game = body.game;
 
