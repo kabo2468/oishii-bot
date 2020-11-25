@@ -89,4 +89,13 @@ export default {
         const fortune = fortunes[Math.floor(rnd * fortunes.length)];
         return `今日の運勢は${fortune}！\nラッキーフードは ${good ? goodText : badText} ${food} です！`;
     },
+    games: {
+        reversi: {
+            started: (name: string, url: string): string => `${name}と対局を始めました！\n[観戦する](${url})`,
+            win: (name: string): string => `${name}に勝ちました！`,
+            lose: (name: string): string => `${name}に負けました`,
+            draw: (name: string): string => `${name}と引き分けました`,
+            surrendered: (name: string): string => `${name}が投了しちゃいました`,
+        },
+    },
 };

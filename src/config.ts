@@ -21,6 +21,7 @@ type JsonConfig = {
 };
 
 export type Config = {
+    host: string;
     wsUrl: string;
     apiUrl: string;
     apiKey: string;
@@ -105,6 +106,7 @@ export default async function loadConfig(): Promise<Config> {
     const ownerIds = await Promise.all(getOwners);
 
     return {
+        host: url,
         apiKey: config.apiKey,
         apiUrl,
         wsUrl,

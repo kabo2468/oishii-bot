@@ -12,9 +12,6 @@ export default async function (bot: Bot, userId: string): Promise<void> {
     bot.connectChannel('gamesReversiGame', channelId, {
         gameId: game.id,
     });
-    setTimeout(() => {
-        wsSend('accept');
-    }, 1000);
     log(`Invited. (userId: ${userId})`);
 
     const genListener = (channelId: string) => {
@@ -24,6 +21,16 @@ export default async function (bot: Bot, userId: string): Promise<void> {
             if (json.body.id !== channelId) return;
 
             if (json.body.type === 'watchers') return;
+
+            // 今は何も流れてこない
+            if (json.body.type === 'update-form') {
+                back.send({
+                    type: 'updateForm',
+                    body: {
+                        game: json.body.body,
+                    },
+                });
+            }
 
             if (json.body.type === 'started') {
                 back.send({
@@ -44,21 +51,38 @@ export default async function (bot: Bot, userId: string): Promise<void> {
             if (json.body.type === 'ended') {
                 back.send({
                     type: 'ended',
+                    body: json.body.body,
                 });
                 bot.ws.removeEventListener('message', fn);
             }
         };
     };
 
+    const form = [
+        {
+            id: 'post',
+            type: 'switch',
+            label: '対局情報を投稿するのを許可',
+            value: true,
+        },
+    ];
+
     const listener = genListener(channelId);
     bot.ws.addEventListener('message', listener);
+    setTimeout(() => {
+        wsSend('initForm', form);
+    }, 1000);
+    setTimeout(() => {
+        wsSend('accept');
+    }, 2000);
 
     const back = fork(`${__dirname}/back`);
     back.send({
         type: 'init',
         body: {
             game,
-            account: bot.account,
+            form,
+            config: bot.config,
         },
     });
 
@@ -73,7 +97,7 @@ export default async function (bot: Bot, userId: string): Promise<void> {
         }
     });
 
-    function wsSend(type: string, body?: Record<string, unknown>) {
+    function wsSend(type: string, body?: unknown) {
         bot.ws.send(
             JSON.stringify({
                 type: 'ch',
