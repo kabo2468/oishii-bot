@@ -47,6 +47,12 @@ interface Form {
     items?: { label: string; value: number }[];
 }
 
+interface Map {
+    width: number;
+    height: number;
+    corner: number[];
+}
+
 class Back {
     private _game!: Game;
     private _form!: Form[];
@@ -57,6 +63,7 @@ class Back {
     private _startedNote?: CreatedNote;
     private _maxTurn!: number;
     private _currentTurn = 0;
+    private _map!: Map;
 
     private get userName(): string {
         const name = this._inviter.name || this._inviter.username;
@@ -130,6 +137,14 @@ class Back {
 
         this._botColor = (this._game.user1Id == this._config.userId && this._game.black == 1) || (this._game.user2Id == this._config.userId && this._game.black == 2);
 
+        const width = this._engine.mapWidth;
+        const height = this._engine.mapHeight;
+        this._map = {
+            width,
+            height,
+            corner: [0, width - 1, height * (width - 1), height * width - 1],
+        };
+
         if (this._botColor) {
             this.think();
         }
@@ -176,8 +191,17 @@ class Back {
         this.log(`(${this._currentTurn}/${this._maxTurn}) Thinking...`);
         console.time('think');
 
-        const places = this._engine.canPutSomewhere(this._botColor);
-        const pos = places[Math.floor(Math.random() * places.length)];
+        const canPutCorner = this._map.corner.filter((value) => this._engine.canPut(this._botColor, value));
+
+        let pos: number;
+        if (canPutCorner.length) {
+            // 角における場合は置く
+            pos = canPutCorner[Math.floor(Math.random() * canPutCorner.length)];
+        } else {
+            // それ以外はランダムに置く
+            const places = this._engine.canPutSomewhere(this._botColor);
+            pos = places[Math.floor(Math.random() * places.length)];
+        }
 
         this._engine.put(this._botColor, pos);
 
