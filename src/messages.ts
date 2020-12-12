@@ -84,10 +84,13 @@ export default {
             return `${arrToStr(text)} ${food}`;
         },
     },
-    fortune: (food: string, good: boolean, rnd: number): string => {
-        const fortunes = ['兆吉', '超吉', '大吉', '吉', '中吉', '末吉', '凶'];
-        const fortune = fortunes[Math.floor(rnd * fortunes.length)];
-        return `今日の運勢は${fortune}！\nラッキーフードは ${good ? goodText : badText} ${food} です！`;
+    fortune: {
+        cw: '今日の運勢を占いました！',
+        text: (food: string, good: boolean, rnd: number): string => {
+            const fortunes = ['兆吉', '超吉', '大吉', '吉', '中吉', '末吉', '凶'];
+            const fortune = fortunes[Math.floor(rnd * fortunes.length)];
+            return `今日の運勢は${fortune}！\nラッキーフードは ${good ? goodText : badText} ${food} です！`;
+        },
     },
     games: {
         reversi: {
