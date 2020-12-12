@@ -14,7 +14,7 @@ export default class extends Module {
         if (bot.config.ownerIds.includes(note.note.userId)) {
             bot.sayFood();
         } else {
-            note.reply(messages.commands.denied);
+            note.reply({ text: messages.commands.denied });
         }
     }
 }

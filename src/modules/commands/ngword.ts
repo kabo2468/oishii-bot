@@ -12,7 +12,7 @@ export default class extends Module {
         note.reaction();
 
         if (!bot.config.ownerIds.includes(note.note.userId)) {
-            note.reply(messages.commands.denied);
+            note.reply({ text: messages.commands.denied });
             return;
         }
 
@@ -25,12 +25,12 @@ export default class extends Module {
         if (add) {
             const ngRes = bot.ngWords.addNGWord(word);
             const exRes = bot.ngWords.removeExcludedWord(word);
-            note.reply(messages.commands.ngWord.add(ngRes, exRes));
+            note.reply({ text: messages.commands.ngWord.add(ngRes, exRes) });
         } else {
             // Remove
             const ngRes = bot.ngWords.removeNGWord(word);
             const exRes = bot.ngWords.addExcludedWord(word);
-            note.reply(messages.commands.ngWord.remove(ngRes, exRes));
+            note.reply({ text: messages.commands.ngWord.remove(ngRes, exRes) });
         }
     }
 }

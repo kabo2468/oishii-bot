@@ -12,7 +12,7 @@ export default class extends Module {
         note.reaction();
 
         if (!bot.config.ownerIds.includes(note.note.userId)) {
-            note.reply(messages.commands.denied);
+            note.reply({ text: messages.commands.denied });
             return;
         }
 
@@ -26,10 +26,10 @@ export default class extends Module {
         };
         const res = await bot.runQuery(query);
         if (res.rowCount > 0) {
-            note.reply(messages.commands.delete.done(res.rowCount));
+            note.reply({ text: messages.commands.delete.done(res.rowCount) });
             this.log(food);
         } else {
-            note.reply(messages.commands.delete.notFound);
+            note.reply({ text: messages.commands.delete.notFound });
             this.log(food, 'Not found.');
         }
     }

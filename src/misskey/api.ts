@@ -62,12 +62,12 @@ export default class API {
         });
     }
 
-    async postText(text: string, visibility: 'public' | 'home' | 'followers' | 'specified' = 'public', replyId?: string): Promise<Note> {
+    async postText(text: string, visibility: 'public' | 'home' | 'followers' | 'specified' = 'public', replyId?: string, cw?: string): Promise<Note> {
         const data = {
             text,
             visibility,
             replyId,
-            ...(text.length > 100 ? { cw: messages.food.long } : {}),
+            ...(text.length > 100 ? { cw: `${cw}\n\n${messages.food.long}` } : { cw }),
         };
         return this.call('notes/create', data)
             .then((res) => res.json())

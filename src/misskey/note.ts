@@ -58,8 +58,8 @@ export class Note {
         return this.tp.findNGWord(ngWord);
     }
 
-    reply(text: string, visibility: Visibilities = this.note.visibility): void {
-        this.bot.api.postText(text, visibility, this.note.id).catch((err) => {
+    reply({ text, visibility = this.note.visibility, cw }: { text: string; visibility?: Visibilities; cw?: string }): void {
+        this.bot.api.postText(text, visibility, this.note.id, cw).catch((err) => {
             throw new Error(err);
         });
     }

@@ -21,10 +21,10 @@ export default class extends Module {
         const res = await bot.getFood({ good, learned });
         const food = res.rows[0].name;
         if (!food) {
-            note.reply(messages.food.idk);
+            note.reply({ text: messages.food.idk });
             return;
         }
         this.log(`${food} (${good})`);
-        note.reply(messages.food.search(food, good));
+        note.reply({ text: messages.food.search(food, good) });
     }
 }

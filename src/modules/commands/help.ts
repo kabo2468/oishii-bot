@@ -12,6 +12,6 @@ export default class extends Module {
         note.reaction();
 
         const _t = messages.commands.help.join('\n');
-        note.reply(`\`\`\`\n${_t}\n\`\`\``);
+        note.reply({ text: `\`\`\`\n${_t}\n\`\`\`` });
     }
 }

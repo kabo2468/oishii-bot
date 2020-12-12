@@ -18,11 +18,11 @@ export default class extends Module {
         const food = res.rows[0].name;
         const good = res.rows[0].good;
         if (!food || good === undefined) {
-            note.reply(messages.food.idk);
+            note.reply({ text: messages.food.idk });
             return;
         }
         this.log(`Food: ${food} (${good})`);
 
-        note.reply(messages.food.hungry(food, good));
+        note.reply({ text: messages.food.hungry(food, good) });
     }
 }

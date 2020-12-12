@@ -27,6 +27,6 @@ export default class extends Module {
 
         const msg = messages.fortune(food, good, rnd);
         this.log(new TextProcess(msg).replaceNewLineToText().toString());
-        note.reply(msg);
+        note.reply({ text: msg });
     }
 }

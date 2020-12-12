@@ -10,6 +10,6 @@ export default class extends Module {
 
     Run(bot: Bot, note: Note): void {
         note.reaction();
-        note.reply(messages.commands.ping);
+        note.reply({ text: messages.commands.ping });
     }
 }

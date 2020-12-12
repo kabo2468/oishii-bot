@@ -19,7 +19,7 @@ export default class extends Module {
 
         const ng = note.findNGWord(bot.ngWords);
         if (ng) {
-            note.reply(messages.food.ngWord);
+            note.reply({ text: messages.food.ngWord });
             this.log('NG WORD:', ng);
             return;
         }
@@ -34,16 +34,16 @@ export default class extends Module {
         if (res.rowCount < 1) {
             const noun = await this.isNoun(food);
             if (noun) {
-                note.reply(messages.food.idk);
+                note.reply({ text: messages.food.idk });
             } else {
-                note.reply(messages.food.canEat);
+                note.reply({ text: messages.food.canEat });
             }
             return;
         }
 
         const isGood = res.rows[0].good;
         const goodText = isGood ? messages.food.good : messages.food.bad;
-        note.reply(goodText);
+        note.reply({ text: goodText });
     }
 
     private async isNoun(text: string): Promise<boolean> {

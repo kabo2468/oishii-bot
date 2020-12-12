@@ -41,6 +41,6 @@ export default class extends Module {
         this.log(uptimeText);
         text.push(uptimeText);
 
-        note.reply(text.join('\n'));
+        note.reply({ text: text.join('\n') });
     }
 }

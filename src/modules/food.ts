@@ -19,6 +19,6 @@ export default class extends Module {
         for (let i = 0; i < num; i++) {
             foods += arrToStr(variables.food.food);
         }
-        note.reply(messages.food.food(foods));
+        note.reply({ text: messages.food.food(foods) });
     }
 }
