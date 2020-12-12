@@ -4,7 +4,6 @@ import { Note } from '../misskey/note';
 import Module from '../module';
 import { TextProcess } from '../utils/text-process';
 import seedrandom from 'seedrandom';
-import { measureMemory } from 'vm';
 
 export default class extends Module {
     Name = 'Fortune';
