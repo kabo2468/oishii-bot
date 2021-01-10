@@ -71,7 +71,7 @@ export default class API {
             text,
             visibility,
             replyId,
-            cw: _cw.join('\n\n'),
+            cw: _cw.length ? _cw.join('\n\n') : null,
         };
         return this.call('notes/create', data)
             .then((res) => res.json())
