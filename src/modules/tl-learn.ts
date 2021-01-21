@@ -5,7 +5,7 @@ import { TextProcess } from '../utils/text-process';
 
 export default class extends Module {
     Name = 'TL Learn';
-    Regex = new RegExp(/.+/);
+    Regex = /.+/;
     LogName = 'TLLN';
 
     async Run(bot: Bot, note: Note): Promise<void> {
