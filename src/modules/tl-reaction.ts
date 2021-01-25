@@ -12,12 +12,13 @@ export default class extends Module {
     Run(bot: Bot, note: Note): void {
         const foods = variables.food.foods;
 
-        const foundFood = foods.filter((food) => food.keywords.includes(note.note.text));
+        const foundFood = foods.filter((food) => food.keywords.some((keyword) => note.note.text.indexOf(keyword) !== -1));
 
         if (foundFood.length === 0) return;
 
-        const postEmoji = chooseOneFromArr(foundFood).emoji;
+        const reactEmoji = chooseOneFromArr(foundFood).emoji;
 
-        note.reaction(postEmoji);
+        note.reaction(reactEmoji);
+        this.log(`Reacted: ${reactEmoji}`);
     }
 }
