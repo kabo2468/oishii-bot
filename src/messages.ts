@@ -1,7 +1,7 @@
 const goodText = 'おいしい';
 const badText = 'まずい';
 
-export const arrToStr = (arr: string[]): string => arr[Math.floor(Math.random() * arr.length)];
+export const chooseOneFromArr = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 export default {
     commands: {
@@ -77,11 +77,11 @@ export default {
         long: '長いもの',
         sushi: (num: number): string => {
             const text = [`にぎりました！`, `にぎったよ！`];
-            return `${arrToStr(text)} ${'🍣'.repeat(num)}`;
+            return `${chooseOneFromArr(text)} ${'🍣'.repeat(num)}`;
         },
         food: (food: string): string => {
             const text = [`これあげる！`, `食べて！`];
-            return `${arrToStr(text)} ${food}`;
+            return `${chooseOneFromArr(text)} ${food}`;
         },
     },
     fortune: {

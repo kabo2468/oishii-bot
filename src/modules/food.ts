@@ -1,5 +1,5 @@
 import { Bot } from '../bot';
-import messages, { arrToStr } from '../messages';
+import messages, { chooseOneFromArr } from '../messages';
 import { Note } from '../misskey/note';
 import Module from '../module';
 import variables from '../variables';
@@ -17,7 +17,7 @@ export default class extends Module {
         this.log('Count:', String(num));
         let foods = '';
         for (let i = 0; i < num; i++) {
-            foods += arrToStr(variables.food.food);
+            foods += chooseOneFromArr(variables.food.foods).emoji;
         }
         note.reply({ text: messages.food.food(foods) });
     }
