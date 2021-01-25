@@ -17,7 +17,7 @@ export default {
             { emoji: '🍑', keywords: ['peach', 'もも', 'モモ', '桃'] },
             { emoji: '🍒', keywords: ['cherries', 'さくらんぼ', '桜桃'] },
             { emoji: '🍓', keywords: ['strawberry', 'いちご', '苺'] },
-            { emoji: '🫐', keywords: ['blueberries', 'ブルーベリー', ''] },
+            { emoji: '🫐', keywords: ['blueberries', 'ブルーベリー'] },
             { emoji: '🥝', keywords: ['kiwi fruit', 'キウイ'] },
             { emoji: '🍅', keywords: ['tomato', 'トマト'] },
             { emoji: '🫒', keywords: ['olive', 'オリーブ'] },
