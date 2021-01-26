@@ -6,6 +6,7 @@ import { TextProcess } from './utils/text-process';
 
 import TLPizzaModule from './modules/tl-pizza';
 import TLLearnModule from './modules/tl-learn';
+import TLReactionModule from './modules/tl-reaction';
 import KawaiiModule from './modules/kawaii';
 import CheckModule from './modules/check';
 import SearchModule from './modules/search';
@@ -29,6 +30,7 @@ import NGWordCommandModule from './modules/commands/ngword';
 const tlModules = {
     pizza: new TLPizzaModule(),
     learn: new TLLearnModule(),
+    reaction: new TLReactionModule(),
 };
 // prettier-ignore
 const modules: Module[] = [
@@ -103,6 +105,7 @@ export default function (bot: Bot): void {
             }
 
             void tlModules.learn.Run(bot, note);
+            void tlModules.reaction.Run(bot, note);
 
             tlCount++;
             if (tlCount > bot.config.followings / 3) {
