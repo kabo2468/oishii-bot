@@ -105,12 +105,12 @@ export default function (bot: Bot): void {
                 tlModules.pizza.Run(bot, note);
                 return;
             }
-            void tlModules.learn.Run(bot, note);
-            void tlModules.reaction.Run(bot, note);
             if (tlModules.call.Regex.test(note.note.text)) {
                 tlModules.call.Run(bot, note);
                 return;
             }
+            void tlModules.learn.Run(bot, note);
+            void tlModules.reaction.Run(bot, note);
 
             tlCount++;
             if (tlCount > bot.config.followings / 3) {
