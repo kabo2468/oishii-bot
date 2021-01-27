@@ -13,10 +13,8 @@ export default class extends Module {
     async Run(bot: Bot, note: Note): Promise<void> {
         const foods = variables.food.foods;
 
-        const wakachi = await new TextProcess(note.note.text).getWakachi();
-        const foundFood = foods.filter((food) => {
-            return food.keywords.some((keyword) => wakachi.includes(keyword));
-        });
+        const nouns = (await new TextProcess(note.note.text).getNouns()).map((noun) => noun.surface_form);
+        const foundFood = foods.filter((food) => food.keywords.some((keyword) => nouns.includes(keyword)));
 
         if (foundFood.length === 0) return;
 
