@@ -55,21 +55,6 @@ export class TextProcess {
         });
     }
 
-    async getWakachi(): Promise<string[]> {
-        const text = this.text;
-        return new Promise((resolve) => {
-            builder({ dicPath: 'node_modules/kuromoji/dict' }).build(function (err, tokenizer) {
-                if (err) throw err;
-
-                const tokens = tokenizer.tokenize(text);
-
-                const wakachi = tokens.map((token) => token.surface_form);
-
-                resolve(wakachi);
-            });
-        });
-    }
-
     omitText(length = 100): TextProcess {
         this.text = this.text.length > length ? `${this.text.substr(0, length)}...` : this.text;
         return this;
