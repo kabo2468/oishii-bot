@@ -81,7 +81,7 @@ npm start
     },
     mecab: {
         // mecabのインストールパス (`which mecab`)
-        binPath: '',
+        binPath: '/usr/bin/mecab',
         // mecabの辞書ファイル
         dicPath: '',
     },
