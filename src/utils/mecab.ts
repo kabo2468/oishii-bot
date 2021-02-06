@@ -40,8 +40,6 @@ export async function mecab(text: string, mecab = 'mecab', dic?: string): Promis
     const args: string[] = [];
     if (dic) args.push('-d', dic);
 
-    console.log('Mecab');
-
     const lines = await cmd(mecab, args, `${text.replace(/[\n\s\t]/g, ' ')}\n`);
 
     const results: Morpheme[] = [];
@@ -65,13 +63,10 @@ export async function mecab(text: string, mecab = 'mecab', dic?: string): Promis
         };
         results.push(pushWord);
     }
-    console.log(results);
     return results;
 }
 
 export async function cmd(command: string, args: string[], stdin: string): Promise<string[]> {
-    console.log('CMD');
-
     const mecab = spawn(command, args);
 
     const writable = new WritableStream();
