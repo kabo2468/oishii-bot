@@ -1,7 +1,9 @@
 import { Bot } from '../bot';
+import { MecabType } from '../config';
 import messages from '../messages';
 import { Note } from '../misskey/note';
 import Module from '../module';
+import { getNouns } from '../utils/get-nouns';
 import { TextProcess } from '../utils/text-process';
 import variables from '../variables';
 
@@ -32,7 +34,7 @@ export default class extends Module {
         if (!res) return;
 
         if (res.rowCount < 1) {
-            const noun = await this.isNoun(food);
+            const noun = await this.isNoun(food, bot.config.mecab);
             if (noun) {
                 note.reply({ text: messages.food.idk });
             } else {
@@ -46,9 +48,9 @@ export default class extends Module {
         note.reply({ text: goodText });
     }
 
-    private async isNoun(text: string): Promise<boolean> {
+    private async isNoun(text: string, mecab: MecabType): Promise<boolean> {
         this.log('Check noun:', text);
-        const nouns = await new TextProcess(text).getNouns();
+        const nouns = await getNouns(text, mecab);
         return nouns ? true : false;
     }
 }
