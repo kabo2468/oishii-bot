@@ -10,14 +10,20 @@ type Post = {
     rateLimitPost: number;
 };
 
+export type MecabType = {
+    binPath: string;
+    dicPath?: string;
+};
+
 type JsonConfig = {
-    [key: string]: string | string[] | boolean | number | Post;
+    [key: string]: string | string[] | boolean | number | Post | MecabType;
     url: string;
     apiKey: string;
     databaseUrl: string;
     dbSSL: boolean;
     ownerUsernames: string[];
     post: Post;
+    mecab: MecabType;
 };
 
 export type Config = {
@@ -31,6 +37,7 @@ export type Config = {
     ownerIds: string[];
     post: Post;
     followings: number;
+    mecab: MecabType;
 };
 
 export default async function loadConfig(): Promise<Config> {
@@ -53,6 +60,9 @@ export default async function loadConfig(): Promise<Config> {
             rateLimitPost: 0,
             rateLimitSec: 0,
             tlPostProbability: 0,
+        },
+        mecab: {
+            binPath: '',
         },
     };
     for (const key of Object.keys(keys)) {
@@ -116,5 +126,6 @@ export default async function loadConfig(): Promise<Config> {
         ownerIds,
         post: config.post,
         followings: Number(follows),
+        mecab: config.mecab,
     };
 }

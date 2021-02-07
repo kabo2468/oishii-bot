@@ -1,6 +1,7 @@
 import { Bot } from '../bot';
 import { Note } from '../misskey/note';
 import Module from '../module';
+import { getNouns } from '../utils/get-nouns';
 import { TextProcess } from '../utils/text-process';
 
 export default class extends Module {
@@ -9,15 +10,15 @@ export default class extends Module {
     LogName = 'TLLN';
 
     async Run(bot: Bot, note: Note): Promise<void> {
-        const text = new TextProcess(note.note.text);
-        this.log('Text:', new TextProcess(note.note.text).replaceNewLineToText().toString());
+        const text = note.note.text;
+        this.log(new TextProcess(text).replaceNewLineToText().toString());
 
-        const nouns = await text.getNouns();
+        const nouns = await getNouns(text, bot.config.mecab);
         if (nouns.length < 1) {
             this.log('Nouns not found.');
             return;
         }
-        const food = nouns[Math.floor(Math.random() * nouns.length)].surface_form;
+        const food = nouns[Math.floor(Math.random() * nouns.length)];
 
         const isExists = await bot.existsFood(food);
         if (isExists) {

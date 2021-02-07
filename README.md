@@ -79,6 +79,12 @@ npm start
         // レートリミットの最大数
         rateLimitPost: 5,
     },
+    mecab: {
+        // mecabのインストールパス (`which mecab`)
+        binPath: '/usr/bin/mecab',
+        // mecabの辞書ファイル
+        dicPath: '',
+    },
 }
 ```
 

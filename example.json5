@@ -10,4 +10,8 @@
         rateLimitSec: 60,
         rateLimitPost: 5,
     },
+    mecab: {
+        binPath: '',
+        dicPath: '',
+    },
 }
