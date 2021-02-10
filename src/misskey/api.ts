@@ -14,7 +14,7 @@ export interface User {
     isCat: boolean;
     isBot: boolean;
     emojis: string[];
-    instance: Instance;
+    instance?: Instance;
 }
 
 export interface Instance {

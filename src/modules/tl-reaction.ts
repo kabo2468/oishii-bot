@@ -14,7 +14,7 @@ export default class extends Module {
         this.log('Search food');
 
         // Local === null
-        if (note.note.user.host !== null || note.note.user.instance.softwareName !== 'misskey') {
+        if (note.note.user.host !== null && note.note.user.instance?.softwareName !== 'misskey') {
             this.log('Not Misskey');
             return;
         }
