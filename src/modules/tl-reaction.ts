@@ -13,6 +13,12 @@ export default class extends Module {
     async Run(bot: Bot, note: Note): Promise<void> {
         this.log('Search food');
 
+        // Local === null
+        if (note.note.user.host !== null || note.note.user.instance.softwareName !== 'misskey') {
+            this.log('Not Misskey');
+            return;
+        }
+
         const foods = variables.food.foods;
 
         const nouns = await getNouns(note.note.text, bot.config.mecab);

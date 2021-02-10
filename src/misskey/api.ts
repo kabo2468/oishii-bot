@@ -14,6 +14,16 @@ export interface User {
     isCat: boolean;
     isBot: boolean;
     emojis: string[];
+    instance: Instance;
+}
+
+export interface Instance {
+    name: string;
+    softwareName: string;
+    softwareVersion: string;
+    iconUrl: string;
+    faviconUrl: string;
+    themeColor: string;
 }
 
 export interface File {
