@@ -18,6 +18,10 @@ Node.js のバージョンは v14 以上にしてください
 
 OS によってインストール方法が異なるので、各自調べてください
 
+### MeCab をインストールする
+
+aptなどのパッケージインストーラーからインストールするか、自分でビルドしてください
+
 ### `example.json5` をコピーして `config.json5` を作る
 
 ```shell
@@ -54,7 +58,7 @@ npm run migration
 npm start
 ```
 
-## config.json
+## config.json5
 
 ```json5
 {
