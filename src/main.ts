@@ -18,6 +18,7 @@ import SushiModule from './modules/sushi';
 import FortuneModule from './modules/fortune';
 import NullpoModule from './modules/nullpo';
 // import ReversiModule from './modules/reversi';
+import ValentineModule from './modules/valentine';
 import Reversi from './modules/reversi/reversi';
 import FollowCommandModule from './modules/commands/follow';
 import UnfollowCommandModule from './modules/commands/unfollow';
@@ -56,6 +57,7 @@ const modules: Module[] = [
     new FortuneModule(),
     new NullpoModule(),
     // new ReversiModule(),
+    new ValentineModule(),
 ];
 
 let tlCount = 0;

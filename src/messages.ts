@@ -83,6 +83,17 @@ export default {
             const text = [`これあげる！`, `食べて！`];
             return `${chooseOneFromArr(text)} ${food}`;
         },
+        valentine: {
+            notToday: '今日はバレンタインデーじゃないよ！',
+            give: {
+                give: (chocolates: string[]): string => `これあげる！${chooseOneFromArr(chocolates)}`,
+                again: (chocolates: string[]): string => `もう一つあげる！${chooseOneFromArr(chocolates)}`,
+            },
+            receive: {
+                thx: 'ありがとう！今度お返しするよ！',
+                again: 'もう一つくれるの！？ありがとう！',
+            },
+        },
     },
     fortune: {
         cw: '今日の運勢を占いました！',
