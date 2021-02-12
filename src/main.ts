@@ -26,6 +26,7 @@ import PingCommandModule from './modules/commands/ping';
 import SayCommandModule from './modules/commands/say';
 import InfoCommandModule from './modules/commands/info';
 import DeleteCommandModule from './modules/commands/delete';
+import DeleteAllCommandModule from './modules/commands/delete-all';
 import NGWordCommandModule from './modules/commands/ngword';
 
 const tlModules = {
@@ -43,6 +44,7 @@ const modules: Module[] = [
     new SayCommandModule(),
     new InfoCommandModule(),
     new DeleteCommandModule(),
+    new DeleteAllCommandModule(),
     new NGWordCommandModule(),
     new CheckModule(),
     new LearnModule(),

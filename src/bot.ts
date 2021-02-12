@@ -125,6 +125,16 @@ export class Bot {
         await this.runQuery(query);
     }
 
+    async removeFood(food: string, many: boolean): Promise<Res> {
+        const textOne = 'in (SELECT name FROM oishii_table WHERE LOWER(name) = LOWER($1) LIMIT 1)';
+        const textMany = '~* $1';
+        const query = {
+            text: `DELETE FROM oishii_table WHERE name ${many ? textMany : textOne}`,
+            values: [food],
+        };
+        return await this.runQuery(query);
+    }
+
     async learnFood(food: string, good: boolean): Promise<void> {
         const query = {
             text: 'UPDATE oishii_table SET good=$1, learned=true WHERE LOWER(name) = LOWER($2)',
