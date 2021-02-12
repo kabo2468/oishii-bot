@@ -14,6 +14,7 @@ export default {
             '/unfollow: フォローを解除する。',
             '/say: なにか言わせる。(オーナーのみ)',
             '/delete: 削除する。（オーナーのみ）',
+            '/delall: その文字列が含まれているものを削除する。（オーナーのみ）',
             // '/chart: DBのレコード数をチャートにする。（オーナーのみ）',
             '/ng (a|b): NGワードを追加/削除する。（オーナーのみ）',
         ],
@@ -82,6 +83,17 @@ export default {
         food: (food: string): string => {
             const text = [`これあげる！`, `食べて！`];
             return `${chooseOneFromArr(text)} ${food}`;
+        },
+        valentine: {
+            notToday: '今日はバレンタインデーじゃないよ！',
+            give: {
+                give: (chocolates: string[]): string => `これあげる！${chooseOneFromArr(chocolates)}`,
+                again: (chocolates: string[]): string => `もう一つあげる！${chooseOneFromArr(chocolates)}`,
+            },
+            receive: {
+                thx: 'ありがとう！今度お返しするよ！',
+                again: 'もう一つくれるの！？ありがとう！',
+            },
         },
     },
     fortune: {
