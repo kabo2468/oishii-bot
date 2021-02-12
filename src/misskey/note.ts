@@ -39,6 +39,11 @@ export class Note {
         this.tp = new TextProcess(note.text);
     }
 
+    get id(): string {
+        const user = this.note.user;
+        return `@${user.username}${user.host ? `@${user.host}` : ''}`;
+    }
+
     removeURLs(): Note {
         this.note.text = this.tp.removeURLs().toString();
         return this;
