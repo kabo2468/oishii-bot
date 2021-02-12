@@ -96,6 +96,7 @@ export default function (bot: Bot): void {
             if (note.note.cw !== null) return;
             if (/@oishiibot/.test(note.note.text)) return;
             if (note.note.visibility === 'specified') return;
+            if (note.note.replyId) return;
 
             note.removeURLs().removeMentions();
 
