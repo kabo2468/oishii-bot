@@ -1,6 +1,6 @@
 {
   "name": "oishii-bot",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "description": "",
   "main": "built/index.js",
   "license": "MIT",
@@ -27,9 +27,7 @@
     "reconnecting-websocket": "^4.4.0",
     "seedrandom": "^3.0.5",
     "uuid": "^8.3.2",
-    "ws": "^7.4.3",
-    "bufferutil": "^4.0.3",
-    "utf-8-validate": "^5.0.4"
+    "ws": "^7.4.3"
   },
   "devDependencies": {
     "@types/eslint": "^7.2.6",
