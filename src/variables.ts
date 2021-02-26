@@ -76,7 +76,7 @@ export default {
             { emoji: '🍙', keywords: ['rice ball', 'おにぎり'] },
             { emoji: '🍚', keywords: ['cooked rice', 'ご飯', 'ごはん'] },
             { emoji: '🍛', keywords: ['curry rice', 'カレー'] },
-            { emoji: '🍜', keywords: ['steaming bowl', 'どんぶり'] },
+            { emoji: '🍜', keywords: ['steaming bowl', 'どんぶり', 'ラーメン'] },
             { emoji: '🍝', keywords: ['spaghetti', 'スパゲッティ'] },
             { emoji: '🍠', keywords: ['roasted sweet potato', 'スイートポテト'] },
             { emoji: '🍢', keywords: ['oden', 'おでん'] },
