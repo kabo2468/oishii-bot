@@ -21,9 +21,11 @@ export default class extends Module {
         const food = match[1];
 
         const res = await bot.removeFood(food, true);
-        if (res.rowCount > 0) {
-            note.reply({ text: messages.commands.delete.done(res.rowCount) });
-            this.log(food);
+        const count = res.rowCount;
+        if (count > 0) {
+            const deletedFoods = res.rows.map((row) => row.name);
+            note.reply({ cw: messages.commands.delete.done(count), text: `\`\`\`\n${deletedFoods.join('\n')}\n\`\`\`` });
+            this.log(`${count} food(s) deleted: ${deletedFoods.join(', ')}`);
         } else {
             note.reply({ text: messages.commands.delete.notFound });
             this.log(food, 'Not found.');

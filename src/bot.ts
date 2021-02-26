@@ -129,7 +129,7 @@ export class Bot {
         const textOne = 'in (SELECT name FROM oishii_table WHERE LOWER(name) = LOWER($1) LIMIT 1)';
         const textMany = '~* $1';
         const query = {
-            text: `DELETE FROM oishii_table WHERE name ${many ? textMany : textOne}`,
+            text: `DELETE FROM oishii_table WHERE name ${many ? textMany : textOne} RETURNING name`,
             values: [food],
         };
         return await this.runQuery(query);
