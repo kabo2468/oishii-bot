@@ -168,7 +168,7 @@ export class Bot {
         this.log(`sayFood: ${food} (${good})`);
 
         const text = messages.food.say(food, good);
-        this.api.postText(text);
+        this.api.postText({ text });
 
         this.rateLimit++;
     }

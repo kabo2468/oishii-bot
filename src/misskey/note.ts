@@ -64,7 +64,7 @@ export class Note {
     }
 
     reply({ text, visibility = this.note.visibility, cw }: { text: string; visibility?: Visibilities; cw?: string }): void {
-        this.bot.api.postText(text, visibility, this.note.id, cw).catch((err) => {
+        this.bot.api.postText({ text, visibility, replyId: this.note.id, cw }).catch((err) => {
             throw new Error(err);
         });
     }
