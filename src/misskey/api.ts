@@ -72,16 +72,29 @@ export default class API {
         });
     }
 
-    async postText(text: string, visibility: 'public' | 'home' | 'followers' | 'specified' = 'public', replyId?: string, cw?: string): Promise<Note> {
+    async postText({
+        text,
+        visibility = 'public',
+        replyId,
+        cw,
+        visibleUserIds,
+    }: {
+        text: string;
+        visibility?: 'public' | 'home' | 'followers' | 'specified';
+        replyId?: string;
+        cw?: string;
+        visibleUserIds?: string[];
+    }): Promise<Note> {
         const _cw: string[] = [];
         if (cw) _cw.push(cw);
         if (text.length > 100) _cw.push(messages.food.long);
 
         const data = {
             text,
-            visibility,
+            visibility: visibleUserIds ? 'specified' : visibility,
             replyId,
             cw: _cw.length ? _cw.join('\n\n') : null,
+            visibleUserIds,
         };
         return this.call('notes/create', data)
             .then((res) => res.json())

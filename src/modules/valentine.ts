@@ -64,7 +64,8 @@ export default class extends Module {
         } else {
             // not yet
             const addUser: User = {
-                id: note.id,
+                username: note.id,
+                id: note.note.userId,
                 gave: 0,
                 received: 0,
             };
@@ -85,11 +86,12 @@ export default class extends Module {
     }
 }
 
-interface Valentine {
+export interface Valentine {
     [k: number]: User[];
 }
 
-interface User {
+export interface User {
+    username: string;
     id: string;
     received: number;
     gave: number;
