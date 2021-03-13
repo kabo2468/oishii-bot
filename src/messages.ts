@@ -95,6 +95,7 @@ export default {
                 again: 'もう一つくれるの！？ありがとう！',
             },
         },
+        whiteDay: (username: string, presents: string): string => `${username} この前のお返しあげる！${presents}`,
     },
     fortune: {
         cw: '今日の運勢を占いました！',
