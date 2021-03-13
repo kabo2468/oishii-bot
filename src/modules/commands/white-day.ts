@@ -20,7 +20,7 @@ export default class extends Module {
         }
 
         const now = new Date();
-        const whiteDayTime = new Date(now.getFullYear(), 2, 14, 2, 17, 0, 0).getTime() - now.getTime();
+        const whiteDayTime = new Date(now.getFullYear(), 2, 14, 12, 0, 0, 0).getTime() - now.getTime();
         if (whiteDayTime < 0) {
             note.reply({ text: 'White day is over' });
             return;
