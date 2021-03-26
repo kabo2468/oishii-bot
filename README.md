@@ -1,5 +1,11 @@
 # oishii-bot
 
+## なにこれ
+
+Misskey で動く日本語Botです。
+
+TLから言葉を学び、それをおいしいかまずいか決めて、投稿するBotです。
+
 ## 使い方
 
 ### Misskey で @oishiibot を作る
@@ -11,6 +17,10 @@
 Node.js のバージョンは v14 以上にしてください
 
 OS によってインストール方法が異なるので、各自調べてください
+
+### MeCab をインストールする
+
+aptなどのパッケージインストーラーからインストールするか、自分でビルドしてください
 
 ### `example.json5` をコピーして `config.json5` を作る
 
@@ -48,7 +58,7 @@ npm run migration
 npm start
 ```
 
-## config.json
+## config.json5
 
 ```json5
 {
@@ -61,8 +71,8 @@ npm start
     databaseUrl: 'postgresql://USER:PASSWORD@HOST:PORT/DATABASE',
     // DBのSSL
     dbSSL: false,
-    // オーナーのUsername オーナーのみが使えるコマンドを使う人を指定する
-    ownerUsername: 'kabo',
+    // オーナーのUsername オーナーのみが使えるコマンドを使う人を配列で指定する
+    ownerUsernames: ['kabo'],
     post: {
         // 何分毎に投稿するか
         autoPostInterval: 60,
@@ -72,6 +82,12 @@ npm start
         rateLimitSec: 60,
         // レートリミットの最大数
         rateLimitPost: 5,
+    },
+    mecab: {
+        // mecabのインストールパス (`which mecab`)
+        binPath: '/usr/bin/mecab',
+        // mecabの辞書ファイル
+        dicPath: '',
     },
 }
 ```

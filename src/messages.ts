@@ -1,7 +1,7 @@
 const goodText = 'おいしい';
 const badText = 'まずい';
 
-export const arrToStr = (arr: string[]): string => arr[Math.floor(Math.random() * arr.length)];
+export const chooseOneFromArr = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 export default {
     commands: {
@@ -14,6 +14,7 @@ export default {
             '/unfollow: フォローを解除する。',
             '/say: なにか言わせる。(オーナーのみ)',
             '/delete: 削除する。（オーナーのみ）',
+            '/delall: その文字列が含まれているものを削除する。（オーナーのみ）',
             // '/chart: DBのレコード数をチャートにする。（オーナーのみ）',
             '/ng (a|b): NGワードを追加/削除する。（オーナーのみ）',
         ],
@@ -77,11 +78,40 @@ export default {
         long: '長いもの',
         sushi: (num: number): string => {
             const text = [`にぎりました！`, `にぎったよ！`];
-            return `${arrToStr(text)} ${'🍣'.repeat(num)}`;
+            return `${chooseOneFromArr(text)} ${'🍣'.repeat(num)}`;
         },
         food: (food: string): string => {
             const text = [`これあげる！`, `食べて！`];
-            return `${arrToStr(text)} ${food}`;
+            return `${chooseOneFromArr(text)} ${food}`;
+        },
+        valentine: {
+            notToday: '今日はバレンタインデーじゃないよ！',
+            give: {
+                give: (chocolates: string[]): string => `これあげる！${chooseOneFromArr(chocolates)}`,
+                again: (chocolates: string[]): string => `もう一つあげる！${chooseOneFromArr(chocolates)}`,
+            },
+            receive: {
+                thx: 'ありがとう！今度お返しするよ！',
+                again: 'もう一つくれるの！？ありがとう！',
+            },
+        },
+        whiteDay: (username: string, presents: string): string => `${username} この前のお返しあげる！${presents}`,
+    },
+    fortune: {
+        cw: '今日の運勢を占いました！',
+        text: (food: string, good: boolean, rnd: number): string => {
+            const fortunes = ['兆吉', '超吉', '大吉', '吉', '中吉', '末吉', '凶'];
+            const fortune = fortunes[Math.floor(rnd * fortunes.length)];
+            return `今日の運勢は${fortune}！\nラッキーフードは ${good ? goodText : badText} ${food} です！`;
+        },
+    },
+    games: {
+        reversi: {
+            started: (name: string, url: string): string => `${name}と対局を始めました！\n[観戦する](${url})`,
+            win: (name: string): string => `${name}に勝ちました！`,
+            lose: (name: string): string => `${name}に負けました`,
+            draw: (name: string): string => `${name}と引き分けました`,
+            surrendered: (name: string): string => `${name}が投了しちゃいました`,
         },
     },
 };

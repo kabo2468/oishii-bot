@@ -5,7 +5,8 @@ import Module from '../module';
 
 export default class extends Module {
     Name = 'Sushi';
-    Regex = /^\s*お?(寿司|すし)を?(握|にぎ)(って|れ)/;
+    Regex = /\s*お?(寿司|すし)を?(握|にぎ)(って|れ)/;
+    LogName = 'SUSH';
 
     Run(bot: Bot, note: Note): void {
         note.reaction();
@@ -14,6 +15,6 @@ export default class extends Module {
         const num = Math.floor(Math.random() * 10) + 1;
         this.log('Count:', String(num));
         const _s = messages.food.sushi(num);
-        note.reply(_s);
+        note.reply({ text: _s });
     }
 }

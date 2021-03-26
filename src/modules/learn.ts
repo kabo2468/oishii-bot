@@ -7,14 +7,15 @@ import variables from '../variables';
 
 export default class extends Module {
     Name = 'Learn';
-    Regex = new RegExp(`(.+)[はも](${variables.food.good}|${variables.food.bad})よ?`);
+    Regex = new RegExp(`(.+?)[はも]?(${variables.food.good}|${variables.food.bad})よ?`);
+    LogName = 'LERN';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
 
         const ng = note.findNGWord(bot.ngWords);
         if (ng) {
-            note.reply(messages.food.ngWord);
+            note.reply({ text: messages.food.ngWord });
             return;
         }
 
@@ -31,6 +32,6 @@ export default class extends Module {
             await bot.addFood(food, good, true);
             this.log('INSERT:', `${food} (${good})`);
         }
-        note.reply(messages.food.learn(food, match[2]));
+        note.reply({ text: messages.food.learn(food, match[2]) });
     }
 }

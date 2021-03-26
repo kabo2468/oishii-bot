@@ -4,7 +4,7 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import wsConst from 'ws';
 import { Config } from './config';
 import messages from './messages';
-import API from './misskey/api';
+import API, { User } from './misskey/api';
 import NGWord from './ng-words';
 
 type Rows = {
@@ -26,6 +26,8 @@ export class Bot {
     public ws: ReconnectingWebSocket;
     private db: Pool;
     private rateLimit = 0;
+    public api: API;
+    public account!: User;
 
     constructor(config: Config, ngWords: NGWord) {
         this.config = config;
@@ -43,6 +45,10 @@ export class Bot {
 
         this.log('Followings:', config.followings);
 
+        this.api = new API(this);
+
+        this.getAccount();
+
         setInterval(() => {
             this.rateLimit = 0;
         }, ms(`${config.post.rateLimitSec}s`));
@@ -51,16 +57,50 @@ export class Bot {
             this.sayFood();
         }, ms(`${config.post.autoPostInterval}m`));
 
-        setInterval(() => {
+        setInterval(async () => {
             this.ws.reconnect();
+            const newFollow: string = await this.api
+                .call('i')
+                .then((res) => res.json())
+                .then((json) => json.followingCount);
+            this.config.followings = Number(newFollow);
+            this.log('Followings:', newFollow);
         }, ms('1h'));
     }
 
-    log(text?: string, ...arg: unknown[]): void {
-        console.log('[Bot]', text, ...arg);
+    private async getAccount() {
+        this.account = await this.api.call('i').then((res) => res.json());
     }
 
-    async runQuery(query: { text: string; values?: (string | boolean)[] }): Promise<Res> {
+    log(text?: string, ...arg: unknown[]): void {
+        console.log('[MAIN]', text, ...arg);
+    }
+
+    connectChannel(channel: string, id: string, params?: Record<string, unknown>): void {
+        this.ws.send(
+            JSON.stringify({
+                type: 'connect',
+                body: {
+                    channel,
+                    id,
+                    params,
+                },
+            })
+        );
+    }
+
+    disconnectChannel(id: string): void {
+        this.ws.send(
+            JSON.stringify({
+                type: 'disconnect',
+                body: {
+                    id,
+                },
+            })
+        );
+    }
+
+    async runQuery(query: { text: string; values?: (string | number | boolean)[] }): Promise<Res> {
         return this.db.query(query).catch((err) => {
             console.error(err);
             process.exit(1);
@@ -68,14 +108,12 @@ export class Bot {
     }
 
     async existsFood(text: string): Promise<boolean> {
-        return new Promise((resolve) => {
-            const query = {
-                text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1))',
-                values: [text],
-            };
-            this.runQuery(query).then((res) => {
-                resolve(res.rows[0].exists);
-            });
+        const query = {
+            text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1))',
+            values: [text],
+        };
+        return await this.runQuery(query).then((res) => {
+            return !!res.rows[0].exists;
         });
     }
 
@@ -87,6 +125,16 @@ export class Bot {
         await this.runQuery(query);
     }
 
+    async removeFood(food: string, many: boolean): Promise<Res> {
+        const textOne = 'in (SELECT name FROM oishii_table WHERE LOWER(name) = LOWER($1) LIMIT 1)';
+        const textMany = '~* $1';
+        const query = {
+            text: `DELETE FROM oishii_table WHERE name ${many ? textMany : textOne} RETURNING name`,
+            values: [food],
+        };
+        return await this.runQuery(query);
+    }
+
     async learnFood(food: string, good: boolean): Promise<void> {
         const query = {
             text: 'UPDATE oishii_table SET good=$1, learned=true WHERE LOWER(name) = LOWER($2)',
@@ -95,14 +143,24 @@ export class Bot {
         await this.runQuery(query);
     }
 
+    async getFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<Res> {
+        const options = [];
+        if (good !== undefined) options.push(`good=${good}`);
+        if (learned !== undefined) options.push(`learned=${learned}`);
+
+        const option = options.length ? `WHERE ${options.join(' AND ')}` : '';
+        const query = {
+            text: `SELECT name, good FROM oishii_table ${option} ORDER BY RANDOM() LIMIT 1`,
+        };
+        const res = await this.runQuery(query);
+        return res;
+    }
+
     async sayFood(): Promise<void> {
         if (this.rateLimit > this.config.post.rateLimitPost) return;
 
-        const rnd = Math.random() < 0.2 ? 'WHERE learned=true' : '';
-        const query = {
-            text: `SELECT name, good FROM oishii_table ${rnd} ORDER BY RANDOM() LIMIT 1`,
-        };
-        const res = await this.runQuery(query);
+        const learned = Math.random() < 0.2;
+        const res = await this.getFood({ learned });
 
         const food = res.rows[0].name;
         const good = res.rows[0].good;
@@ -110,7 +168,7 @@ export class Bot {
         this.log(`sayFood: ${food} (${good})`);
 
         const text = messages.food.say(food, good);
-        API.postText(text);
+        this.api.postText({ text });
 
         this.rateLimit++;
     }

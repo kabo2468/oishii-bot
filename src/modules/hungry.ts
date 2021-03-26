@@ -6,23 +6,23 @@ import Module from '../module';
 export default class extends Module {
     Name = 'Hungry';
     Regex = /お?(腹|(な|にゃ)か|はら)が?([空すあ]い|([減へ][っり]))た?/;
+    LogName = 'HNGR';
 
-    Run(bot: Bot, note: Note): void {
+    async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
 
-        const _g = Math.random() < 0.4 ? 'true' : 'false';
-        const query = `SELECT name, good FROM oishii_table WHERE good=${_g} ORDER BY RANDOM() LIMIT 1`;
+        const _g = Math.random() < 0.4;
 
-        bot.runQuery({ text: query }).then((res) => {
-            const food = res.rows[0].name;
-            const good = res.rows[0].good;
-            if (!food || good === undefined) {
-                note.reply(messages.food.idk);
-                return;
-            }
-            this.log(`Food: ${food} (${good})`);
+        const res = await bot.getFood({ good: _g });
 
-            note.reply(messages.food.hungry(food, good));
-        });
+        const food = res.rows[0].name;
+        const good = res.rows[0].good;
+        if (!food || good === undefined) {
+            note.reply({ text: messages.food.idk });
+            return;
+        }
+        this.log(`Food: ${food} (${good})`);
+
+        note.reply({ text: messages.food.hungry(food, good) });
     }
 }

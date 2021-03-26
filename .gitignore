@@ -3,5 +3,7 @@ node_modules
 test
 built
 config.json5
+mecab
+valentine.json
 
 .idea/*

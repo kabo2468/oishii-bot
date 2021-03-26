@@ -6,12 +6,13 @@ import Module from '../../module';
 export default class extends Module {
     Name = 'NG Word';
     Regex = /^\/ng (a|r) (.+)$/i;
+    LogName = 'NGWD';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
 
-        if (note.note.userId !== bot.config.ownerId) {
-            note.reply(messages.commands.denied);
+        if (!bot.config.ownerIds.includes(note.note.userId)) {
+            note.reply({ text: messages.commands.denied });
             return;
         }
 
@@ -24,12 +25,12 @@ export default class extends Module {
         if (add) {
             const ngRes = bot.ngWords.addNGWord(word);
             const exRes = bot.ngWords.removeExcludedWord(word);
-            note.reply(messages.commands.ngWord.add(ngRes, exRes));
+            note.reply({ text: messages.commands.ngWord.add(ngRes, exRes) });
         } else {
             // Remove
             const ngRes = bot.ngWords.removeNGWord(word);
             const exRes = bot.ngWords.addExcludedWord(word);
-            note.reply(messages.commands.ngWord.remove(ngRes, exRes));
+            note.reply({ text: messages.commands.ngWord.remove(ngRes, exRes) });
         }
     }
 }

@@ -7,6 +7,7 @@ import Module from '../../module';
 export default class extends Module {
     Name = 'Info';
     Regex = /^\/info$/i;
+    LogName = 'INFO';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
@@ -40,6 +41,6 @@ export default class extends Module {
         this.log(uptimeText);
         text.push(uptimeText);
 
-        note.reply(text.join('\n'));
+        note.reply({ text: text.join('\n') });
     }
 }

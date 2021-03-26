@@ -4,15 +4,11 @@ import { Bot } from './bot';
 export default abstract class Module {
     abstract readonly Name: string;
     abstract readonly Regex: RegExp;
+    abstract readonly LogName: string;
 
-    abstract Run(bot: Bot, note?: Note): void;
-
-    About(): void {
-        console.log(`Name: ${this.Name}`);
-        console.log(`Regex: ${this.Regex.toString()}`);
-    }
+    abstract Run(bot: Bot, note?: Note | string): void;
 
     protected log(text?: string, ...arg: string[]): void {
-        console.log(`[${this.Name}]`, text, ...arg);
+        console.log(`[${this.LogName}]`, text, ...arg);
     }
 }

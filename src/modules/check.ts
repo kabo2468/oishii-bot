@@ -1,13 +1,16 @@
 import { Bot } from '../bot';
+import { MecabType } from '../config';
 import messages from '../messages';
 import { Note } from '../misskey/note';
 import Module from '../module';
+import { getNouns } from '../utils/get-nouns';
 import { TextProcess } from '../utils/text-process';
 import variables from '../variables';
 
 export default class extends Module {
     Name = 'Check';
     Regex = new RegExp(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})の?[？?]+`);
+    LogName = 'CHCK';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
@@ -18,7 +21,7 @@ export default class extends Module {
 
         const ng = note.findNGWord(bot.ngWords);
         if (ng) {
-            note.reply(messages.food.ngWord);
+            note.reply({ text: messages.food.ngWord });
             this.log('NG WORD:', ng);
             return;
         }
@@ -31,23 +34,23 @@ export default class extends Module {
         if (!res) return;
 
         if (res.rowCount < 1) {
-            const noun = await this.isNoun(food);
+            const noun = await this.isNoun(food, bot.config.mecab);
             if (noun) {
-                note.reply(messages.food.idk);
+                note.reply({ text: messages.food.idk });
             } else {
-                note.reply(messages.food.canEat);
+                note.reply({ text: messages.food.canEat });
             }
             return;
         }
 
         const isGood = res.rows[0].good;
         const goodText = isGood ? messages.food.good : messages.food.bad;
-        note.reply(goodText);
+        note.reply({ text: goodText });
     }
 
-    private async isNoun(text: string): Promise<boolean> {
+    private async isNoun(text: string, mecab: MecabType): Promise<boolean> {
         this.log('Check noun:', text);
-        const nouns = await new TextProcess(text).getNouns();
+        const nouns = await getNouns(text, mecab);
         return nouns ? true : false;
     }
 }

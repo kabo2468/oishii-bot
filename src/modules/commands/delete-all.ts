@@ -4,9 +4,9 @@ import { Note } from '../../misskey/note';
 import Module from '../../module';
 
 export default class extends Module {
-    Name = 'Delete';
-    Regex = /^\/del(ete)? (.+)$/i;
-    LogName = 'DELT';
+    Name = 'Delete All';
+    Regex = /^\/delall (.+)$/i;
+    LogName = 'DLAL';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
@@ -20,10 +20,12 @@ export default class extends Module {
         if (!match) return;
         const food = match[1];
 
-        const res = await bot.removeFood(food, false);
-        if (res.rowCount > 0) {
-            note.reply({ text: messages.commands.delete.done(res.rowCount) });
-            this.log(food);
+        const res = await bot.removeFood(food, true);
+        const count = res.rowCount;
+        if (count > 0) {
+            const deletedFoods = res.rows.map((row) => row.name);
+            note.reply({ cw: messages.commands.delete.done(count), text: `\`\`\`\n${deletedFoods.join('\n')}\n\`\`\`` });
+            this.log(`${count} food(s) deleted: ${deletedFoods.join(', ')}`);
         } else {
             note.reply({ text: messages.commands.delete.notFound });
             this.log(food, 'Not found.');
