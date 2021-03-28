@@ -51,17 +51,17 @@ export class Note {
     }
 
     removeURLs(): Note {
-        this.note.text = this.tp.removeURLs().toString();
+        this._text = this.tp.removeURLs().toString();
         return this;
     }
 
     removeMentions(): Note {
-        this.note.text = this.tp.removeMentions().toString();
+        this._text = this.tp.removeMentions().toString();
         return this;
     }
 
     removeMentionToMe(): Note {
-        this.note.text = this.tp.removeMentionToMe().toString();
+        this._text = this.tp.removeMentionToMe().toString();
         return this;
     }
 
