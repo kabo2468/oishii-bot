@@ -10,7 +10,7 @@ export default class extends Module {
     LogName = 'TLLN';
 
     async Run(bot: Bot, note: Note): Promise<void> {
-        const text = note.note.text;
+        const text = note.text;
         this.log(new TextProcess(text).replaceNewLineToText().toString());
 
         const nouns = await getNouns(text, bot.config.mecab);

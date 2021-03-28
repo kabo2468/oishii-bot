@@ -96,9 +96,9 @@ export default function (bot: Bot): void {
             const note = new Note(bot, json.body.body);
 
             if (note.note.userId === bot.config.userId) return;
-            if (note.note.text === null) return;
+            if (!note.text) return;
             if (note.note.cw !== null) return;
-            if (/@oishiibot/.test(note.note.text)) return;
+            if (/@oishiibot/.test(note.text)) return;
             if (note.note.visibility === 'specified') return;
             if (note.note.replyId) return;
 
@@ -110,11 +110,11 @@ export default function (bot: Bot): void {
                 return;
             }
 
-            if (tlModules.pizza.Regex.test(note.note.text)) {
+            if (tlModules.pizza.Regex.test(note.text)) {
                 tlModules.pizza.Run(bot, note);
                 return;
             }
-            if (tlModules.call.Regex.test(note.note.text)) {
+            if (tlModules.call.Regex.test(note.text)) {
                 tlModules.call.Run(bot, note);
                 return;
             }
@@ -163,9 +163,9 @@ export default function (bot: Bot): void {
             if (isNote(json.body.body)) {
                 const note = new Note(bot, json.body.body);
                 note.removeURLs().removeMentionToMe();
-                bot.log('Text:', new TextProcess(note.note.text).replaceNewLineToText().toString());
+                bot.log('Text:', new TextProcess(note.text).replaceNewLineToText().toString());
 
-                const mod = modules.find((module) => module.Regex.test(note.note.text));
+                const mod = modules.find((module) => module.Regex.test(note.text));
                 if (mod) {
                     bot.log('Module:', mod.Name);
                     setTimeout(() => {
