@@ -29,6 +29,7 @@ import InfoCommandModule from './modules/commands/info';
 import DeleteCommandModule from './modules/commands/delete';
 import DeleteAllCommandModule from './modules/commands/delete-all';
 import NGWordCommandModule from './modules/commands/ngword';
+import EncodeCommandModule from './modules/commands/encode';
 import ValentineMigrateCommandModule from './modules/commands/valentine-migrate';
 import WhiteDayModule from './modules/commands/white-day';
 
@@ -49,6 +50,7 @@ const modules: Module[] = [
     new DeleteCommandModule(),
     new DeleteAllCommandModule(),
     new NGWordCommandModule(),
+    new EncodeCommandModule(),
     new ValentineMigrateCommandModule(),
     new WhiteDayModule(),
     new CheckModule(),

@@ -39,6 +39,7 @@ export default {
             add: (ng: boolean, ex: boolean): string => `追加しました。(NG: ${ng}, Exclude: ${ex})`,
             remove: (ng: boolean, ex: boolean): string => `削除しました。(NG: ${ng}, Exclude: ${ex})`,
         },
+        encode: (status: boolean): string => `EncodeMode を${status ? 'オン' : 'オフ'}にしました。`,
     },
     pizza: {
         text: [

@@ -27,6 +27,7 @@ devDependencies:
   '@typescript-eslint/parser': 4.19.0_eslint@7.23.0+typescript@4.2.3
   eslint: 7.23.0
   eslint-config-prettier: 8.1.0_eslint@7.23.0
+  iconv-lite: 0.6.2
   prettier: 2.2.1
   rimraf: 3.0.2
   ts-node: 9.1.1_typescript@4.2.3
@@ -823,6 +824,14 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==
+  /iconv-lite/0.6.2:
+    dependencies:
+      safer-buffer: 2.1.2
+    dev: true
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha512-2y91h5OpQlolefMPmUlivelittSWy0rP+oYVpn6A7GwVHNE8AWzoYOBNmlwks3LobaJxgHCYZAnyNo2GgpNRNQ==
   /ignore/4.0.6:
     dev: true
     engines:
@@ -1269,6 +1278,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==
+  /safer-buffer/2.1.2:
+    dev: true
+    resolution:
+      integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
   /seedrandom/3.0.5:
     dev: false
     resolution:
@@ -1566,6 +1579,7 @@ specifiers:
   bufferutil: ^4.0.3
   eslint: ^7.23.0
   eslint-config-prettier: 8.1.0
+  iconv-lite: ^0.6.2
   json5: ^2.2.0
   kuromoji: ^0.1.2
   memory-streams: ^0.1.3
