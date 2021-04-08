@@ -9,7 +9,7 @@ import variables from '../variables';
 
 export default class extends Module {
     Name = 'Check';
-    Regex = new RegExp(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})の?[？?]+`);
+    Regex = new RegExp(`(.+?)(は|って)?(${variables.food.good}|${variables.food.bad})の?[？?]+`);
     LogName = 'CHCK';
 
     async Run(bot: Bot, note: Note): Promise<void> {
