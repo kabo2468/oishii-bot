@@ -18,7 +18,7 @@ export default class extends Module {
 
         const match = note.text.match(this.Regex);
         if (!match) return;
-        const food = match[1];
+        const food = match[2];
 
         const res = await bot.removeFood(food, false);
         if (res.rowCount > 0) {
