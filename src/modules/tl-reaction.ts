@@ -1,7 +1,7 @@
 import { Bot } from '../bot';
-import { chooseOneFromArr } from '../messages';
 import { Note } from '../misskey/note';
 import Module from '../module';
+import { chooseOneFromArr } from '../utils/cofa';
 import { getNouns } from '../utils/get-nouns';
 import variables from '../variables';
 

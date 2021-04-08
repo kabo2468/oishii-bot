@@ -1,8 +1,9 @@
 import { readFileSync } from 'fs';
 import { Bot } from '../../bot';
-import messages, { chooseOneFromArr } from '../../messages';
+import messages from '../../messages';
 import { Note } from '../../misskey/note';
 import Module from '../../module';
+import { chooseOneFromArr } from '../../utils/cofa';
 import variables from '../../variables';
 import { Valentine } from '../valentine';
 

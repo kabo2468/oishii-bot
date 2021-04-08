@@ -1,7 +1,7 @@
+import { chooseOneFromArr } from './utils/cofa';
+
 const goodText = 'おいしい';
 const badText = 'まずい';
-
-export const chooseOneFromArr = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 export default {
     commands: {

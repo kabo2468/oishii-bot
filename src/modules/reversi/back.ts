@@ -4,6 +4,7 @@ import { Config } from '../../config';
 import messages from '../../messages';
 import { User } from '../../misskey/api';
 import { CreatedNote } from '../../misskey/note';
+import { chooseOneFromArr } from '../../utils/cofa';
 
 interface Mes {
     type: string;
@@ -196,11 +197,11 @@ class Back {
         let pos: number;
         if (canPutCorner.length) {
             // 角における場合は置く
-            pos = canPutCorner[Math.floor(Math.random() * canPutCorner.length)];
+            pos = chooseOneFromArr(canPutCorner);
         } else {
             // それ以外はランダムに置く
             const places = this._engine.canPutSomewhere(this._botColor);
-            pos = places[Math.floor(Math.random() * places.length)];
+            pos = chooseOneFromArr(places);
         }
 
         this._engine.put(this._botColor, pos);
