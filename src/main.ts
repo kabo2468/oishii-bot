@@ -146,14 +146,17 @@ export default function (bot: Bot): void {
                     host: string;
                 } = JSON.parse(data.data).body.body;
 
-                const done = bot.api
-                    .call('following/create', {
-                        userId: json.body.body.id,
-                    })
-                    .catch((err) => console.error(err));
+                (async () => {
+                    const done = await bot.api
+                        .call('following/create', {
+                            userId: json.body.body.id,
+                        })
+                        .then((json) => json.ok)
+                        .catch((err) => console.error(err));
 
-                const logPrefix = done ? 'Followed' : 'Failed to follow';
-                bot.log(`${logPrefix} @${user.username}${user.host ? `@${user.host}` : ''} (ID: ${user.id})`);
+                    const logPrefix = done ? 'Followed' : 'Failed to follow';
+                    bot.log(`${logPrefix} @${user.username}${user.host ? `@${user.host}` : ''} (ID: ${user.id})`);
+                })();
                 return;
             }
 
