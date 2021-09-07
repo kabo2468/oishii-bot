@@ -19,12 +19,14 @@ loadConfig()
             await client.query(createTableQuery).then((res) => console.log(res));
 
             log('ADD UserId & NoteId');
-            const addUserNoteIdTSQuery = 'ALTER TABLE IF EXISTS oishii_table ADD userId text, add noteId text, add created timestamp not null default CURRENT_TIMESTAMP';
-            await client.query(addUserNoteIdTSQuery);
+            const addUserNoteIdTSQuery =
+                'ALTER TABLE IF EXISTS oishii_table ADD IF NOT EXISTS userId text, ADD IF NOT EXISTS noteId text, ADD IF NOT EXISTS created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP';
+            await client.query(addUserNoteIdTSQuery).then((res) => console.log(res));
 
             await client.query('COMMIT');
         } catch (e) {
             await client.query('ROLLBACK');
+            log('ROLLBACK');
             throw e;
         } finally {
             console.log('Migration End.');
@@ -35,5 +37,5 @@ loadConfig()
 
 function log(text: string): void {
     const bar = '-'.repeat(10);
-    console.log(`${bar}${text}${bar}\n`);
+    console.log(`${bar} ${text} ${bar}`);
 }
