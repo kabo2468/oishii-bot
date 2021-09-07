@@ -12,8 +12,9 @@ export type Row = {
     name: string;
     good: boolean;
     learned: boolean;
-    userId: string;
-    noteId: string;
+    userid: string;
+    noteid: string;
+    created: Date;
     exists: boolean;
     count: string;
 };

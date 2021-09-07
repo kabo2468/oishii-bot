@@ -19,13 +19,13 @@ export default class extends Module {
 
         const match = note.text.match(this.Regex);
         if (!match) return;
-        const food = new TextProcess(match[2]).removeSpace().toString();
+        const food = new TextProcess(match[1]).removeSpace().toString();
 
         const res = await bot.getFood(food);
         if (res.rowCount > 0) {
             const row = res.rows[0];
             note.reply({ text: messages.commands.get.found(row) });
-            this.log(`${row}`);
+            this.log(JSON.stringify(row));
         } else {
             note.reply({ text: messages.commands.notFound });
             this.log(food, 'Not found.');

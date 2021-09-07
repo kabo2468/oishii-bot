@@ -44,7 +44,8 @@ export default {
         },
         encode: (status: boolean): string => `EncodeMode を${status ? 'オン' : 'オフ'}にしました。`,
         get: {
-            found: (row: Partial<Row>): string => `\`\`\`\nName: ${row.name}\nGood: ${row.good}\nLearned: ${row.learned}\nuserId: ${row.userId}\nnoteId: ${row.noteId}\n\`\`\``,
+            found: (row: Partial<Row>): string =>
+                `\`\`\`\nname: ${row.name}\ngood: ${row.good}\nlearned: ${row.learned}\nuserId: ${row.userid}\nnoteId: ${row.noteid}\ncreated: ${row.created?.toLocaleString()}\n\`\`\``,
         },
     },
     pizza: {
