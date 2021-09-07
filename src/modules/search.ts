@@ -18,7 +18,7 @@ export default class extends Module {
         const good = new RegExp(variables.food.good).test(match[3]);
         const learned = !!match[1];
 
-        const res = await bot.getFood({ good, learned });
+        const res = await bot.getRandomFood({ good, learned });
         const food = res.rows[0].name;
         if (!food) {
             note.reply({ text: messages.food.idk });

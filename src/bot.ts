@@ -8,16 +8,18 @@ import messages from './messages';
 import API, { User } from './misskey/api';
 import NGWord from './ng-words';
 
-type Rows = {
+export type Row = {
     name: string;
     good: boolean;
     learned: boolean;
+    userId: string;
+    noteId: string;
     exists: boolean;
     count: string;
 };
 
 type Res = {
-    rows: Partial<Rows>[];
+    rows: Partial<Row>[];
     rowCount: number;
 };
 
@@ -119,10 +121,10 @@ export class Bot {
         });
     }
 
-    async addFood(food: string, good: boolean, learned = false): Promise<void> {
+    async addFood(food: string, good: boolean, learned = false, userId: string, noteId: string): Promise<void> {
         const query = {
-            text: 'INSERT INTO oishii_table ( name, good, learned ) VALUES ( $1, $2, $3 )',
-            values: [food, good, learned],
+            text: 'INSERT INTO oishii_table ( name, good, learned, userId, noteId ) VALUES ( $1, $2, $3, $4, $5 )',
+            values: [food, good, learned, userId, noteId],
         };
         await this.runQuery(query);
     }
@@ -134,18 +136,18 @@ export class Bot {
             text: `DELETE FROM oishii_table WHERE name ${many ? textMany : textOne} RETURNING name`,
             values: [food],
         };
-        return await this.runQuery(query);
+        return this.runQuery(query);
     }
 
-    async learnFood(food: string, good: boolean): Promise<void> {
+    async updateFood(food: string, good: boolean, learned = true, userId: string, noteId: string): Promise<void> {
         const query = {
-            text: 'UPDATE oishii_table SET good=$1, learned=true WHERE LOWER(name) = LOWER($2)',
-            values: [good, food],
+            text: 'UPDATE oishii_table SET good=$1, learned=$3, userId=$4, noteId=$5 WHERE LOWER(name) = LOWER($2)',
+            values: [good, food, learned, userId, noteId],
         };
         await this.runQuery(query);
     }
 
-    async getFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<Res> {
+    async getRandomFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<Res> {
         const options = [];
         if (good !== undefined) options.push(`good=${good}`);
         if (learned !== undefined) options.push(`learned=${learned}`);
@@ -169,7 +171,7 @@ export class Bot {
         if (this.rateLimit > this.config.post.rateLimitPost) return;
 
         const learned = Math.random() < 0.2;
-        const res = await this.getFood({ learned });
+        const res = await this.getRandomFood({ learned });
 
         const food = res.rows[0].name;
         const good = res.rows[0].good;

@@ -28,7 +28,7 @@ export default class extends Module {
             note.reply({ cw: messages.commands.delete.done(count), text: `\`\`\`\n${deletedFoods.join('\n')}\n\`\`\`` });
             this.log(`${count} food(s) deleted: ${deletedFoods.join(', ')}`);
         } else {
-            note.reply({ text: messages.commands.delete.notFound });
+            note.reply({ text: messages.commands.notFound });
             this.log(food, 'Not found.');
         }
     }

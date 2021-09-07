@@ -20,7 +20,7 @@ export default class extends Module {
             text: 'SELECT setseed($1)',
             values: [rnd],
         });
-        const res = await bot.getFood();
+        const res = await bot.getRandomFood();
         const food = res.rows[0].name;
         const good = res.rows[0].good;
         if (!food || good === undefined) return;

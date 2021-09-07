@@ -26,7 +26,7 @@ export default class extends Module {
             note.reply({ text: messages.commands.delete.done(res.rowCount) });
             this.log(food);
         } else {
-            note.reply({ text: messages.commands.delete.notFound });
+            note.reply({ text: messages.commands.notFound });
             this.log(food, 'Not found.');
         }
     }

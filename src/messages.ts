@@ -6,6 +6,7 @@ const badText = 'まずい';
 export default {
     commands: {
         denied: 'このコマンドは、オーナーのみ実行できます。',
+        notFound: '見つかりませんでした。',
         help: [
             '/help: コマンドリストを表示する。',
             '/ping: 生存確認する。',
