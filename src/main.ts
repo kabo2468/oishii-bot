@@ -32,6 +32,7 @@ import NGWordCommandModule from './modules/commands/ngword';
 import EncodeCommandModule from './modules/commands/encode';
 import ValentineMigrateCommandModule from './modules/commands/valentine-migrate';
 import WhiteDayCommandModule from './modules/commands/white-day';
+import GetCommandModule from './modules/commands/get';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -52,6 +53,7 @@ const modules: Module[] = [
     new NGWordCommandModule(),
     new EncodeCommandModule(),
     new ValentineMigrateCommandModule(),
+    new GetCommandModule(),
     new WhiteDayCommandModule(),
     new CheckModule(),
     new LearnModule(),

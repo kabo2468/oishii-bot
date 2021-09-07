@@ -147,6 +147,14 @@ export class Bot {
         await this.runQuery(query);
     }
 
+    async getFood(name: string): Promise<Res> {
+        const query = {
+            text: `SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1)`,
+            values: [name],
+        };
+        return this.runQuery(query);
+    }
+
     async getRandomFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<Res> {
         const options = [];
         if (good !== undefined) options.push(`good=${good}`);

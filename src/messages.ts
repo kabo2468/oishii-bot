@@ -1,3 +1,4 @@
+import { Row } from './bot';
 import { chooseOneFromArr } from './utils/cofa';
 
 const goodText = 'おいしい';
@@ -19,12 +20,12 @@ export default {
             // '/chart: DBのレコード数をチャートにする。（オーナーのみ）',
             '/ng (a|b): NGワードを追加/削除する。（オーナーのみ）',
             '/setwhite: ホワイトデーの設定をする。（オーナーのみ）',
+            '/get: DBから食べ物を取得する。（オーナーのみ）',
         ],
         ping: 'ぽん！',
         nullpo: 'ガッ',
         delete: {
             done: (num: number): string => `${num}件削除しました。`,
-            notFound: '見つかりませんでした。',
         },
         follow: {
             done: 'フォローしました。',
@@ -42,6 +43,9 @@ export default {
             remove: (ng: boolean, ex: boolean): string => `削除しました。(NG: ${ng}, Exclude: ${ex})`,
         },
         encode: (status: boolean): string => `EncodeMode を${status ? 'オン' : 'オフ'}にしました。`,
+        get: {
+            found: (row: Partial<Row>): string => `\`\`\`\nName: ${row.name}\nGood: ${row.good}\nLearned: ${row.learned}\nuserId: ${row.userId}\nnoteId: ${row.noteId}\n\`\`\``,
+        },
     },
     pizza: {
         text: [
