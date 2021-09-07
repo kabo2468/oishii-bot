@@ -12,9 +12,10 @@ export type Row = {
     name: string;
     good: boolean;
     learned: boolean;
-    userid: string;
-    noteid: string;
+    userId: string;
+    noteId: string;
     created: Date;
+    updated: Date;
     exists: boolean;
     count: string;
 };
@@ -105,7 +106,7 @@ export class Bot {
         );
     }
 
-    async runQuery(query: { text: string; values?: (string | number | boolean)[] }): Promise<Res> {
+    async runQuery(query: { text: string; values?: (string | number | boolean | Date)[] }): Promise<Res> {
         return this.db.query(query).catch((err) => {
             console.error(err);
             process.exit(1);
@@ -114,7 +115,7 @@ export class Bot {
 
     async existsFood(text: string): Promise<boolean> {
         const query = {
-            text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1))',
+            text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER("name") = LOWER($1))',
             values: [text],
         };
         return await this.runQuery(query).then((res) => {
@@ -124,33 +125,33 @@ export class Bot {
 
     async addFood(food: string, good: boolean, learned = false, userId: string, noteId: string): Promise<void> {
         const query = {
-            text: 'INSERT INTO oishii_table ( name, good, learned, userId, noteId ) VALUES ( $1, $2, $3, $4, $5 )',
+            text: 'INSERT INTO oishii_table ( "name", "good", "learned", "userId", "noteId" ) VALUES ( $1, $2, $3, $4, $5 )',
             values: [food, good, learned, userId, noteId],
         };
         await this.runQuery(query);
     }
 
     async removeFood(food: string, many: boolean): Promise<Res> {
-        const textOne = 'in (SELECT name FROM oishii_table WHERE LOWER(name) = LOWER($1) LIMIT 1)';
+        const textOne = 'in (SELECT "name" FROM oishii_table WHERE LOWER("name") = LOWER($1) LIMIT 1)';
         const textMany = '~* $1';
         const query = {
-            text: `DELETE FROM oishii_table WHERE name ${many ? textMany : textOne} RETURNING name`,
+            text: `DELETE FROM oishii_table WHERE "name" ${many ? textMany : textOne} RETURNING "name"`,
             values: [food],
         };
         return this.runQuery(query);
     }
 
-    async updateFood(food: string, good: boolean, learned = true, userId: string, noteId: string): Promise<void> {
+    async updateFood(food: string, good: boolean, learned = true, userId: string, noteId: string, updateDate: Date): Promise<void> {
         const query = {
-            text: 'UPDATE oishii_table SET good=$1, learned=$3, userId=$4, noteId=$5 WHERE LOWER(name) = LOWER($2)',
-            values: [good, food, learned, userId, noteId],
+            text: 'UPDATE oishii_table SET "good"=$1, "learned"=$3, "userId"=$4, "noteId"=$5, "updated"=$6 WHERE LOWER("name") = LOWER($2)',
+            values: [good, food, learned, userId, noteId, updateDate],
         };
         await this.runQuery(query);
     }
 
     async getFood(name: string): Promise<Res> {
         const query = {
-            text: `SELECT * FROM oishii_table WHERE LOWER(name) = LOWER($1)`,
+            text: `SELECT * FROM oishii_table WHERE LOWER("name") = LOWER($1)`,
             values: [name],
         };
         return this.runQuery(query);
@@ -158,12 +159,12 @@ export class Bot {
 
     async getRandomFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<Res> {
         const options = [];
-        if (good !== undefined) options.push(`good=${good}`);
-        if (learned !== undefined) options.push(`learned=${learned}`);
+        if (good !== undefined) options.push(`"good"=${good}`);
+        if (learned !== undefined) options.push(`"learned"=${learned}`);
 
         const option = options.length ? `WHERE ${options.join(' AND ')}` : '';
         const query = {
-            text: `SELECT name, good FROM oishii_table ${option} ORDER BY RANDOM() LIMIT 1`,
+            text: `SELECT "name", "good" FROM oishii_table ${option} ORDER BY RANDOM() LIMIT 1`,
         };
         const res = await this.runQuery(query);
         if (this.encodeMode) {

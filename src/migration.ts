@@ -15,12 +15,12 @@ loadConfig()
             await client.query('BEGIN');
 
             log('CREATE TABLE');
-            const createTableQuery = 'CREATE TABLE IF NOT EXISTS oishii_table ( name text PRIMARY KEY, good boolean DEFAULT true NOT NULL, learned boolean DEFAULT false NOT NULL )';
+            const createTableQuery = 'CREATE TABLE IF NOT EXISTS oishii_table ( "name" text PRIMARY KEY, "good" boolean DEFAULT true NOT NULL, "learned" boolean DEFAULT false NOT NULL )';
             await client.query(createTableQuery).then((res) => console.log(res));
 
             log('ADD UserId & NoteId');
             const addUserNoteIdTSQuery =
-                'ALTER TABLE IF EXISTS oishii_table ADD IF NOT EXISTS userId text, ADD IF NOT EXISTS noteId text, ADD IF NOT EXISTS created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP';
+                'ALTER TABLE IF EXISTS oishii_table ADD IF NOT EXISTS "userId" text, ADD IF NOT EXISTS "noteId" text, ADD IF NOT EXISTS "created" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP, ADD IF NOT EXISTS "updated" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP';
             await client.query(addUserNoteIdTSQuery).then((res) => console.log(res));
 
             await client.query('COMMIT');

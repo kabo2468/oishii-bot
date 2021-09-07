@@ -26,7 +26,7 @@ export default class extends Module {
 
         const isExists = await bot.existsFood(food);
         if (isExists) {
-            await bot.updateFood(food, good, true, note.note.userId, note.note.id);
+            await bot.updateFood(food, good, true, note.note.userId, note.note.id, note.note.createdAt);
             this.log('UPDATE:', `${food} (${good})`);
         } else {
             await bot.addFood(food, good, true, note.note.userId, note.note.id);
