@@ -41,7 +41,7 @@ export class Note {
         this.tp = new TextProcess(this._text);
     }
 
-    get id(): string {
+    get screenId(): string {
         const user = this.note.user;
         return `@${user.username}${user.host ? `@${user.host}` : ''}`;
     }

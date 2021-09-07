@@ -27,7 +27,7 @@ export default class extends Module {
         }
 
         const query = {
-            text: 'SELECT good FROM oishii_table WHERE LOWER(name) = LOWER($1)',
+            text: 'SELECT "good" FROM oishii_table WHERE LOWER("name") = LOWER($1)',
             values: [food],
         };
         const res = await bot.runQuery(query);

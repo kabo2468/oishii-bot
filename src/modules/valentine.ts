@@ -32,10 +32,10 @@ export default class extends Module {
         const json = JSON.parse(file) as Valentine;
 
         const thisYearUsers = json[now.getFullYear()];
-        const user = thisYearUsers.find((user) => user.id === note.id);
+        const user = thisYearUsers.find((user) => user.id === note.screenId);
         const isGive = match[2] === 'あげる';
 
-        this.log(note.id, isGive ? 'gives' : 'receives');
+        this.log(note.screenId, isGive ? 'gives' : 'receives');
 
         if (user) {
             // already exists
@@ -64,7 +64,7 @@ export default class extends Module {
         } else {
             // not yet
             const addUser: User = {
-                username: note.id,
+                username: note.screenId,
                 id: note.note.userId,
                 gave: 0,
                 received: 0,

@@ -13,7 +13,7 @@ export default class extends Module {
 
         const _g = Math.random() < 0.4;
 
-        const res = await bot.getFood({ good: _g });
+        const res = await bot.getRandomFood({ good: _g });
 
         const food = res.rows[0].name;
         const good = res.rows[0].good;

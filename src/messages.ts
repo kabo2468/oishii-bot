@@ -1,3 +1,4 @@
+import { Row } from './bot';
 import { chooseOneFromArr } from './utils/cofa';
 
 const goodText = 'おいしい';
@@ -6,6 +7,7 @@ const badText = 'まずい';
 export default {
     commands: {
         denied: 'このコマンドは、オーナーのみ実行できます。',
+        notFound: '見つかりませんでした。',
         help: [
             '/help: コマンドリストを表示する。',
             '/ping: 生存確認する。',
@@ -17,12 +19,13 @@ export default {
             '/delall: その文字列が含まれているものを削除する。（オーナーのみ）',
             // '/chart: DBのレコード数をチャートにする。（オーナーのみ）',
             '/ng (a|b): NGワードを追加/削除する。（オーナーのみ）',
+            '/setwhite: ホワイトデーの設定をする。（オーナーのみ）',
+            '/get: DBから食べ物を取得する。（オーナーのみ）',
         ],
         ping: 'ぽん！',
         nullpo: 'ガッ',
         delete: {
             done: (num: number): string => `${num}件削除しました。`,
-            notFound: '見つかりませんでした。',
         },
         follow: {
             done: 'フォローしました。',
@@ -40,6 +43,12 @@ export default {
             remove: (ng: boolean, ex: boolean): string => `削除しました。(NG: ${ng}, Exclude: ${ex})`,
         },
         encode: (status: boolean): string => `EncodeMode を${status ? 'オン' : 'オフ'}にしました。`,
+        get: {
+            found: (row: Partial<Row>): string =>
+                `\`\`\`\nname: "${row.name}"\ngood: ${row.good}\nlearned: ${row.learned}\nuserId: "${row.userId}"\nnoteId: "${
+                    row.noteId
+                }"\ncreated: "${row.created?.toLocaleString()}"\nupdated: "${row.updated?.toLocaleString()}"\n\`\`\``,
+        },
     },
     pizza: {
         text: [

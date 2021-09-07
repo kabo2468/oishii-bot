@@ -5,9 +5,9 @@ import Module from '../../module';
 import { TextProcess } from '../../utils/text-process';
 
 export default class extends Module {
-    Name = 'Delete';
-    Regex = /^\/del(ete)? (.+)$/i;
-    LogName = 'DELT';
+    Name = 'Get';
+    Regex = /^\/get (.+)$/i;
+    LogName = 'GETS';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
@@ -19,12 +19,13 @@ export default class extends Module {
 
         const match = note.text.match(this.Regex);
         if (!match) return;
-        const food = new TextProcess(match[2]).removeSpace().toString();
+        const food = new TextProcess(match[1]).removeSpace().toString();
 
-        const res = await bot.removeFood(food, false);
+        const res = await bot.getFood(food);
         if (res.rowCount > 0) {
-            note.reply({ text: messages.commands.delete.done(res.rowCount) });
-            this.log(food);
+            const row = res.rows[0];
+            note.reply({ text: messages.commands.get.found(row) });
+            this.log(JSON.stringify(row));
         } else {
             note.reply({ text: messages.commands.notFound });
             this.log(food, 'Not found.');

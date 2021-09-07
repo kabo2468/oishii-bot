@@ -26,10 +26,10 @@ export default class extends Module {
 
         const isExists = await bot.existsFood(food);
         if (isExists) {
-            await bot.learnFood(food, good);
+            await bot.updateFood(food, good, true, note.note.userId, note.note.id, note.note.createdAt);
             this.log('UPDATE:', `${food} (${good})`);
         } else {
-            await bot.addFood(food, good, true);
+            await bot.addFood(food, good, true, note.note.userId, note.note.id);
             this.log('INSERT:', `${food} (${good})`);
         }
         note.reply({ text: messages.food.learn(food, match[2]) });
