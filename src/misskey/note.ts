@@ -14,8 +14,8 @@ export interface CreatedNote {
     createdAt: Date;
     userId: string;
     user: User;
-    text: string;
-    cw?: string;
+    text?: string;
+    cw: string | null;
     visibility: Visibilities;
     renoteCount: number;
     repliesCount: number;
@@ -33,10 +33,12 @@ export class Note {
     private bot: Bot;
     public note: CreatedNote;
     private tp: TextProcess;
+    private _text: string;
     constructor(bot: Bot, note: CreatedNote) {
         this.bot = bot;
         this.note = note;
-        this.tp = new TextProcess(note.text);
+        this._text = note.text || '';
+        this.tp = new TextProcess(this._text);
     }
 
     get id(): string {
@@ -44,18 +46,22 @@ export class Note {
         return `@${user.username}${user.host ? `@${user.host}` : ''}`;
     }
 
+    get text(): string {
+        return this._text;
+    }
+
     removeURLs(): Note {
-        this.note.text = this.tp.removeURLs().toString();
+        this._text = this.tp.removeURLs().toString();
         return this;
     }
 
     removeMentions(): Note {
-        this.note.text = this.tp.removeMentions().toString();
+        this._text = this.tp.removeMentions().toString();
         return this;
     }
 
     removeMentionToMe(): Note {
-        this.note.text = this.tp.removeMentionToMe().toString();
+        this._text = this.tp.removeMentionToMe().toString();
         return this;
     }
 

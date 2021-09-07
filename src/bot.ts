@@ -1,3 +1,4 @@
+import iconv from 'iconv-lite';
 import ms from 'ms';
 import { Pool } from 'pg';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -28,6 +29,7 @@ export class Bot {
     private rateLimit = 0;
     public api: API;
     public account!: User;
+    public encodeMode = false;
 
     constructor(config: Config, ngWords: NGWord) {
         this.config = config;
@@ -153,6 +155,13 @@ export class Bot {
             text: `SELECT name, good FROM oishii_table ${option} ORDER BY RANDOM() LIMIT 1`,
         };
         const res = await this.runQuery(query);
+        if (this.encodeMode) {
+            res.rows.forEach((row) => {
+                const name = row.name;
+                if (!name) return;
+                row.name = iconv.decode(Buffer.from(name), 'Shift_JIS');
+            });
+        }
         return res;
     }
 

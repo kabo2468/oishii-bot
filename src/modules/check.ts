@@ -9,13 +9,13 @@ import variables from '../variables';
 
 export default class extends Module {
     Name = 'Check';
-    Regex = new RegExp(`(.+)(は|って)(${variables.food.good}|${variables.food.bad})の?[？?]+`);
+    Regex = new RegExp(`(.+?)(は|って)?(${variables.food.good}|${variables.food.bad})の?[？?]+`);
     LogName = 'CHCK';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
 
-        const match = note.note.text.match(this.Regex);
+        const match = note.text.match(this.Regex);
         if (!match) return;
         const food = new TextProcess(match[1]).removeSpace().toString();
 

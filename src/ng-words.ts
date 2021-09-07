@@ -22,7 +22,7 @@ export default class NGWord {
         });
     }
 
-    excludeNGWord(str: string): string {
+    excludeAllowedWord(str: string): string {
         let text = toHiragana(str.toLowerCase());
         this.excludedWords.forEach((w) => {
             text = text.replace(w, '');

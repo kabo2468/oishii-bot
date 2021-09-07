@@ -19,7 +19,7 @@ export default class extends Module {
             return;
         }
 
-        const match = note.note.text.match(this.Regex);
+        const match = note.text.match(this.Regex);
         if (!match) return;
 
         const fileName = './valentine.json';

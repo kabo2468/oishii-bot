@@ -1,7 +1,8 @@
 import { Bot } from '../bot';
-import messages, { chooseOneFromArr } from '../messages';
+import messages from '../messages';
 import { Note } from '../misskey/note';
 import Module from '../module';
+import { chooseOneFromArr } from '../utils/cofa';
 import variables from '../variables';
 
 export default class extends Module {

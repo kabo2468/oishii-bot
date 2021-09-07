@@ -1,6 +1,7 @@
 import { Bot } from '../bot';
 import { Note } from '../misskey/note';
 import Module from '../module';
+import { chooseOneFromArr } from '../utils/cofa';
 import { getNouns } from '../utils/get-nouns';
 import { TextProcess } from '../utils/text-process';
 
@@ -10,7 +11,7 @@ export default class extends Module {
     LogName = 'TLLN';
 
     async Run(bot: Bot, note: Note): Promise<void> {
-        const text = note.note.text;
+        const text = note.text;
         this.log(new TextProcess(text).replaceNewLineToText().toString());
 
         const nouns = await getNouns(text, bot.config.mecab);
@@ -18,7 +19,7 @@ export default class extends Module {
             this.log('Nouns not found.');
             return;
         }
-        const food = nouns[Math.floor(Math.random() * nouns.length)];
+        const food = chooseOneFromArr(nouns);
 
         const isExists = await bot.existsFood(food);
         if (isExists) {

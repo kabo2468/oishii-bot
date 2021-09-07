@@ -23,9 +23,12 @@ export class TextProcess {
     }
 
     findNGWord(ngWord: NGWord): string | undefined {
-        const _t = ngWord.excludeNGWord(this.text);
+        const _t = ngWord
+            .excludeAllowedWord(this.text)
+            .replace(/[\s!#$%&*,-./?\\^_|~、。ー×○●]/g, '') //NGワード避けする文字を消す
+            .trim();
         const ngWords = ngWord.get;
-        return ngWords.find((ng) => new RegExp(ng).exec(_t));
+        return ngWords.find((ng) => _t.indexOf(ng) !== -1);
     }
 
     removeSpace(): TextProcess {

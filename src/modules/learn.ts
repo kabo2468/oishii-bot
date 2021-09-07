@@ -19,7 +19,7 @@ export default class extends Module {
             return;
         }
 
-        const match = note.note.text.match(this.Regex);
+        const match = note.text.match(this.Regex);
         if (!match) return;
         const food = new TextProcess(match[1]).removeSpace().toString();
         const good = new RegExp(variables.food.good).test(match[2]);

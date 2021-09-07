@@ -2,6 +2,7 @@ import { Bot } from '../../bot';
 import messages from '../../messages';
 import { Note } from '../../misskey/note';
 import Module from '../../module';
+import { TextProcess } from '../../utils/text-process';
 
 export default class extends Module {
     Name = 'Delete';
@@ -16,9 +17,9 @@ export default class extends Module {
             return;
         }
 
-        const match = note.note.text.match(this.Regex);
+        const match = note.text.match(this.Regex);
         if (!match) return;
-        const food = match[1];
+        const food = new TextProcess(match[2]).removeSpace().toString();
 
         const res = await bot.removeFood(food, false);
         if (res.rowCount > 0) {

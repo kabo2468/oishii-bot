@@ -1,7 +1,7 @@
+import { chooseOneFromArr } from './utils/cofa';
+
 const goodText = 'おいしい';
 const badText = 'まずい';
-
-export const chooseOneFromArr = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 export default {
     commands: {
@@ -39,6 +39,7 @@ export default {
             add: (ng: boolean, ex: boolean): string => `追加しました。(NG: ${ng}, Exclude: ${ex})`,
             remove: (ng: boolean, ex: boolean): string => `削除しました。(NG: ${ng}, Exclude: ${ex})`,
         },
+        encode: (status: boolean): string => `EncodeMode を${status ? 'オン' : 'オフ'}にしました。`,
     },
     pizza: {
         text: [
