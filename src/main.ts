@@ -1,38 +1,37 @@
 import { Bot } from './bot';
-import Module from './module';
 import { Streaming } from './misskey/api';
 import { isNote, Note } from './misskey/note';
-import { TextProcess } from './utils/text-process';
-
-import TLPizzaModule from './modules/tl-pizza';
-import TLLearnModule from './modules/tl-learn';
-import TLReactionModule from './modules/tl-reaction';
-import TLCallModule from './modules/tl-call';
-import KawaiiModule from './modules/kawaii';
+import Module from './module';
 import CheckModule from './modules/check';
-import SearchModule from './modules/search';
-import LearnModule from './modules/learn';
-import HungryModule from './modules/hungry';
-import FoodModule from './modules/food';
-import SushiModule from './modules/sushi';
-import FortuneModule from './modules/fortune';
-import NullpoModule from './modules/nullpo';
-// import ReversiModule from './modules/reversi';
-import ValentineModule from './modules/valentine';
-import Reversi from './modules/reversi/reversi';
-import FollowCommandModule from './modules/commands/follow';
-import UnfollowCommandModule from './modules/commands/unfollow';
-import HelpCommandModule from './modules/commands/help';
-import PingCommandModule from './modules/commands/ping';
-import SayCommandModule from './modules/commands/say';
-import InfoCommandModule from './modules/commands/info';
 import DeleteCommandModule from './modules/commands/delete';
 import DeleteAllCommandModule from './modules/commands/delete-all';
-import NGWordCommandModule from './modules/commands/ngword';
 import EncodeCommandModule from './modules/commands/encode';
+import FollowCommandModule from './modules/commands/follow';
+import GetCommandModule from './modules/commands/get';
+import HelpCommandModule from './modules/commands/help';
+import InfoCommandModule from './modules/commands/info';
+import NGWordCommandModule from './modules/commands/ngword';
+import PingCommandModule from './modules/commands/ping';
+import SayCommandModule from './modules/commands/say';
+import UnfollowCommandModule from './modules/commands/unfollow';
 import ValentineMigrateCommandModule from './modules/commands/valentine-migrate';
 import WhiteDayCommandModule from './modules/commands/white-day';
-import GetCommandModule from './modules/commands/get';
+import FoodModule from './modules/food';
+import FortuneModule from './modules/fortune';
+import HungryModule from './modules/hungry';
+import KawaiiModule from './modules/kawaii';
+import LearnModule from './modules/learn';
+import NullpoModule from './modules/nullpo';
+import Reversi from './modules/reversi/reversi';
+import SearchModule from './modules/search';
+import SushiModule from './modules/sushi';
+import TLCallModule from './modules/tl-call';
+import TLLearnModule from './modules/tl-learn';
+import TLPizzaModule from './modules/tl-pizza';
+import TLReactionModule from './modules/tl-reaction';
+// import ReversiModule from './modules/reversi';
+import ValentineModule from './modules/valentine';
+import { TextProcess } from './utils/text-process';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -42,6 +41,17 @@ const tlModules = {
 };
 // prettier-ignore
 const modules: Module[] = [
+    new CheckModule(),
+    new SearchModule(),
+    new LearnModule(),
+    new HungryModule(),
+    new FoodModule(),
+    new SushiModule(),
+    new KawaiiModule(),
+    new FortuneModule(),
+    new NullpoModule(),
+    // new ReversiModule(),
+    new ValentineModule(),
     new FollowCommandModule(),
     new UnfollowCommandModule(),
     new HelpCommandModule(),
@@ -55,17 +65,6 @@ const modules: Module[] = [
     new ValentineMigrateCommandModule(),
     new GetCommandModule(),
     new WhiteDayCommandModule(),
-    new CheckModule(),
-    new LearnModule(),
-    new SearchModule(),
-    new HungryModule(),
-    new FoodModule(),
-    new SushiModule(),
-    new KawaiiModule(),
-    new FortuneModule(),
-    new NullpoModule(),
-    // new ReversiModule(),
-    new ValentineModule(),
 ];
 
 let tlCount = 0;
