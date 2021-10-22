@@ -92,6 +92,7 @@ export default {
             { emoji: '🦞', keywords: ['lobster', 'ロブスター'] },
             { emoji: '🦐', keywords: ['shrimp', 'エビ', '海老'] },
             { emoji: '🦑', keywords: ['squid', 'イカ', '烏賊'] },
+            { emoji: '🐙', keywords: ['octopus', 'タコ', '蛸'] },
             { emoji: '🦪', keywords: ['oyster', 'カキ', '牡蠣'] },
             { emoji: '🍦', keywords: ['soft ice cream', 'ソフトクリーム'] },
             { emoji: '🍧', keywords: ['shaved ice', 'シャーベット'] },
