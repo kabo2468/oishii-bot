@@ -36,7 +36,10 @@ export class Note {
     private _text: string;
     constructor(bot: Bot, note: CreatedNote) {
         this.bot = bot;
-        this.note = note;
+        this.note = {
+            ...note,
+            createdAt: new Date(note.createdAt),
+        };
         this._text = note.text || '';
         this.tp = new TextProcess(this._text);
     }
