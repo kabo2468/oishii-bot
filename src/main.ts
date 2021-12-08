@@ -5,6 +5,7 @@ import Module from './module';
 import CheckModule from './modules/check';
 import DeleteCommandModule from './modules/commands/delete';
 import DeleteAllCommandModule from './modules/commands/delete-all';
+import DeleteUserCommandModule from './modules/commands/delete-user';
 import EncodeCommandModule from './modules/commands/encode';
 import FollowCommandModule from './modules/commands/follow';
 import GetCommandModule from './modules/commands/get';
@@ -60,6 +61,7 @@ const modules: Module[] = [
     new InfoCommandModule(),
     new DeleteCommandModule(),
     new DeleteAllCommandModule(),
+    new DeleteUserCommandModule(),
     new NGWordCommandModule(),
     new EncodeCommandModule(),
     new ValentineMigrateCommandModule(),

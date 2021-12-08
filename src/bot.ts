@@ -141,6 +141,14 @@ export class Bot {
         return this.runQuery(query);
     }
 
+    async removeFoodFromUserId(userId: string): Promise<Res> {
+        const query = {
+            text: `DELETE FROM oishii_table WHERE "userId" = $1 RETURNING "name"`,
+            values: [userId],
+        };
+        return this.runQuery(query);
+    }
+
     async updateFood(food: string, good: boolean, learned = true, userId: string, noteId: string, updateDate: Date): Promise<void> {
         const query = {
             text: 'UPDATE oishii_table SET "good"=$1, "learned"=$3, "userId"=$4, "noteId"=$5, "updated"=$6 WHERE LOWER("name") = LOWER($2)',
