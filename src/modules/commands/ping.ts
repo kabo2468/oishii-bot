@@ -10,6 +10,7 @@ export default class extends Module {
 
     Run(bot: Bot, note: Note): void {
         note.reaction();
-        note.reply({ text: messages.commands.ping });
+        const time = Date.now() - note.note.createdAt.getTime();
+        note.reply({ text: messages.commands.ping(time) });
     }
 }

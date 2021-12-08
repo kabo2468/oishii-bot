@@ -22,7 +22,7 @@ export default {
             '/setwhite: ホワイトデーの設定をする。（オーナーのみ）',
             '/get: DBから食べ物を取得する。（オーナーのみ）',
         ],
-        ping: 'ぽん！',
+        ping: (time: number): string => `ぽん！(${time}ms)`,
         nullpo: 'ガッ',
         delete: {
             done: (num: number): string => `${num}件削除しました。`,
