@@ -141,9 +141,9 @@ export class Bot {
         return this.runQuery(query);
     }
 
-    async removeFoodFromUserId(userId: string): Promise<Res> {
+    async removeFoodFromUserId(userId: string, learnedOnly: boolean): Promise<Res> {
         const query = {
-            text: `DELETE FROM oishii_table WHERE "userId" = $1 RETURNING "name"`,
+            text: `DELETE FROM oishii_table WHERE "userId" = $1 ${learnedOnly ? 'AND "learned" = true' : ''} RETURNING "name"`,
             values: [userId],
         };
         return this.runQuery(query);

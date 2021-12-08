@@ -6,7 +6,7 @@ import { TextProcess } from '../../utils/text-process';
 
 export default class extends Module {
     Name = 'Delete User';
-    Regex = /^\/delusr (.+)$/i;
+    Regex = /^\/deluser (.+) (false|true)$/i;
     LogName = 'DLUS';
 
     async Run(bot: Bot, note: Note): Promise<void> {
@@ -20,8 +20,9 @@ export default class extends Module {
         const match = note.text.match(this.Regex);
         if (!match) return;
         const user = new TextProcess(match[1]).removeSpace().toString();
+        const learnedOnly = new TextProcess(match[2]).removeSpace().toString() === 'true';
 
-        const res = await bot.removeFoodFromUserId(user);
+        const res = await bot.removeFoodFromUserId(user, learnedOnly);
         const count = res.rowCount;
         if (count > 0) {
             const deletedFoods = res.rows.map((row) => row.name);
