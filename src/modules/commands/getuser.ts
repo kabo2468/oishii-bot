@@ -6,7 +6,7 @@ import Module from '../../module';
 export default class extends Module {
     Name = 'GetUser';
     Regex = /^\/getuser (.+)$/i;
-    LogName = 'GetUser';
+    LogName = 'GETU';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
