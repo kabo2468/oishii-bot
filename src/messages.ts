@@ -22,6 +22,7 @@ export default {
             '/ng (a|b): NGワードを追加/削除する。（オーナーのみ）',
             '/setwhite: ホワイトデーの設定をする。（オーナーのみ）',
             '/get: DBから食べ物を取得する。（オーナーのみ）',
+            '/getuser (userId) (p): 該当ユーザーが登録したものを見る（オーナーのみ）',
         ],
         ping: (time: number): string => `ぽん！(${time}ms)`,
         nullpo: 'ガッ',

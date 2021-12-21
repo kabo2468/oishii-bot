@@ -18,6 +18,7 @@ import UnfollowCommandModule from './modules/commands/unfollow';
 import ValentineMigrateCommandModule from './modules/commands/valentine-migrate';
 import WhiteDayCommandModule from './modules/commands/white-day';
 import LearnedCommandModule from './modules/commands/learned';
+import GetUserCommandModule from './modules/commands/getuser';
 import FoodModule from './modules/food';
 import FortuneModule from './modules/fortune';
 import HungryModule from './modules/hungry';
@@ -69,6 +70,7 @@ const modules: Module[] = [
     new GetCommandModule(),
     new WhiteDayCommandModule(),
     new LearnedCommandModule(),
+    new GetUserCommandModule(),
 ];
 
 let tlCount = 0;
