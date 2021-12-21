@@ -202,24 +202,13 @@ export class Bot {
         this.rateLimit++;
     }
 
-    async getUserFoods(noteid:string,userId:string,page?:number): Promise<void> {
-        if (this.rateLimit > this.config.post.rateLimitPost) return;
+    async getUserFoods(userId:string,page?:number): Promise<Res> {
         const offset = page==undefined?'OFFSET 0':'OFFSET '+page*5;
         const query = {
             text: `SELECT "name", "good" FROM oishii_table WHERE LOWER("name") = LOWER($1) AND learned = TRUE ODER BY updated DESC LIMIT 5 ${offset}`,
             values: [userId],
         };
         const res = await this.runQuery(query);
-        if(res.rowCount<=0){
-            
-            return;
-        }
-        var text="";
-        res.rows.forEach(foods => {
-            if (!foods.name || foods.good === undefined) return;
-            text += messages.food.say(foods.name,foods.good);
-        });
-        // 元noteに付随させる
-        this.rateLimit++;
+        return res;
     }
 }
