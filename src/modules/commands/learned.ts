@@ -18,10 +18,7 @@ export default class extends Module {
 
         const res = await bot.getUserFoods(note.note.userId, page);
         if (res.rowCount > 0) {
-            let text = "";
-            res.rows.forEach(item=>{
-                text += item.name + (item.good?":美味しい\n":":まずい\n");
-            });
+            const text = res.rows.map((row) => `${row.name}: ${row.good ? messages.food.good : messages.food.bad}`).join('\n');
             note.reply({text:text});
         } else {
             note.reply({ text: messages.commands.notFound });
