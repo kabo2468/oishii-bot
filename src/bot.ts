@@ -201,4 +201,13 @@ export class Bot {
 
         this.rateLimit++;
     }
+
+    async getUserFoods(userId:string,page?:number): Promise<Res> {
+        const offset = page ? `OFFSET ${page * 5}` : 'OFFSET 0';
+        const query = {
+            text: `SELECT "name", "good" FROM oishii_table WHERE "userId" = $1 AND learned = TRUE ORDER BY updated DESC LIMIT 5 ${offset}`,
+            values:[userId]
+        };
+        return await this.runQuery(query);
+    }
 }
