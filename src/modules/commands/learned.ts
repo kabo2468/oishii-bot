@@ -23,7 +23,6 @@ export default class extends Module {
         } else {
             note.reply({ text: messages.commands.notFound });
         }
-        return;
     }
 }
     
