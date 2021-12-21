@@ -16,11 +16,10 @@ export default class extends Module {
         }
         const match = note.text.match(this.Regex);
         if (!match) return;
-        const notesplits = note.text.split(' ');
-        if(notesplits.length<2) return;
-        const userId = notesplits[1];
-        const page = Number.parseInt(notesplits[2]);
-        const res = await bot.getUserFoods(userId,page==NaN?0:page);
+        const userId = match[1];
+        const page = match[2] ? Number(match[2].trim()) : 0;
+
+        const res = await bot.getUserFoods(userId, page);
         if (res.rowCount > 0) {
             const text = res.rows.map((row) => `${row.name}: ${row.good ? messages.food.good : messages.food.bad}`).join('\n');
             note.reply({text:text});
