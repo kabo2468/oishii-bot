@@ -11,8 +11,6 @@ export default class extends Module {
     LogName = 'TLRC';
 
     async Run(bot: Bot, note: Note): Promise<void> {
-        this.log('Search food');
-
         // Local === null
         if (note.note.user.host !== null && note.note.user.instance?.softwareName !== 'misskey') {
             this.log('Not Misskey');
