@@ -14,8 +14,9 @@ export default class extends Module {
         
         const match = note.text.match(this.Regex);
         if (!match) return;
-        const page = note.text.replace(match[0],"").trim().match(/^[0-9]{1,2}/);
-        const res = await bot.getUserFoods(note.note.userId,page==null?0:Number.parseInt(page[0]));
+        const page = match[1] ? Number(match[1]?.trim()) : 0;
+
+        const res = await bot.getUserFoods(note.note.userId, page);
         if (res.rowCount > 0) {
             let text = "";
             res.rows.forEach(item=>{
