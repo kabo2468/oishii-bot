@@ -2,7 +2,6 @@ import { Bot } from '../../bot';
 import messages from '../../messages';
 import { Note } from '../../misskey/note';
 import Module from '../../module';
-import { TextProcess } from '../../utils/text-process';
 
 export default class extends Module {
     Name = 'Learned';
