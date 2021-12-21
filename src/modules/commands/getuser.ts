@@ -5,9 +5,9 @@ import Module from '../../module';
 import { TextProcess } from '../../utils/text-process';
 
 export default class extends Module {
-    Name = 'UserData';
-    Regex = /^\/UserData (.+)$/i;
-    LogName = 'UData';
+    Name = 'GetUser';
+    Regex = /^\/getuser (.+)$/i;
+    LogName = 'GetUser';
 
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
