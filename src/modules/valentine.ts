@@ -3,7 +3,6 @@ import { Bot } from '../bot';
 import messages from '../messages';
 import { Note } from '../misskey/note';
 import Module from '../module';
-import variables from '../variables';
 
 export default class extends Module {
     Name = 'Valentine';
@@ -32,10 +31,12 @@ export default class extends Module {
         const json = JSON.parse(file) as Valentine;
 
         const thisYearUsers = json[now.getFullYear()];
-        const user = thisYearUsers.find((user) => user.id === note.screenId);
+        const user = thisYearUsers.find((user) => user.id === note.note.userId);
         const isGive = match[2] === 'あげる';
 
         this.log(note.screenId, isGive ? 'gives' : 'receives');
+
+        const num = Math.floor(Math.random() * 3) + 1;
 
         if (user) {
             // already exists
@@ -53,10 +54,10 @@ export default class extends Module {
                 // user receive
                 if (user.received < 1) {
                     // user first receive
-                    note.reply({ text: messages.food.valentine.give.give(variables.food.chocolates) });
+                    note.reply({ text: messages.food.valentine.give.first(num) });
                 } else {
                     // user more receive
-                    note.reply({ text: messages.food.valentine.give.again(variables.food.chocolates) });
+                    note.reply({ text: messages.food.valentine.give.again(num) });
                 }
                 user.received++;
             }
@@ -75,7 +76,7 @@ export default class extends Module {
                 addUser.gave++;
             } else {
                 // user first receive
-                note.reply({ text: messages.food.valentine.give.give(variables.food.chocolates) });
+                note.reply({ text: messages.food.valentine.give.first(num) });
                 addUser.received++;
             }
             thisYearUsers.push(addUser);
@@ -90,7 +91,7 @@ export interface Valentine {
     [k: number]: User[];
 }
 
-export interface User {
+interface User {
     username: string;
     id: string;
     received: number;

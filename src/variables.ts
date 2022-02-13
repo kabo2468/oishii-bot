@@ -134,6 +134,5 @@ export default {
             { emoji: '🔪', keywords: ['🔪', 'kitchen knife', '包丁'] },
             { emoji: '🏺', keywords: ['🏺', 'amphora', 'アンフォラ'] },
         ],
-        chocolates: ['🍫', '🍪'],
     },
 };

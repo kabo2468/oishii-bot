@@ -39,10 +39,10 @@ export default class extends Module {
             const user = thisYearUsers[i];
 
             const count = user.gave;
-            let presents = '';
-            for (let j = 0; j < count; j++) {
-                presents += chooseOneFromArr(variables.food.foods).emoji;
-            }
+            const presents = new Array(count)
+                .fill('')
+                .map(() => chooseOneFromArr(variables.food.foods).emoji)
+                .join('');
 
             setTimeout(() => {
                 bot.api.postText({ text: messages.food.whiteDay(user.username, presents), visibility: 'specified', visibleUserIds: [user.id] });

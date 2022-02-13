@@ -99,8 +99,8 @@ export default {
         valentine: {
             notToday: '今日はバレンタインデーじゃないよ！',
             give: {
-                give: (chocolates: string[]): string => `これあげる！${chooseOneFromArr(chocolates)}`,
-                again: (chocolates: string[]): string => `もう一つあげる！${chooseOneFromArr(chocolates)}`,
+                first: (num: number): string => `これあげる！${'🍫'.repeat(num)}`,
+                again: (num: number): string => `もう一つあげる！${'🍫'.repeat(num)}`,
             },
             receive: {
                 thx: 'ありがとう！今度お返しするよ！',
