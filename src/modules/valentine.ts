@@ -31,7 +31,7 @@ export default class extends Module {
         const json = JSON.parse(file) as Valentine;
 
         const thisYearUsers = json[now.getFullYear()];
-        const user = thisYearUsers.find((user) => user.id === note.screenId);
+        const user = thisYearUsers.find((user) => user.id === note.note.userId);
         const isGive = match[2] === 'あげる';
 
         this.log(note.screenId, isGive ? 'gives' : 'receives');
