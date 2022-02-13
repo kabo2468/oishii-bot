@@ -15,7 +15,6 @@ import NGWordCommandModule from './modules/commands/ngword';
 import PingCommandModule from './modules/commands/ping';
 import SayCommandModule from './modules/commands/say';
 import UnfollowCommandModule from './modules/commands/unfollow';
-import ValentineMigrateCommandModule from './modules/commands/valentine-migrate';
 import WhiteDayCommandModule from './modules/commands/white-day';
 import LearnedCommandModule from './modules/commands/learned';
 import GetUserCommandModule from './modules/commands/getuser';
@@ -66,7 +65,6 @@ const modules: Module[] = [
     new DeleteUserCommandModule(),
     new NGWordCommandModule(),
     new EncodeCommandModule(),
-    new ValentineMigrateCommandModule(),
     new GetCommandModule(),
     new WhiteDayCommandModule(),
     new LearnedCommandModule(),

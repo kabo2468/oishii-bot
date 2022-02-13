@@ -91,7 +91,7 @@ export interface Valentine {
     [k: number]: User[];
 }
 
-export interface User {
+interface User {
     username: string;
     id: string;
     received: number;
