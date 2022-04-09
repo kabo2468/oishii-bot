@@ -1,9 +1,9 @@
+import seedrandom from 'seedrandom';
 import { Bot } from '../bot';
 import messages from '../messages';
 import { Note } from '../misskey/note';
 import Module from '../module';
 import { TextProcess } from '../utils/text-process';
-import seedrandom from 'seedrandom';
 
 export default class extends Module {
     Name = 'Fortune';
@@ -23,7 +23,6 @@ export default class extends Module {
         const res = await bot.getRandomFood();
         const food = res.rows[0].name;
         const good = res.rows[0].good;
-        if (!food || good === undefined) return;
 
         const msg = messages.fortune.text(food, good, rnd);
         this.log(new TextProcess(msg).replaceNewLineToText().toString());

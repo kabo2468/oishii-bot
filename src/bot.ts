@@ -1,6 +1,6 @@
 import iconv from 'iconv-lite';
 import ms from 'ms';
-import { Pool } from 'pg';
+import { Pool, QueryResult } from 'pg';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import wsConst from 'ws';
 import { Config } from './config';
@@ -8,7 +8,7 @@ import messages from './messages';
 import API, { User } from './misskey/api';
 import NGWord from './ng-words';
 
-export type Row = {
+export interface Row {
     name: string;
     good: boolean;
     learned: boolean;
@@ -18,12 +18,10 @@ export type Row = {
     updated: Date;
     exists: boolean;
     count: string;
-};
+}
 
-type Res = {
-    rows: Partial<Row>[];
-    rowCount: number;
-};
+type Keys = keyof Row;
+type Res<T extends Keys = Keys> = Pick<Row, T>;
 
 export class Bot {
     public config: Config;
@@ -106,8 +104,8 @@ export class Bot {
         );
     }
 
-    async runQuery(query: { text: string; values?: (string | number | boolean | Date)[] }): Promise<Res> {
-        return this.db.query(query).catch((err) => {
+    async runQuery<T extends Keys = Keys>(query: { text: string; values?: (Row[Keys] | number)[] }): Promise<QueryResult<Res<T>>> {
+        return this.db.query<Res<T>>(query).catch((err) => {
             console.error(err);
             process.exit(1);
         });
@@ -118,8 +116,8 @@ export class Bot {
             text: 'SELECT EXISTS (SELECT * FROM oishii_table WHERE LOWER("name") = LOWER($1))',
             values: [text],
         };
-        return await this.runQuery(query).then((res) => {
-            return !!res.rows[0].exists;
+        return await this.runQuery<'exists'>(query).then((res) => {
+            return res.rows[0].exists;
         });
     }
 
@@ -131,22 +129,22 @@ export class Bot {
         await this.runQuery(query);
     }
 
-    async removeFood(food: string, many: boolean): Promise<Res> {
+    async removeFood(food: string, many: boolean): Promise<QueryResult<Res<'name'>>> {
         const textOne = 'in (SELECT "name" FROM oishii_table WHERE LOWER("name") = LOWER($1) LIMIT 1)';
         const textMany = '~* $1';
         const query = {
             text: `DELETE FROM oishii_table WHERE "name" ${many ? textMany : textOne} RETURNING "name"`,
             values: [food],
         };
-        return this.runQuery(query);
+        return this.runQuery<'name'>(query);
     }
 
-    async removeFoodFromUserId(userId: string, learnedOnly: boolean): Promise<Res> {
+    async removeFoodFromUserId(userId: string, learnedOnly: boolean): Promise<QueryResult<Res<'name'>>> {
         const query = {
             text: `DELETE FROM oishii_table WHERE "userId" = $1 ${learnedOnly ? 'AND "learned" = true' : ''} RETURNING "name"`,
             values: [userId],
         };
-        return this.runQuery(query);
+        return this.runQuery<'name'>(query);
     }
 
     async updateFood(food: string, good: boolean, learned = true, userId: string, noteId: string, updateDate: Date): Promise<void> {
@@ -157,7 +155,7 @@ export class Bot {
         await this.runQuery(query);
     }
 
-    async getFood(name: string): Promise<Res> {
+    async getFood(name: string): Promise<QueryResult<Res>> {
         const query = {
             text: `SELECT * FROM oishii_table WHERE LOWER("name") = LOWER($1)`,
             values: [name],
@@ -165,7 +163,7 @@ export class Bot {
         return this.runQuery(query);
     }
 
-    async getRandomFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<Res> {
+    async getRandomFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<QueryResult<Res<'name' | 'good'>>> {
         const options = [];
         if (good !== undefined) options.push(`"good"=${good}`);
         if (learned !== undefined) options.push(`"learned"=${learned}`);
@@ -174,7 +172,7 @@ export class Bot {
         const query = {
             text: `SELECT "name", "good" FROM oishii_table ${option} ORDER BY RANDOM() LIMIT 1`,
         };
-        const res = await this.runQuery(query);
+        const res = await this.runQuery<'name' | 'good'>(query);
         if (this.encodeMode) {
             res.rows.forEach((row) => {
                 const name = row.name;
@@ -193,7 +191,6 @@ export class Bot {
 
         const food = res.rows[0].name;
         const good = res.rows[0].good;
-        if (!food || good === undefined) return;
         this.log(`sayFood: ${food} (${good})`);
 
         const text = messages.food.say(food, good);
@@ -202,7 +199,7 @@ export class Bot {
         this.rateLimit++;
     }
 
-    async getUserFoods(userId: string, page?: number): Promise<Res> {
+    async getUserFoods(userId: string, page?: number): Promise<QueryResult<Res>> {
         const offset = page ? `OFFSET ${page * 10}` : 'OFFSET 0';
         const query = {
             text: `SELECT "name", "good" FROM oishii_table WHERE "userId" = $1 AND learned = TRUE ORDER BY updated DESC LIMIT 10 ${offset}`,
