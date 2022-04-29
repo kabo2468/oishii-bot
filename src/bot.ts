@@ -7,6 +7,7 @@ import { Config } from './config';
 import messages from './messages';
 import API, { User } from './misskey/api';
 import NGWord from './ng-words';
+import { botVersion } from './utils/version';
 
 export interface Row {
     name: string;
@@ -44,7 +45,13 @@ export class Bot {
         this.db = psql;
 
         this.ws = new ReconnectingWebSocket(`${config.wsUrl}/streaming?i=${config.apiKey}`, [], {
-            WebSocket: wsConst,
+            // reconnecting-websocket ではUA指定できないので
+            // https://github.com/pladaria/reconnecting-websocket/issues/138#issuecomment-698206018
+            WebSocket: class extends wsConst {
+                constructor(url: string, protocols: string | string[]) {
+                    super(url, protocols, { headers: { 'User-Agent': `oishii-bot/${botVersion} (WebSocket / https://github.com/kabo2468/oishii-bot)` } });
+                }
+            },
         });
 
         this.log('Followings:', config.followings);

@@ -1,6 +1,7 @@
 import fetch, { Response } from 'node-fetch';
 import { Bot } from '../bot';
 import messages from '../messages';
+import { botVersion } from '../utils/version';
 import { CreatedNote, Note } from './note';
 
 export interface User {
@@ -65,7 +66,10 @@ export default class API {
         return fetch(`${this.bot.config.apiUrl}/${endpoint}`, {
             method: 'post',
             body: JSON.stringify(postBody),
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
+            },
         }).catch((err) => {
             throw new Error(err);
         });
