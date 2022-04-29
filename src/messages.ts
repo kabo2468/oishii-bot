@@ -46,10 +46,21 @@ export default {
         },
         encode: (status: boolean): string => `EncodeMode を${status ? 'オン' : 'オフ'}にしました。`,
         get: {
-            found: (row: Partial<Row>): string =>
-                `\`\`\`\nname: "${row.name}"\ngood: ${row.good}\nlearned: ${row.learned}\nuserId: "${row.userId}"\nnoteId: "${
-                    row.noteId
-                }"\ncreated: "${row.created?.toLocaleString()}"\nupdated: "${row.updated?.toLocaleString()}"\n\`\`\``,
+            found: (row: Partial<Row>): string => {
+                const map = {
+                    name: row.name,
+                    good: row.good,
+                    learned: row.learned,
+                    userId: row.userId,
+                    noteId: row.noteId,
+                    created: row.created,
+                    updated: row.updated,
+                };
+                const text = Object.entries(map)
+                    .map((key, value) => `${key}: "${value}"`)
+                    .join('\n');
+                return `\`\`\`\n${text}\n\`\`\``;
+            },
         },
     },
     pizza: {

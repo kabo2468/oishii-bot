@@ -30,7 +30,7 @@ export default class extends Module {
             text: 'SELECT "good" FROM oishii_table WHERE LOWER("name") = LOWER($1)',
             values: [food],
         };
-        const res = await bot.runQuery(query);
+        const res = await bot.runQuery<'good'>(query);
         if (!res) return;
 
         if (res.rowCount < 1) {

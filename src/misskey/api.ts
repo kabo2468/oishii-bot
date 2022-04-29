@@ -1,7 +1,6 @@
 import fetch, { Response } from 'node-fetch';
 import { Bot } from '../bot';
 import messages from '../messages';
-import { CreatedMessage, Message } from './message';
 import { CreatedNote, Note } from './note';
 
 export interface User {
@@ -111,20 +110,6 @@ export default class API {
         };
         return (await this.call('notes/reactions/create', data)).ok;
     }
-
-    async sendMessage(text: string, userId: string, groupId?: string): Promise<Message> {
-        const data = {
-            text,
-            userId,
-            groupId,
-        };
-        return this.call('messaging/messages/create', data)
-            .then((res) => res.json())
-            .then((json) => new Message(this.bot, json))
-            .catch((err) => {
-                throw new Error(err);
-            });
-    }
 }
 
 export interface Streaming {
@@ -132,6 +117,6 @@ export interface Streaming {
     body: {
         id: string;
         type: string;
-        body: CreatedNote | CreatedMessage | ReversiRes;
+        body: CreatedNote | ReversiRes;
     };
 }
