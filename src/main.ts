@@ -94,6 +94,9 @@ export default function (bot: Bot): void {
     bot.ws.addEventListener('close', function () {
         bot.log('Disconnected.');
     });
+    bot.ws.addEventListener('error', function (err) {
+        bot.log('Error:', err.message);
+    });
 
     bot.ws.addEventListener('message', function (data) {
         const json = JSON.parse(data.data) as Streaming;
