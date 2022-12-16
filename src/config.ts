@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import JSON5 from 'json5';
 import fetch from 'node-fetch';
+import { ClientConfig } from 'pg';
 
 type Post = {
     [key: string]: number;
@@ -16,11 +17,11 @@ export type MecabType = {
 };
 
 type JsonConfig = {
-    [key: string]: string | string[] | boolean | number | Post | MecabType;
+    [key: string]: string | string[] | boolean | number | Post | MecabType | ClientConfig['ssl'];
     url: string;
     apiKey: string;
     databaseUrl: string;
-    dbSSL: boolean;
+    dbSSL: ClientConfig['ssl'];
     ownerUsernames: string[];
     post: Post;
     mecab: MecabType;
@@ -43,7 +44,6 @@ export type Config = {
 export default async function loadConfig(): Promise<Config> {
     const json = readFileSync('./config.json5', { encoding: 'utf-8' });
     const jsonConfig = JSON5.parse(json) as JsonConfig;
-    if (jsonConfig.url.endsWith('/')) jsonConfig.url.slice(0, -1);
     jsonConfig.ownerUsernames.forEach((username) => {
         if (username.startsWith('@')) username.slice(1);
     });
