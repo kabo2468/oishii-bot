@@ -13,6 +13,11 @@ export default class extends Module {
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
 
+        if (note.note.visibility === 'specified') {
+            this.log('SKIP(SPECIFIED):', note.note.id);
+            return;
+        }
+
         const ng = note.findNGWord(bot.ngWords);
         if (ng) {
             note.reply({ text: messages.food.ngWord });
