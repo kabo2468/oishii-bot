@@ -11,11 +11,8 @@ export default class extends Module {
         note.reaction();
 
         this.log(`${note.note.user.username} (${note.note.userId})`);
-        const ok = await bot.api.call({
-            endpoint: 'following/create',
-            body: {
-                userId: note.note.userId,
-            },
+        const ok = await bot.api.call('following/create', {
+            userId: note.note.userId,
         });
         this.log('OK:', String(ok));
     }

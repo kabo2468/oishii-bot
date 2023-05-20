@@ -49,19 +49,19 @@ export interface Group {
 export default class API {
     constructor(private bot: Bot) {}
 
-    async call(endpoint: string, body?: Record<string, unknown>) {
+    async call<T>(endpoint: string, body?: Record<string, unknown>) {
         const postBody = {
             ...body,
             i: this.bot.config.apiKey,
         };
         return got
-            .post(`${this.bot.config.apiUrl}/${endpoint}`, {
+            .post<T>(`${this.bot.config.apiUrl}/${endpoint}`, {
                 json: postBody,
                 headers: {
                     'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
                 },
+                responseType: 'json',
             })
-            .json()
             .catch((err) => {
                 console.error(err);
                 throw err;
@@ -92,9 +92,8 @@ export default class API {
             cw: _cw.length ? _cw.join('\n\n') : null,
             visibleUserIds,
         };
-        return this.call('notes/create', data)
-            .then((res) => res.json<{ createdNote: CreatedNote }>())
-            .then((json) => new Note(this.bot, json.createdNote))
+        return this.call<{ createdNote: CreatedNote }>('notes/create', data)
+            .then((res) => new Note(this.bot, res.body.createdNote))
             .catch((err) => {
                 console.error(err);
             });

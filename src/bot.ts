@@ -70,17 +70,14 @@ export class Bot {
 
         setInterval(async () => {
             this.ws.reconnect();
-            const newFollow: string = await this.api
-                .call('i')
-                .then((res) => res.json<{ followingCount: string }>())
-                .then((json) => json.followingCount);
+            const newFollow: string = await this.api.call<{ followingCount: string }>('i').then((res) => res.body.followingCount);
             this.config.followings = Number(newFollow);
             this.log('Followings:', newFollow);
         }, ms('1h'));
     }
 
     private async getAccount() {
-        this.account = await this.api.call('i').then((res) => res.json());
+        this.account = await this.api.call<User>('i').then((res) => res.body);
     }
 
     log(text?: string, ...arg: unknown[]): void {
