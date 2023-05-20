@@ -46,15 +46,6 @@ export interface Group {
     userIds: string[];
 }
 
-export interface ReversiRes {
-    id: string;
-    createdAt: string;
-    parentId: string;
-    parent: User;
-    childId: string;
-    child: User;
-}
-
 export default class API {
     constructor(private bot: Bot) {}
 
@@ -122,6 +113,6 @@ export interface Streaming {
     body: {
         id: string;
         type: string;
-        body: CreatedNote | ReversiRes;
+        body: CreatedNote;
     };
 }
