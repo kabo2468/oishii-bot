@@ -1,7 +1,7 @@
-import { Bot } from '../bot';
-import NGWord from '../ng-words';
-import { TextProcess } from '../utils/text-process';
-import { User } from './api';
+import { Bot } from '../bot.js';
+import NGWord from '../ng-words.js';
+import { TextProcess } from '../utils/text-process.js';
+import { User } from './api.js';
 
 export interface Reactions {
     [key: string]: number;

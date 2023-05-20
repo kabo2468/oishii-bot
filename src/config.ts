@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
+import got from 'got';
 import JSON5 from 'json5';
-import fetch from 'node-fetch';
 import { ClientConfig } from 'pg';
 
 type Post = {
@@ -96,14 +96,14 @@ export default async function loadConfig(): Promise<Config> {
     const apiUrl = url + '/api';
 
     const api = async (endpoint: string, data: Record<string, unknown>): Promise<Record<string, string>> => {
-        return await fetch(`${apiUrl}/${endpoint}`, {
-            method: 'post',
-            body: JSON.stringify({
-                i: jsonConfig.apiKey,
-                ...data,
-            }),
-            headers: { 'Content-Type': 'application/json' },
-        }).then((res) => res.json());
+        return await got
+            .post(`${apiUrl}/${endpoint}`, {
+                json: {
+                    i: jsonConfig.apiKey,
+                    ...data,
+                },
+            })
+            .json<Record<string, string>>();
     };
 
     const [userId, follows] = await api('i', {}).then((json) => [json.id, json.followingCount]);

@@ -1,4 +1,4 @@
-import NGWord from '../ng-words';
+import NGWord from '../ng-words.js';
 
 export class TextProcess {
     constructor(private text: string) {}

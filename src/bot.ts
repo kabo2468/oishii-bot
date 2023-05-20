@@ -3,11 +3,11 @@ import ms from 'ms';
 import { Pool, QueryResult } from 'pg';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import wsConst from 'ws';
-import { Config } from './config';
-import messages from './messages';
-import API, { User } from './misskey/api';
-import NGWord from './ng-words';
-import { botVersion } from './utils/version';
+import { Config } from './config.js';
+import messages from './messages.js';
+import API, { User } from './misskey/api.js';
+import NGWord from './ng-words.js';
+import { botVersion } from './utils/version.js';
 
 export interface Row {
     name: string;
@@ -27,7 +27,7 @@ type Res<T extends Keys = Keys> = Pick<Row, T>;
 export class Bot {
     public config: Config;
     public ngWords: NGWord;
-    public ws: ReconnectingWebSocket;
+    public ws: ReconnectingWebSocket.default;
     private db: Pool;
     private rateLimit = 0;
     public api: API;
@@ -44,7 +44,7 @@ export class Bot {
         });
         this.db = psql;
 
-        this.ws = new ReconnectingWebSocket(`${config.wsUrl}/streaming?i=${config.apiKey}`, [], {
+        this.ws = new ReconnectingWebSocket.default(`${config.wsUrl}/streaming?i=${config.apiKey}`, [], {
             // reconnecting-websocket ではUA指定できないので
             // https://github.com/pladaria/reconnecting-websocket/issues/138#issuecomment-698206018
             WebSocket: class extends wsConst {
@@ -72,7 +72,7 @@ export class Bot {
             this.ws.reconnect();
             const newFollow: string = await this.api
                 .call('i')
-                .then((res) => res.json())
+                .then((res) => res.json<{ followingCount: string }>())
                 .then((json) => json.followingCount);
             this.config.followings = Number(newFollow);
             this.log('Followings:', newFollow);

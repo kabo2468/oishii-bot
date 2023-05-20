@@ -1,5 +1,5 @@
-import { Row } from './bot';
-import { chooseOneFromArr } from './utils/cofa';
+import { Row } from './bot.js';
+import { chooseOneFromArr } from './utils/cofa.js';
 
 const goodText = 'おいしい';
 const badText = 'まずい';

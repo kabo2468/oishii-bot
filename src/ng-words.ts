@@ -1,6 +1,6 @@
 import fs from 'fs';
 import readline from 'readline';
-import toHiragana from './utils/to-hiragana';
+import toHiragana from './utils/to-hiragana.js';
 
 export default class NGWord {
     private excludedWords: string[] = [];

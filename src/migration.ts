@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import loadConfig from './config';
+import loadConfig from './config.js';
 
 loadConfig()
     .then(async (config) => {

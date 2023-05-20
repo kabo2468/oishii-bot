@@ -1,37 +1,37 @@
-import { Bot } from './bot';
-import { Streaming } from './misskey/api';
-import { isNote, Note } from './misskey/note';
-import Module from './module';
-import CheckModule from './modules/check';
-import DeleteCommandModule from './modules/commands/delete';
-import DeleteAllCommandModule from './modules/commands/delete-all';
-import DeleteUserCommandModule from './modules/commands/delete-user';
-import EncodeCommandModule from './modules/commands/encode';
-import FollowCommandModule from './modules/commands/follow';
-import GetCommandModule from './modules/commands/get';
-import GetUserCommandModule from './modules/commands/getuser';
-import HelpCommandModule from './modules/commands/help';
-import InfoCommandModule from './modules/commands/info';
-import LearnedCommandModule from './modules/commands/learned';
-import NGWordCommandModule from './modules/commands/ngword';
-import PingCommandModule from './modules/commands/ping';
-import SayCommandModule from './modules/commands/say';
-import UnfollowCommandModule from './modules/commands/unfollow';
-import WhiteDayCommandModule from './modules/commands/white-day';
-import FoodModule from './modules/food';
-import FortuneModule from './modules/fortune';
-import HungryModule from './modules/hungry';
-import KawaiiModule from './modules/kawaii';
-import LearnModule from './modules/learn';
-import NullpoModule from './modules/nullpo';
-import SearchModule from './modules/search';
-import SushiModule from './modules/sushi';
-import TLCallModule from './modules/tl-call';
-import TLLearnModule from './modules/tl-learn';
-import TLPizzaModule from './modules/tl-pizza';
-import TLReactionModule from './modules/tl-reaction';
-import ValentineModule from './modules/valentine';
-import { TextProcess } from './utils/text-process';
+import { Bot } from './bot.js';
+import { Streaming } from './misskey/api.js';
+import { isNote, Note } from './misskey/note.js';
+import Module from './module.js';
+import CheckModule from './modules/check.js';
+import DeleteAllCommandModule from './modules/commands/delete-all.js';
+import DeleteUserCommandModule from './modules/commands/delete-user.js';
+import DeleteCommandModule from './modules/commands/delete.js';
+import EncodeCommandModule from './modules/commands/encode.js';
+import FollowCommandModule from './modules/commands/follow.js';
+import GetCommandModule from './modules/commands/get.js';
+import GetUserCommandModule from './modules/commands/getuser.js';
+import HelpCommandModule from './modules/commands/help.js';
+import InfoCommandModule from './modules/commands/info.js';
+import LearnedCommandModule from './modules/commands/learned.js';
+import NGWordCommandModule from './modules/commands/ngword.js';
+import PingCommandModule from './modules/commands/ping.js';
+import SayCommandModule from './modules/commands/say.js';
+import UnfollowCommandModule from './modules/commands/unfollow.js';
+import WhiteDayCommandModule from './modules/commands/white-day.js';
+import FoodModule from './modules/food.js';
+import FortuneModule from './modules/fortune.js';
+import HungryModule from './modules/hungry.js';
+import KawaiiModule from './modules/kawaii.js';
+import LearnModule from './modules/learn.js';
+import NullpoModule from './modules/nullpo.js';
+import SearchModule from './modules/search.js';
+import SushiModule from './modules/sushi.js';
+import TLCallModule from './modules/tl-call.js';
+import TLLearnModule from './modules/tl-learn.js';
+import TLPizzaModule from './modules/tl-pizza.js';
+import TLReactionModule from './modules/tl-reaction.js';
+import ValentineModule from './modules/valentine.js';
+import { TextProcess } from './utils/text-process.js';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -156,7 +156,7 @@ export default function (bot: Bot): void {
                         .call('following/create', {
                             userId: json.body.body.id,
                         })
-                        .then((json) => json.ok)
+                        .then((res) => res.ok)
                         .catch((err) => console.error(err));
 
                     const logPrefix = done ? 'Followed' : 'Failed to follow';

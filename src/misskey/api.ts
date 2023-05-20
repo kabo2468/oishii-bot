@@ -1,8 +1,8 @@
-import fetch, { Response } from 'node-fetch';
-import { Bot } from '../bot';
-import messages from '../messages';
-import { botVersion } from '../utils/version';
-import { CreatedNote, Note } from './note';
+import got from 'got';
+import { Bot } from '../bot.js';
+import messages from '../messages.js';
+import { botVersion } from '../utils/version.js';
+import { CreatedNote, Note } from './note.js';
 
 export interface User {
     id: string;
@@ -49,22 +49,23 @@ export interface Group {
 export default class API {
     constructor(private bot: Bot) {}
 
-    async call(endpoint: string, body?: Record<string, unknown>): Promise<Response> {
+    async call(endpoint: string, body?: Record<string, unknown>) {
         const postBody = {
             ...body,
             i: this.bot.config.apiKey,
         };
-        return fetch(`${this.bot.config.apiUrl}/${endpoint}`, {
-            method: 'post',
-            body: JSON.stringify(postBody),
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
-            },
-        }).catch((err) => {
-            console.error(err);
-            throw err;
-        });
+        return got
+            .post(`${this.bot.config.apiUrl}/${endpoint}`, {
+                json: postBody,
+                headers: {
+                    'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
+                },
+            })
+            .json()
+            .catch((err) => {
+                console.error(err);
+                throw err;
+            });
     }
 
     async postText({
@@ -92,8 +93,8 @@ export default class API {
             visibleUserIds,
         };
         return this.call('notes/create', data)
-            .then((res) => res.json())
-            .then((json: { createdNote: CreatedNote }) => new Note(this.bot, json.createdNote))
+            .then((res) => res.json<{ createdNote: CreatedNote }>())
+            .then((json) => new Note(this.bot, json.createdNote))
             .catch((err) => {
                 console.error(err);
             });
