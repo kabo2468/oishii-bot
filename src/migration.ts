@@ -32,7 +32,7 @@ loadConfig()
         } catch (e) {
             await client.query('ROLLBACK');
             log('ROLLBACK');
-            throw e;
+            console.error(e);
         } finally {
             console.log('Migration End.');
             client.release();

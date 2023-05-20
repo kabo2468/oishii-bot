@@ -74,13 +74,13 @@ export class Note {
 
     reply({ text, visibility = this.note.visibility, cw }: { text: string; visibility?: Visibilities; cw?: string }): void {
         this.bot.api.postText({ text, visibility, replyId: this.note.id, cw }).catch((err) => {
-            throw new Error(err);
+            throw err;
         });
     }
 
     reaction(reaction = '🍮'): void {
         this.bot.api.reactionToNote(this.note.id, reaction).catch((err) => {
-            throw new Error(err);
+            throw err;
         });
     }
 }

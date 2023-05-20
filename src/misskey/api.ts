@@ -71,7 +71,8 @@ export default class API {
                 'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
             },
         }).catch((err) => {
-            throw new Error(err);
+            console.error(err);
+            throw err;
         });
     }
 
@@ -87,7 +88,7 @@ export default class API {
         replyId?: string;
         cw?: string;
         visibleUserIds?: string[];
-    }): Promise<Note> {
+    }): Promise<Note | void> {
         const _cw: string[] = [];
         if (cw) _cw.push(cw);
         if (text.length > 100) _cw.push(messages.food.long);
@@ -103,7 +104,7 @@ export default class API {
             .then((res) => res.json())
             .then((json: { createdNote: CreatedNote }) => new Note(this.bot, json.createdNote))
             .catch((err) => {
-                throw new Error(err);
+                console.error(err);
             });
     }
 

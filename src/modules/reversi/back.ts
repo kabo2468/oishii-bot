@@ -232,7 +232,8 @@ class Back {
             .then((res) => res.json())
             .then((json: { createdNote: CreatedNote }) => json.createdNote)
             .catch((err) => {
-                throw new Error(err);
+                console.error(err);
+                throw err;
             });
     }
 }
