@@ -1,5 +1,5 @@
-import { Note } from './misskey/note';
-import { Bot } from './bot';
+import { Bot } from './bot.js';
+import { Note } from './misskey/note.js';
 
 export default abstract class Module {
     abstract readonly Name: string;

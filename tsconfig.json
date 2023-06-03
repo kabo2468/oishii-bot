@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "module": "NodeNext",
     "outDir": "./built",
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "removeComments": true,
-    "moduleResolution": "Node",
-    "resolveJsonModule": true
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "resolvePackageJsonExports": false
   },
   "exclude": [
     "test/**/*"

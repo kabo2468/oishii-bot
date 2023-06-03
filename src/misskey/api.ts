@@ -1,8 +1,8 @@
-import fetch, { Response } from 'node-fetch';
-import { Bot } from '../bot';
-import messages from '../messages';
-import { botVersion } from '../utils/version';
-import { CreatedNote, Note } from './note';
+import got from 'got';
+import { Bot } from '../bot.js';
+import messages from '../messages.js';
+import { botVersion } from '../utils/version.js';
+import { CreatedNote, Note } from './note.js';
 
 export interface User {
     id: string;
@@ -46,33 +46,26 @@ export interface Group {
     userIds: string[];
 }
 
-export interface ReversiRes {
-    id: string;
-    createdAt: string;
-    parentId: string;
-    parent: User;
-    childId: string;
-    child: User;
-}
-
 export default class API {
     constructor(private bot: Bot) {}
 
-    async call(endpoint: string, body?: Record<string, unknown>): Promise<Response> {
+    async call<T>(endpoint: string, body?: Record<string, unknown>) {
         const postBody = {
             ...body,
             i: this.bot.config.apiKey,
         };
-        return fetch(`${this.bot.config.apiUrl}/${endpoint}`, {
-            method: 'post',
-            body: JSON.stringify(postBody),
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
-            },
-        }).catch((err) => {
-            throw new Error(err);
-        });
+        return got
+            .post<T>(`${this.bot.config.apiUrl}/${endpoint}`, {
+                json: postBody,
+                headers: {
+                    'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
+                },
+                responseType: 'json',
+            })
+            .catch((err) => {
+                console.error(err);
+                throw err;
+            });
     }
 
     async postText({
@@ -87,7 +80,7 @@ export default class API {
         replyId?: string;
         cw?: string;
         visibleUserIds?: string[];
-    }): Promise<Note> {
+    }): Promise<Note | void> {
         const _cw: string[] = [];
         if (cw) _cw.push(cw);
         if (text.length > 100) _cw.push(messages.food.long);
@@ -99,11 +92,10 @@ export default class API {
             cw: _cw.length ? _cw.join('\n\n') : null,
             visibleUserIds,
         };
-        return this.call('notes/create', data)
-            .then((res) => res.json())
-            .then((json: { createdNote: CreatedNote }) => new Note(this.bot, json.createdNote))
+        return this.call<{ createdNote: CreatedNote }>('notes/create', data)
+            .then((res) => new Note(this.bot, res.body.createdNote))
             .catch((err) => {
-                throw new Error(err);
+                console.error(err);
             });
     }
 
@@ -121,6 +113,6 @@ export interface Streaming {
     body: {
         id: string;
         type: string;
-        body: CreatedNote | ReversiRes;
+        body: CreatedNote;
     };
 }

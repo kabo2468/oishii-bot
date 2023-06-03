@@ -1,5 +1,5 @@
-import { MecabType } from '../config';
-import { mecab } from './mecab';
+import { MecabType } from '../config.js';
+import { mecab } from './mecab.js';
 
 export async function getNouns(text: string, mecabConfig: MecabType): Promise<string[]> {
     const tokens = await mecab(text, mecabConfig.binPath, mecabConfig.dicPath);

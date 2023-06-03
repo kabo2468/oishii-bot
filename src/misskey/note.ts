@@ -1,7 +1,7 @@
-import { Bot } from '../bot';
-import NGWord from '../ng-words';
-import { TextProcess } from '../utils/text-process';
-import { User } from './api';
+import { Bot } from '../bot.js';
+import NGWord from '../ng-words.js';
+import { TextProcess } from '../utils/text-process.js';
+import { User } from './api.js';
 
 export interface Reactions {
     [key: string]: number;
@@ -74,13 +74,13 @@ export class Note {
 
     reply({ text, visibility = this.note.visibility, cw }: { text: string; visibility?: Visibilities; cw?: string }): void {
         this.bot.api.postText({ text, visibility, replyId: this.note.id, cw }).catch((err) => {
-            throw new Error(err);
+            throw err;
         });
     }
 
     reaction(reaction = '🍮'): void {
         this.bot.api.reactionToNote(this.note.id, reaction).catch((err) => {
-            throw new Error(err);
+            throw err;
         });
     }
 }

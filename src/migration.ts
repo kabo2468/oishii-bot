@@ -1,9 +1,9 @@
-import { Pool } from 'pg';
-import loadConfig from './config';
+import pg from 'pg';
+import loadConfig from './config.js';
 
 loadConfig()
     .then(async (config) => {
-        const pool = new Pool({
+        const pool = new pg.Pool({
             connectionString: config.databaseUrl,
             ssl: config.dbSSL,
         });
@@ -32,7 +32,7 @@ loadConfig()
         } catch (e) {
             await client.query('ROLLBACK');
             log('ROLLBACK');
-            throw e;
+            console.error(e);
         } finally {
             console.log('Migration End.');
             client.release();
