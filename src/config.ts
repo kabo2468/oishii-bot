@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import got from 'got';
 import JSON5 from 'json5';
-import { ClientConfig } from 'pg';
+import pg from 'pg';
 
 type Post = {
     [key: string]: number;
@@ -17,11 +17,11 @@ export type MecabType = {
 };
 
 type JsonConfig = {
-    [key: string]: string | string[] | boolean | number | Post | MecabType | ClientConfig['ssl'];
+    [key: string]: string | string[] | boolean | number | Post | MecabType | pg.ClientConfig['ssl'];
     url: string;
     apiKey: string;
     databaseUrl: string;
-    dbSSL: ClientConfig['ssl'];
+    dbSSL: pg.ClientConfig['ssl'];
     ownerUsernames: string[];
     post: Post;
     mecab: MecabType;

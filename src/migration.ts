@@ -1,9 +1,9 @@
-import { Pool } from 'pg';
+import pg from 'pg';
 import loadConfig from './config.js';
 
 loadConfig()
     .then(async (config) => {
-        const pool = new Pool({
+        const pool = new pg.Pool({
             connectionString: config.databaseUrl,
             ssl: config.dbSSL,
         });

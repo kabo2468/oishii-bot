@@ -9,7 +9,8 @@
     "forceConsistentCasingInFileNames": true,
     "removeComments": true,
     "moduleResolution": "nodenext",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "resolvePackageJsonExports": false
   },
   "exclude": [
     "test/**/*"
