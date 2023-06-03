@@ -1,6 +1,6 @@
 {
   "name": "oishii-bot",
-  "version": "2.13.9",
+  "version": "2.13.11",
   "description": "",
   "exports": "./built/index.js",
   "license": "MIT",
