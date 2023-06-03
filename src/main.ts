@@ -96,7 +96,7 @@ export default function (bot: Bot): void {
     });
 
     bot.ws.addEventListener('message', function (data) {
-        const json = JSON.parse(data.data) as Streaming;
+        const json = JSON.parse(data.data.toString()) as Streaming;
 
         if (json.body.id === 'streamingTLId') {
             if (!isNote(json.body.body)) return;
@@ -149,7 +149,7 @@ export default function (bot: Bot): void {
                     id: string;
                     username: string;
                     host: string;
-                } = JSON.parse(data.data).body.body;
+                } = JSON.parse(data.data.toString()).body.body;
 
                 (async () => {
                     const done = await bot.api

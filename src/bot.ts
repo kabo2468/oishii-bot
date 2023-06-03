@@ -1,13 +1,11 @@
 import iconv from 'iconv-lite';
 import ms from 'ms';
 import pg from 'pg';
-import ReconnectingWebSocket from 'reconnecting-websocket';
-import wsConst from 'ws';
 import { Config } from './config.js';
 import messages from './messages.js';
 import API, { User } from './misskey/api.js';
 import NGWord from './ng-words.js';
-import { botVersion } from './utils/version.js';
+import { ReconnectWS } from './websocket.js';
 
 export interface Row {
     name: string;
@@ -27,7 +25,7 @@ type Res<T extends Keys = Keys> = Pick<Row, T>;
 export class Bot {
     public config: Config;
     public ngWords: NGWord;
-    public ws: ReconnectingWebSocket.default;
+    public ws: ReconnectWS;
     private db: pg.Pool;
     private rateLimit = 0;
     public api: API;
@@ -44,15 +42,7 @@ export class Bot {
         });
         this.db = psql;
 
-        this.ws = new ReconnectingWebSocket.default(`${config.wsUrl}/streaming?i=${config.apiKey}`, [], {
-            // reconnecting-websocket ではUA指定できないので
-            // https://github.com/pladaria/reconnecting-websocket/issues/138#issuecomment-698206018
-            WebSocket: class extends wsConst {
-                constructor(url: string, protocols: string | string[]) {
-                    super(url, protocols, { headers: { 'User-Agent': `oishii-bot/${botVersion} (WebSocket / https://github.com/kabo2468/oishii-bot)` } });
-                }
-            },
-        });
+        this.ws = new ReconnectWS(`${config.wsUrl}/streaming?i=${config.apiKey}`);
 
         this.log('Followings:', config.followings);
 

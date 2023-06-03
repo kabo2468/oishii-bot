@@ -19,9 +19,6 @@ dependencies:
   pg:
     specifier: ^8.11.0
     version: 8.11.0
-  reconnecting-websocket:
-    specifier: ^4.4.0
-    version: 4.4.0
   seedrandom:
     specifier: ^3.0.5
     version: 3.0.5
@@ -1441,10 +1438,6 @@ packages:
       inherits: 2.0.4
       isarray: 0.0.1
       string_decoder: 0.10.31
-    dev: false
-
-  /reconnecting-websocket@4.4.0:
-    resolution: {integrity: sha512-D2E33ceRPga0NvTDhJmphEgJ7FUYF0v4lr1ki0csq06OdlxKfugGzN0dSkxM/NfqCxYELK4KcaTOUOjTV6Dcng==}
     dev: false
 
   /resolve-alpn@1.2.1:
