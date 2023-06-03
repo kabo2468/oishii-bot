@@ -1,11 +1,11 @@
 import { readFileSync } from 'fs';
-import { Bot } from '../../bot';
-import messages from '../../messages';
-import { Note } from '../../misskey/note';
-import Module from '../../module';
-import { chooseOneFromArr } from '../../utils/cofa';
-import variables from '../../variables';
-import { Valentine } from '../valentine';
+import { Bot } from '../../bot.js';
+import messages from '../../messages.js';
+import { Note } from '../../misskey/note.js';
+import Module from '../../module.js';
+import { chooseOneFromArr } from '../../utils/cofa.js';
+import variables from '../../variables.js';
+import { Valentine } from '../valentine.js';
 
 export default class extends Module {
     Name = 'White Day';

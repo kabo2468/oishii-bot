@@ -1,11 +1,11 @@
-import { Bot } from '../bot';
-import { MecabType } from '../config';
-import messages from '../messages';
-import { Note } from '../misskey/note';
-import Module from '../module';
-import { getNouns } from '../utils/get-nouns';
-import { TextProcess } from '../utils/text-process';
-import variables from '../variables';
+import { Bot } from '../bot.js';
+import { MecabType } from '../config.js';
+import messages from '../messages.js';
+import { Note } from '../misskey/note.js';
+import Module from '../module.js';
+import { getNouns } from '../utils/get-nouns.js';
+import { TextProcess } from '../utils/text-process.js';
+import variables from '../variables.js';
 
 export default class extends Module {
     Name = 'Check';

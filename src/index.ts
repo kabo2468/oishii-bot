@@ -1,7 +1,7 @@
-import NGWord from './ng-words';
-import loadConfig from './config';
-import main from './main';
-import { Bot } from './bot';
+import { Bot } from './bot.js';
+import loadConfig from './config.js';
+import main from './main.js';
+import NGWord from './ng-words.js';
 
 process.on('unhandledRejection', console.dir);
 

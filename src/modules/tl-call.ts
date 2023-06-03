@@ -1,6 +1,6 @@
-import { Bot } from '../bot';
-import { Note } from '../misskey/note';
-import Module from '../module';
+import { Bot } from '../bot.js';
+import { Note } from '../misskey/note.js';
+import Module from '../module.js';
 
 export default class extends Module {
     Name = 'TL Call';

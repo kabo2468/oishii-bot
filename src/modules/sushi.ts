@@ -1,7 +1,7 @@
-import { Bot } from '../bot';
-import messages from '../messages';
-import { Note } from '../misskey/note';
-import Module from '../module';
+import { Bot } from '../bot.js';
+import messages from '../messages.js';
+import { Note } from '../misskey/note.js';
+import Module from '../module.js';
 
 export default class extends Module {
     Name = 'Sushi';

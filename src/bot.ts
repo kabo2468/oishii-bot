@@ -1,13 +1,11 @@
 import iconv from 'iconv-lite';
 import ms from 'ms';
-import { Pool, QueryResult } from 'pg';
-import ReconnectingWebSocket from 'reconnecting-websocket';
-import wsConst from 'ws';
-import { Config } from './config';
-import messages from './messages';
-import API, { User } from './misskey/api';
-import NGWord from './ng-words';
-import { botVersion } from './utils/version';
+import pg from 'pg';
+import { Config } from './config.js';
+import messages from './messages.js';
+import API, { User } from './misskey/api.js';
+import NGWord from './ng-words.js';
+import { ReconnectWS } from './websocket.js';
 
 export interface Row {
     name: string;
@@ -27,8 +25,8 @@ type Res<T extends Keys = Keys> = Pick<Row, T>;
 export class Bot {
     public config: Config;
     public ngWords: NGWord;
-    public ws: ReconnectingWebSocket;
-    private db: Pool;
+    public ws: ReconnectWS;
+    private db: pg.Pool;
     private rateLimit = 0;
     public api: API;
     public account!: User;
@@ -38,21 +36,13 @@ export class Bot {
         this.config = config;
         this.ngWords = ngWords;
 
-        const psql = new Pool({
+        const psql = new pg.Pool({
             ssl: config.dbSSL,
             connectionString: config.databaseUrl,
         });
         this.db = psql;
 
-        this.ws = new ReconnectingWebSocket(`${config.wsUrl}/streaming?i=${config.apiKey}`, [], {
-            // reconnecting-websocket ではUA指定できないので
-            // https://github.com/pladaria/reconnecting-websocket/issues/138#issuecomment-698206018
-            WebSocket: class extends wsConst {
-                constructor(url: string, protocols: string | string[]) {
-                    super(url, protocols, { headers: { 'User-Agent': `oishii-bot/${botVersion} (WebSocket / https://github.com/kabo2468/oishii-bot)` } });
-                }
-            },
-        });
+        this.ws = new ReconnectWS(`${config.wsUrl}/streaming?i=${config.apiKey}`);
 
         this.log('Followings:', config.followings);
 
@@ -70,17 +60,14 @@ export class Bot {
 
         setInterval(async () => {
             this.ws.reconnect();
-            const newFollow: string = await this.api
-                .call('i')
-                .then((res) => res.json())
-                .then((json) => json.followingCount);
+            const newFollow: string = await this.api.call<{ followingCount: string }>('i').then((res) => res.body.followingCount);
             this.config.followings = Number(newFollow);
             this.log('Followings:', newFollow);
         }, ms('1h'));
     }
 
     private async getAccount() {
-        this.account = await this.api.call('i').then((res) => res.json());
+        this.account = await this.api.call<User>('i').then((res) => res.body);
     }
 
     log(text?: string, ...arg: unknown[]): void {
@@ -111,7 +98,7 @@ export class Bot {
         );
     }
 
-    async runQuery<T extends Keys = Keys>(query: { text: string; values?: (Row[Keys] | number)[] }): Promise<QueryResult<Res<T>>> {
+    async runQuery<T extends Keys = Keys>(query: { text: string; values?: (Row[Keys] | number)[] }): Promise<pg.QueryResult<Res<T>>> {
         return this.db.query<Res<T>>(query).catch((err) => {
             console.error(err);
             process.exit(1);
@@ -136,7 +123,7 @@ export class Bot {
         await this.runQuery(query);
     }
 
-    async removeFood(food: string, many: boolean): Promise<QueryResult<Res<'name'>>> {
+    async removeFood(food: string, many: boolean): Promise<pg.QueryResult<Res<'name'>>> {
         const textOne = 'in (SELECT "name" FROM oishii_table WHERE LOWER("name") = LOWER($1) LIMIT 1)';
         const textMany = '~* $1';
         const query = {
@@ -146,7 +133,7 @@ export class Bot {
         return this.runQuery<'name'>(query);
     }
 
-    async removeFoodFromUserId(userId: string, learnedOnly: boolean): Promise<QueryResult<Res<'name'>>> {
+    async removeFoodFromUserId(userId: string, learnedOnly: boolean): Promise<pg.QueryResult<Res<'name'>>> {
         const query = {
             text: `DELETE FROM oishii_table WHERE "userId" = $1 ${learnedOnly ? 'AND "learned" = true' : ''} RETURNING "name"`,
             values: [userId],
@@ -162,7 +149,7 @@ export class Bot {
         await this.runQuery(query);
     }
 
-    async getFood(name: string): Promise<QueryResult<Res>> {
+    async getFood(name: string): Promise<pg.QueryResult<Res>> {
         const query = {
             text: `SELECT * FROM oishii_table WHERE LOWER("name") = LOWER($1)`,
             values: [name],
@@ -170,7 +157,7 @@ export class Bot {
         return this.runQuery(query);
     }
 
-    async getRandomFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<QueryResult<Res<'name' | 'good'>>> {
+    async getRandomFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<pg.QueryResult<Res<'name' | 'good'>>> {
         const options = [];
         if (good !== undefined) options.push(`"good"=${good}`);
         if (learned !== undefined) options.push(`"learned"=${learned}`);
@@ -206,7 +193,7 @@ export class Bot {
         this.rateLimit++;
     }
 
-    async getUserFoods(userId: string, page?: number): Promise<QueryResult<Res>> {
+    async getUserFoods(userId: string, page?: number): Promise<pg.QueryResult<Res>> {
         const offset = page ? `OFFSET ${page * 10}` : 'OFFSET 0';
         const query = {
             text: `SELECT "name", "good" FROM oishii_table WHERE "userId" = $1 AND learned = TRUE ORDER BY updated DESC LIMIT 10 ${offset}`,
