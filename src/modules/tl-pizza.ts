@@ -14,6 +14,5 @@ export default class extends Module {
         if (note.note.replyId !== null) return;
         const visibility = note.note.visibility !== 'public' ? note.note.visibility : 'home';
         note.reply({ text: messages.pizza.toText(), visibility });
-        return;
     }
 }

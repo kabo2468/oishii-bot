@@ -5,7 +5,7 @@ import Module from '../../module.js';
 
 export default class extends Module {
     Name = 'GetUser';
-    Regex = /^\/getuser ([\w\d]+)( \d+)?$/i;
+    Regex = /^\/getuser (\w+)( \d+)?$/i;
     LogName = 'GETU';
 
     async Run(bot: Bot, note: Note): Promise<void> {
@@ -16,7 +16,7 @@ export default class extends Module {
             return;
         }
 
-        const match = note.text.match(this.Regex);
+        const match = RegExp(this.Regex).exec(note.text);
         if (!match) return;
         const userId = match[1];
         const page = match[2] ? Number(match[2].trim()) - 1 : 0;

@@ -5,7 +5,7 @@ import Module from '../../module.js';
 
 export default class extends Module {
     Name = 'NG Word';
-    Regex = /^\/ng (a|r) (.+)$/i;
+    Regex = /^\/ng ([ar]) (.+)$/i;
     LogName = 'NGWD';
 
     async Run(bot: Bot, note: Note): Promise<void> {
@@ -16,10 +16,10 @@ export default class extends Module {
             return;
         }
 
-        const match = note.text.match(this.Regex);
+        const match = RegExp(this.Regex).exec(note.text);
         if (!match) return;
 
-        const add = match[1] === 'a' ? true : false;
+        const add = match[1] === 'a';
         const word = match[2];
 
         if (add) {

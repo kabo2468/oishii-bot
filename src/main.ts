@@ -160,7 +160,8 @@ export default function (bot: Bot): void {
                         .catch((err) => console.error(err));
 
                     const logPrefix = done ? 'Followed' : 'Failed to follow';
-                    bot.log(`${logPrefix} @${user.username}${user.host ? `@${user.host}` : ''} (ID: ${user.id})`);
+                    const host = user.host ? `@${user.host}` : '';
+                    bot.log(`${logPrefix} @${user.username}${host} (ID: ${user.id})`);
                 })();
                 return;
             }
