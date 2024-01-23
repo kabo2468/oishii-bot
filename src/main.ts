@@ -24,6 +24,7 @@ import HungryModule from './modules/hungry.js';
 import KawaiiModule from './modules/kawaii.js';
 import LearnModule from './modules/learn.js';
 import NullpoModule from './modules/nullpo.js';
+import ReversiModule from './modules/reversi/reversi';
 import SearchModule from './modules/search.js';
 import SushiModule from './modules/sushi.js';
 import TLCallModule from './modules/tl-call.js';
@@ -50,6 +51,7 @@ const modules: Module[] = [
     new KawaiiModule(),
     new FortuneModule(),
     new NullpoModule(),
+    new ReversiModule(),
     new ValentineModule(),
     new FollowCommandModule(),
     new UnfollowCommandModule(),
@@ -139,7 +141,7 @@ export default function (bot: Bot): void {
 
         if (json.body.id === 'streamingMainId') {
             const type = json.body.type;
-            const allowTypes = ['mention', 'messagingMessage', 'followed'];
+            const allowTypes = ['mention', 'messagingMessage', 'followed', 'reversiInvited'];
             if (!allowTypes.includes(type)) return;
 
             if (!('parentId' in json.body.body) && json.body.body.user?.isBot === true) return;
@@ -164,6 +166,11 @@ export default function (bot: Bot): void {
                     bot.log(`${logPrefix} @${user.username}${host} (ID: ${user.id})`);
                 })();
                 return;
+            }
+
+            if (type === 'reversiInvited') {
+                if (!('parentId' in json.body.body)) return;
+                Reversi(bot, json.body.body.parentId);
             }
 
             if (!isNote(json.body.body)) return;
