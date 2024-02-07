@@ -1,7 +1,7 @@
-import { Bot } from '../../bot';
-import { Note } from '../../misskey/note';
-import Module from '../../module';
-import Reversi from './reversi';
+import { Bot } from '../../bot.js';
+import { Note } from '../../misskey/note.js';
+import Module from '../../module.js';
+import Reversi from './reversi.js';
 
 export default class extends Module {
     Name = 'Reversi';

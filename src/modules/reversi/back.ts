@@ -1,44 +1,54 @@
-import Reversi, { Color } from 'misskey-reversi';
-import fetch from 'node-fetch';
-import { Config } from '../../config';
-import messages from '../../messages';
-import { User } from '../../misskey/api';
-import { CreatedNote } from '../../misskey/note';
-import { chooseOneFromArr } from '../../utils/cofa';
+import got from 'got';
+import { Config } from '../../config.js';
+import messages from '../../messages.js';
+import { User } from '../../misskey/api.js';
+import { CreatedNote } from '../../misskey/note.js';
+import { chooseOneFromArr } from '../../utils/cofa.js';
+import { botVersion } from '../../utils/version.js';
+import { Color, Game } from './engine.js';
+import { ReversiMatch } from './reversi.js';
 
-interface Mes {
-    type: string;
-    body: Body;
+interface InitMes {
+    type: 'init';
+    body: {
+        game: ReversiMatch;
+        form: Form[];
+        config: Config;
+    };
 }
+
+interface CanceledMes {
+    type: 'canceled';
+    body: ReversiMatch;
+}
+
+interface StartedMes {
+    type: 'started';
+    body: {
+        game: ReversiMatch;
+    };
+}
+
+interface SetMes {
+    type: 'set';
+    body: {
+        time: number;
+        player: boolean;
+        operation: 'put';
+        pos: number;
+        id: string;
+    };
+}
+
+interface EndedMes {
+    type: 'ended';
+    body: ReversiMatch;
+}
+
+type Mes = InitMes | CanceledMes | StartedMes | SetMes | EndedMes;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Body = Record<string, any>;
-
-interface Game {
-    id: string;
-    createdAt: string;
-    startedAt: string;
-    isStarted: boolean;
-    isEnded: boolean;
-    form1: Form[];
-    form2: Form[];
-    user1Accepted: boolean;
-    user2Accepted: boolean;
-    user1Id: string;
-    user2Id: string;
-    user1: User;
-    user2: User;
-    winnerId: null;
-    winner: null;
-    surrendered: null;
-    black: number;
-    bw: string;
-    isLlotheo: boolean;
-    canPutEverywhere: boolean;
-    loopedBoard: boolean;
-    logs: string[];
-    map: string[];
-}
+type Bodyasdada = Record<string, any> | { game: ReversiMatch; form: Form; config: Config };
 
 interface Form {
     id: string;
@@ -55,10 +65,10 @@ interface Map {
 }
 
 class Back {
-    private _game!: Game;
+    private _game!: ReversiMatch;
     private _form!: Form[];
     private _config!: Config;
-    private _engine!: Reversi;
+    private _engine!: Game;
     private _botColor!: Color;
     private _inviter!: User;
     private _startedNote?: CreatedNote;
@@ -71,20 +81,11 @@ class Back {
         return `?[${name}](${this._config.host}/@${this._inviter.username})さん`;
     }
 
-    private getForm(id: string): Form {
-        const form = this._form.find((i) => i.id === id);
-        if (!form) throw new Error('Not Found.');
-        return form;
-    }
-
     constructor() {
         process.on('message', (msg: Mes) => {
             switch (msg.type) {
                 case 'init':
                     this.onInit(msg.body);
-                    break;
-                case 'updateForm':
-                    this.onUpdateForm(msg.body);
                     break;
                 case 'started':
                     this.onStarted(msg.body);
@@ -95,6 +96,9 @@ class Back {
                 case 'set':
                     this.onSet(msg.body);
                     break;
+                case 'canceled':
+                    this.log('Canceled:', `${msg.body}`);
+                    process.exit();
             }
         });
     }
@@ -103,32 +107,27 @@ class Back {
         console.log(`[RVBC] (${this._game.id})`, text, ...arg);
     }
 
-    async onInit(body: Body) {
+    async onInit(body: InitMes['body']) {
         this._game = body.game;
         this._form = body.form;
         this._config = body.config;
         this._inviter = this._game.user1Id === this._config.userId ? this._game.user2 : this._game.user1;
         this.log(`Booted. (PID: ${process.pid})`);
+        this.log('game', `${JSON.stringify(this._game)}`);
     }
 
-    onUpdateForm(body: Body) {
-        const item = this.getForm(body.id);
-        item.value = body.value;
-    }
-
-    async onStarted(body: Body) {
+    async onStarted(body: StartedMes['body']) {
         this._form = body.game.form2;
 
         this.log(`Match Started. (userId: ${this._inviter.id})`);
 
-        if (this.getForm('post').value) {
-            const text = messages.games.reversi.started(this.userName, `${this._config.host}/games/reversi/${this._game.id}`);
-            this._startedNote = await this.post({ text });
-        }
+        const text = messages.games.reversi.started(this.userName, `${this._config.host}/games/reversi/${this._game.id}`);
+        this._startedNote = await this.post({ text });
 
         this._game = body.game;
 
-        this._engine = new Reversi(this._game.map, {
+        this.log('map', `${JSON.stringify(this._game)}`);
+        this._engine = new Game(this._game.map, {
             canPutEverywhere: this._game.canPutEverywhere,
             isLlotheo: this._game.isLlotheo,
             loopedBoard: this._game.loopedBoard,
@@ -151,7 +150,7 @@ class Back {
         }
     }
 
-    async onEnded(body: Body) {
+    async onEnded(body: EndedMes['body']) {
         // ストリームから切断
         process.send?.({
             type: 'ended',
@@ -159,7 +158,7 @@ class Back {
 
         let text: string;
 
-        if (body.game.surrendered) {
+        if (body.surrenderedUserId) {
             text = messages.games.reversi.surrendered(this.userName);
         } else if (body.winnerId) {
             if (body.winnerId === this._config.userId) {
@@ -171,19 +170,17 @@ class Back {
             text = messages.games.reversi.draw(this.userName);
         }
 
-        if (this.getForm('post').value) {
-            await this.post({ text, renoteId: this._startedNote?.id });
-        }
+        await this.post({ text, renoteId: this._startedNote?.id });
 
         this.log(`End. (PID: ${process.pid})`);
         process.exit();
     }
 
-    onSet(body: Body) {
-        this._engine.put(body.color, body.pos);
+    onSet(body: SetMes['body']) {
+        this._engine.putStone(body.pos);
         this._currentTurn++;
 
-        if (body.next === this._botColor) {
+        if (this._engine.turn === this._botColor) {
             this.think();
         }
     }
@@ -200,11 +197,11 @@ class Back {
             pos = chooseOneFromArr(canPutCorner);
         } else {
             // それ以外はランダムに置く
-            const places = this._engine.canPutSomewhere(this._botColor);
+            const places = this._engine.getPuttablePlaces(this._botColor);
             pos = chooseOneFromArr(places);
         }
 
-        this._engine.put(this._botColor, pos);
+        this._engine.putStone(pos);
 
         this.log('Thought:', String(pos));
         console.timeEnd('think');
@@ -221,16 +218,18 @@ class Back {
         const data = {
             i: this._config.apiKey,
             text,
-            visibility: 'public',
+            visibility: 'home',
             ...(renoteId ? { renoteId } : {}),
         };
-        return await fetch(`${this._config.apiUrl}/notes/create`, {
-            method: 'post',
-            body: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then((res) => res.json())
-            .then((json: { createdNote: CreatedNote }) => json.createdNote)
+        return got
+            .post<{ createdNote: CreatedNote }>(`${this._config.apiUrl}/notes/create`, {
+                json: data,
+                headers: {
+                    'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
+                },
+                responseType: 'json',
+            })
+            .then((res) => res.body.createdNote)
             .catch((err) => {
                 console.error(err);
                 throw err;

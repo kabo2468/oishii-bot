@@ -24,7 +24,8 @@ import HungryModule from './modules/hungry.js';
 import KawaiiModule from './modules/kawaii.js';
 import LearnModule from './modules/learn.js';
 import NullpoModule from './modules/nullpo.js';
-import ReversiModule from './modules/reversi/reversi';
+import ReversiModule from './modules/reversi/index.js';
+import Reversi from './modules/reversi/reversi.js';
 import SearchModule from './modules/search.js';
 import SushiModule from './modules/sushi.js';
 import TLCallModule from './modules/tl-call.js';
@@ -82,6 +83,10 @@ export default function (bot: Bot): void {
             channel: 'main',
             id: 'streamingMainId',
         },
+        {
+            channel: 'reversi',
+            id: 'streamingReversiId',
+        },
     ];
 
     bot.ws.addEventListener('open', function () {
@@ -99,6 +104,7 @@ export default function (bot: Bot): void {
 
     bot.ws.addEventListener('message', function (data) {
         const json = JSON.parse(data.data.toString()) as Streaming;
+        console.log(json);
 
         if (json.body.id === 'streamingTLId') {
             if (!isNote(json.body.body)) return;
@@ -141,10 +147,10 @@ export default function (bot: Bot): void {
 
         if (json.body.id === 'streamingMainId') {
             const type = json.body.type;
-            const allowTypes = ['mention', 'messagingMessage', 'followed', 'reversiInvited'];
+            const allowTypes = ['mention', 'followed'];
             if (!allowTypes.includes(type)) return;
 
-            if (!('parentId' in json.body.body) && json.body.body.user?.isBot === true) return;
+            if ('user' in json.body.body && json.body.body.user.isBot) return;
 
             if (type === 'followed') {
                 const user: {
@@ -156,7 +162,7 @@ export default function (bot: Bot): void {
                 (async () => {
                     const done = await bot.api
                         .call('following/create', {
-                            userId: json.body.body.id,
+                            userId: user.id,
                         })
                         .then((res) => res.ok)
                         .catch((err) => console.error(err));
@@ -166,11 +172,6 @@ export default function (bot: Bot): void {
                     bot.log(`${logPrefix} @${user.username}${host} (ID: ${user.id})`);
                 })();
                 return;
-            }
-
-            if (type === 'reversiInvited') {
-                if (!('parentId' in json.body.body)) return;
-                Reversi(bot, json.body.body.parentId);
             }
 
             if (!isNote(json.body.body)) return;
@@ -187,6 +188,13 @@ export default function (bot: Bot): void {
                 return;
             }
             note.reaction();
+        }
+
+        if (json.body.id === 'streamingReversiId') {
+            const type = json.body.type;
+            if (type === 'invited') {
+                Reversi(bot, json.body.body.user.id);
+            }
         }
     });
 }
