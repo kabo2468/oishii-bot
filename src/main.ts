@@ -104,7 +104,6 @@ export default function (bot: Bot): void {
 
     bot.ws.addEventListener('message', function (data) {
         const json = JSON.parse(data.data.toString()) as Streaming;
-        console.log(json);
 
         if (json.body.id === 'streamingTLId') {
             if (!isNote(json.body.body)) return;

@@ -118,7 +118,6 @@ class Back {
 
         this._game = body.game;
 
-        this.log('map', `${JSON.stringify(this._game)}`);
         this._engine = new Game(this._game.map, {
             canPutEverywhere: this._game.canPutEverywhere,
             isLlotheo: this._game.isLlotheo,
