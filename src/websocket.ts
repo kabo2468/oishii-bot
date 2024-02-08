@@ -129,6 +129,11 @@ export class ReconnectWS {
         this.#listeners[type].push(listener);
     }
 
+    removeEventListener<T extends keyof WebSocketEventListenerMap>(type: T, listener: WebSocketEventListenerMap[T]) {
+        // @ts-ignore
+        this.#listeners[type] = this.#listeners[type].filter((l) => l !== listener);
+    }
+
     send(data: SendDataType) {
         if (this.#ws && this.#ws.readyState === State.OPEN) {
             this.#ws.send(data);
