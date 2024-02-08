@@ -27,8 +27,8 @@ export default async function (bot: Bot, userId: string): Promise<void> {
     log(`Invited. (userId: ${userId})`);
 
     const genListener = (channelId: string) => {
-        return function fn(data: ws.MessageEvent['data']) {
-            const json = JSON.parse(data.toString()) as Res;
+        return function fn(data: ws.MessageEvent) {
+            const json = JSON.parse(data.data.toString()) as Res;
 
             if (json.body.id !== channelId) return;
 
@@ -67,17 +67,13 @@ export default async function (bot: Bot, userId: string): Promise<void> {
                     type: 'ended',
                     body: json.body.body,
                 });
-                bot.ws.removeEventListener('message', function () {
-                    return fn(data);
-                });
+                bot.ws.removeEventListener('message', fn);
             }
         };
     };
 
     const listener = genListener(channelId);
-    bot.ws.addEventListener('message', function (data) {
-        listener(data.data);
-    });
+    bot.ws.addEventListener('message', listener);
     bot.ws.addEventListener('close', function () {
         playingIds.clear();
     });
