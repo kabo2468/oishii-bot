@@ -73,8 +73,7 @@ class Back {
     private _appliedOps: string[] = [];
 
     private get userName(): string {
-        const name = this._inviter.name || this._inviter.username;
-        return `?[${name}](${this._config.host}/@${this._inviter.username})さん`;
+        return `@${this._inviter.username} さん`;
     }
 
     constructor() {
