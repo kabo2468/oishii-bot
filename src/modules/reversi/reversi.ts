@@ -94,6 +94,7 @@ export default async function (bot: Bot, userId: string): Promise<void> {
         if (message.type == 'put') {
             wsSend('putStone', {
                 pos: message.pos,
+                id: message.id,
             });
         } else if (message.type == 'ended') {
             log(`Match Ended. (userId: ${userId})`);

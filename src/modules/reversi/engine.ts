@@ -195,9 +195,7 @@ export class Game {
                 [x, y] = nextPos(x, y);
 
                 // 座標が指し示す位置がボード外に出たとき
-                x = ((x % this.mapWidth) + this.mapWidth) % this.mapWidth;
-                y = ((y % this.mapHeight) + this.mapHeight) % this.mapHeight;
-                if (this.opts.loopedBoard && this.xyToPos(x, y) === initPos) {
+                if (this.opts.loopedBoard && this.xyToPos((x = ((x % this.mapWidth) + this.mapWidth) % this.mapWidth), (y = ((y % this.mapHeight) + this.mapHeight) % this.mapHeight)) === initPos) {
                     // 盤面の境界でループし、自分が石を置く位置に戻ってきたとき、挟めるようにしている (ref: Test4のマップ)
                     return found;
                 } else if (x === -1 || y === -1 || x === this.mapWidth || y === this.mapHeight) return []; // 挟めないことが確定 (盤面外に到達)

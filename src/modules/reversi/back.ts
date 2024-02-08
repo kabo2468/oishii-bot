@@ -69,7 +69,8 @@ class Back {
     private _startedNote?: CreatedNote;
     private _maxTurn!: number;
     private _currentTurn = 0;
-    private _map!: Map;
+    private _corners!: number[];
+    private _appliedOps: string[] = [];
 
     private get userName(): string {
         const name = this._inviter.name || this._inviter.username;
@@ -107,16 +108,16 @@ class Back {
         this._config = body.config;
         this._inviter = this._game.user1Id === this._config.userId ? this._game.user2 : this._game.user1;
         this.log(`Booted. (PID: ${process.pid})`);
-        this.log('game', `${JSON.stringify(this._game)}`);
     }
 
     async onStarted(body: StartedMes['body']) {
         this.log(`Match Started. (userId: ${this._inviter.id})`);
 
-        const text = messages.games.reversi.started(this.userName, `${this._config.host}/games/reversi/${this._game.id}`);
+        const text = messages.games.reversi.started(this.userName, `${this._config.host}/reversi/g/${this._game.id}`);
         this._startedNote = await this.post({ text });
 
         this._game = body.game;
+        this.log('game', `${JSON.stringify(this._game)}`);
 
         this._engine = new Game(this._game.map, {
             canPutEverywhere: this._game.canPutEverywhere,
@@ -128,13 +129,36 @@ class Back {
 
         this._botColor = (this._game.user1Id == this._config.userId && this._game.black == 1) || (this._game.user2Id == this._config.userId && this._game.black == 2);
 
-        const width = this._engine.mapWidth;
-        const height = this._engine.mapHeight;
-        this._map = {
-            width,
-            height,
-            corner: [0, width - 1, height * (width - 1), height * width - 1],
-        };
+        this._corners = [];
+        this._engine.map.forEach((pix, i) => {
+            if (pix == 'null') return;
+
+            const [x, y] = this._engine.posToXy(i);
+            const get = (x: number, y: number) => {
+                if (x < 0 || y < 0 || x >= this._engine.mapWidth || y >= this._engine.mapHeight) return 'null';
+                return this._engine.mapDataGet(this._engine.xyToPos(x, y));
+            };
+
+            const isNotSumi =
+                // -
+                //  +
+                //   -
+                (get(x - 1, y - 1) == 'empty' && get(x + 1, y + 1) == 'empty') ||
+                //  -
+                //  +
+                //  -
+                (get(x, y - 1) == 'empty' && get(x, y + 1) == 'empty') ||
+                //   -
+                //  +
+                // -
+                (get(x + 1, y - 1) == 'empty' && get(x - 1, y + 1) == 'empty') ||
+                //
+                // -+-
+                //
+                (get(x - 1, y) == 'empty' && get(x + 1, y) == 'empty');
+            const isSumi = !isNotSumi;
+            if (isSumi) this._corners.push(i);
+        });
 
         if (this._botColor) {
             this.think();
@@ -168,11 +192,13 @@ class Back {
     }
 
     onSet(body: SetMes['body']) {
-        this._engine.putStone(body.pos);
-        this._currentTurn++;
+        if (body.id == null || !this._appliedOps.includes(body.id)) {
+            this._engine.putStone(body.pos);
+            this._currentTurn++;
 
-        if (this._engine.turn === this._botColor) {
-            this.think();
+            if (this._engine.turn === this._botColor) {
+                this.think();
+            }
         }
     }
 
@@ -180,7 +206,7 @@ class Back {
         this.log(`(${this._currentTurn}/${this._maxTurn}) Thinking...`);
         console.time('think');
 
-        const canPutCorner = this._map.corner.filter((value) => this._engine.canPut(this._botColor, value));
+        const canPutCorner = this._corners.filter((pos) => this._engine.canPut(this._botColor, pos));
 
         let pos: number;
         if (canPutCorner.length) {
@@ -193,15 +219,23 @@ class Back {
         }
 
         this._engine.putStone(pos);
+        this._currentTurn++;
 
         this.log('Thought:', String(pos));
         console.timeEnd('think');
 
         setTimeout(() => {
+            const id = Math.random().toString(36).slice(2);
             process.send?.({
                 type: 'put',
                 pos,
+                id,
             });
+            this._appliedOps.push(id);
+
+            if (this._engine.turn === this._botColor) {
+                this.think();
+            }
         }, 1000);
     }
 
