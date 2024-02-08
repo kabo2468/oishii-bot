@@ -12,7 +12,6 @@ interface InitMes {
     type: 'init';
     body: {
         game: ReversiMatch;
-        form: Form[];
         config: Config;
     };
 }
@@ -47,9 +46,6 @@ interface EndedMes {
 
 type Mes = InitMes | CanceledMes | StartedMes | SetMes | EndedMes;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Bodyasdada = Record<string, any> | { game: ReversiMatch; form: Form; config: Config };
-
 interface Form {
     id: string;
     type: string;
@@ -66,7 +62,6 @@ interface Map {
 
 class Back {
     private _game!: ReversiMatch;
-    private _form!: Form[];
     private _config!: Config;
     private _engine!: Game;
     private _botColor!: Color;
@@ -109,7 +104,6 @@ class Back {
 
     async onInit(body: InitMes['body']) {
         this._game = body.game;
-        this._form = body.form;
         this._config = body.config;
         this._inviter = this._game.user1Id === this._config.userId ? this._game.user2 : this._game.user1;
         this.log(`Booted. (PID: ${process.pid})`);
@@ -117,8 +111,6 @@ class Back {
     }
 
     async onStarted(body: StartedMes['body']) {
-        this._form = body.game.form2;
-
         this.log(`Match Started. (userId: ${this._inviter.id})`);
 
         const text = messages.games.reversi.started(this.userName, `${this._config.host}/games/reversi/${this._game.id}`);

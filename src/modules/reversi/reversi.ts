@@ -74,32 +74,19 @@ export default async function (bot: Bot, userId: string): Promise<void> {
         };
     };
 
-    const form = [
-        {
-            id: 'post',
-            type: 'switch',
-            label: '対局情報を投稿するのを許可',
-            value: true,
-        },
-    ];
-
     const listener = genListener(channelId);
     bot.ws.addEventListener('message', function (data) {
         listener(data.data);
     });
     setTimeout(() => {
-        wsSend('initForm', form);
-    }, 1000);
-    setTimeout(() => {
         wsSend('ready', true);
-    }, 2000);
+    }, 1000);
 
     const back = fork(`${__dirname}/back`);
     back.send({
         type: 'init',
         body: {
             game,
-            form,
             config: bot.config,
         },
     });
