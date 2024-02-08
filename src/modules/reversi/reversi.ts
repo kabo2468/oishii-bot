@@ -62,6 +62,7 @@ export default async function (bot: Bot, userId: string): Promise<void> {
             }
 
             if (json.body.type === 'ended') {
+                playingIds.delete(userId);
                 back.send({
                     type: 'ended',
                     body: json.body.body,
@@ -76,6 +77,9 @@ export default async function (bot: Bot, userId: string): Promise<void> {
     const listener = genListener(channelId);
     bot.ws.addEventListener('message', function (data) {
         listener(data.data);
+    });
+    bot.ws.addEventListener('close', function () {
+        playingIds.clear();
     });
     setTimeout(() => {
         wsSend('ready', true);
