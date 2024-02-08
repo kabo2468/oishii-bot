@@ -46,6 +46,10 @@ export interface Group {
     userIds: string[];
 }
 
+export interface ReversiInvitedRes {
+    user: User;
+}
+
 export default class API {
     constructor(private bot: Bot) {}
 
@@ -112,7 +116,22 @@ export interface Streaming {
     type: string;
     body: {
         id: string;
-        type: string;
-        body: CreatedNote;
-    };
+    } & (
+        | {
+              type: 'homeTimeline';
+              body: CreatedNote;
+          }
+        | {
+              type: 'mention';
+              body: CreatedNote;
+          }
+        | {
+              type: 'followed';
+              body: User;
+          }
+        | {
+              type: 'invited';
+              body: { user: User };
+          }
+    );
 }

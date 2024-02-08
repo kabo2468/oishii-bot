@@ -43,9 +43,9 @@ export type Config = {
 
 export default async function loadConfig(): Promise<Config> {
     const json = readFileSync('./config.json5', { encoding: 'utf-8' });
-    const jsonConfig = JSON5.parse(json) as JsonConfig;
-    jsonConfig.ownerUsernames.forEach((username) => {
-        if (username.startsWith('@')) username.slice(1);
+    const jsonConfig = JSON5.parse<JsonConfig>(json);
+    jsonConfig.ownerUsernames.forEach((username, index) => {
+        if (username.startsWith('@')) jsonConfig.ownerUsernames[index] = username.slice(1);
     });
 
     const errors: string[] = [];
@@ -77,9 +77,7 @@ export default async function loadConfig(): Promise<Config> {
                 if (_v !== undefined) continue;
             } else if (Array.isArray(_v)) {
                 if (_v.length) continue;
-            } else {
-                if (_v) continue;
-            }
+            } else if (_v) continue;
             errors.push(key);
         }
     }

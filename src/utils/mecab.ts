@@ -1,9 +1,9 @@
 // syuilo/ai/src/modules/keyword/mecab.ts + modified
 import { spawn } from 'child_process';
-import { promisify } from 'util';
-import { pipeline as streamPipeline } from 'stream';
 import { WritableStream } from 'memory-streams';
 import { EOL } from 'os';
+import { pipeline as streamPipeline } from 'stream';
+import { promisify } from 'util';
 
 const pipeline = promisify(streamPipeline);
 
@@ -40,7 +40,7 @@ export async function mecab(text: string, mecab = 'mecab', dic?: string): Promis
     const args: string[] = [];
     if (dic) args.push('-d', dic);
 
-    const lines = await cmd(mecab, args, `${text.replace(/[\n\s\t]/g, ' ')}\n`);
+    const lines = await cmd(mecab, args, `${text.replace(/\s/g, ' ')}\n`);
 
     const results: Morpheme[] = [];
 

@@ -2,7 +2,6 @@ import { Bot } from '../bot.js';
 import messages from '../messages.js';
 import { Note } from '../misskey/note.js';
 import Module from '../module.js';
-import { TextProcess } from '../utils/text-process.js';
 import variables from '../variables.js';
 
 export default class extends Module {
@@ -24,9 +23,9 @@ export default class extends Module {
             return;
         }
 
-        const match = note.text.match(this.Regex);
+        const match = RegExp(this.Regex).exec(note.text);
         if (!match) return;
-        const food = new TextProcess(match[1]).removeSpace().toString();
+        const food = match[1].trim();
         const good = new RegExp(variables.food.good).test(match[2]);
 
         const isExists = await bot.existsFood(food);

@@ -2,7 +2,6 @@ import { Bot } from '../../bot.js';
 import messages from '../../messages.js';
 import { Note } from '../../misskey/note.js';
 import Module from '../../module.js';
-import { TextProcess } from '../../utils/text-process.js';
 
 export default class extends Module {
     Name = 'Delete User';
@@ -17,10 +16,10 @@ export default class extends Module {
             return;
         }
 
-        const match = note.text.match(this.Regex);
+        const match = RegExp(this.Regex).exec(note.text);
         if (!match) return;
-        const user = new TextProcess(match[1]).removeSpace().toString();
-        const learnedOnly = new TextProcess(match[2]).removeSpace().toString() === 'true';
+        const user = match[1].trim();
+        const learnedOnly = match[2].trim() === 'true';
 
         const res = await bot.removeFoodFromUserId(user, learnedOnly);
         const count = res.rowCount;

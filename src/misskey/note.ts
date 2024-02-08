@@ -40,30 +40,31 @@ export class Note {
             ...note,
             createdAt: new Date(note.createdAt),
         };
-        this._text = note.text || '';
+        this._text = note.text ?? '';
         this.tp = new TextProcess(this._text);
     }
 
     get screenId(): string {
         const user = this.note.user;
-        return `@${user.username}${user.host ? `@${user.host}` : ''}`;
+        const host = user.host ? `@${user.host}` : '';
+        return `@${user.username}${host}`;
     }
 
     get text(): string {
         return this._text;
     }
 
-    removeURLs(): Note {
+    removeURLs(): this {
         this._text = this.tp.removeURLs().toString();
         return this;
     }
 
-    removeMentions(): Note {
+    removeMentions(): this {
         this._text = this.tp.removeMentions().toString();
         return this;
     }
 
-    removeMentionToMe(): Note {
+    removeMentionToMe(): this {
         this._text = this.tp.removeMentionToMe().toString();
         return this;
     }
@@ -73,7 +74,8 @@ export class Note {
     }
 
     reply({ text, visibility = this.note.visibility, cw }: { text: string; visibility?: Visibilities; cw?: string }): void {
-        this.bot.api.postText({ text, visibility, replyId: this.note.id, cw }).catch((err) => {
+        const _t = `${this.screenId}\n${text}`;
+        this.bot.api.postText({ text: _t, visibility, replyId: this.note.id, cw }).catch((err) => {
             throw err;
         });
     }

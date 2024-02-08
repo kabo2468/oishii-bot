@@ -11,7 +11,7 @@ export default class extends Module {
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
 
-        const match = note.text.match(this.Regex);
+        const match = RegExp(this.Regex).exec(note.text);
         if (!match) return;
         const userId = note.note.userId;
         const page = match[1] ? Number(match[1]?.trim()) - 1 : 0;
