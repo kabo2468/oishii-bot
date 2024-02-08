@@ -194,6 +194,10 @@ export default function (bot: Bot): void {
             if (type === 'invited') {
                 Reversi(bot, json.body.body.user.id);
             }
+            if (type === 'matched') {
+                const enemyUserId = json.body.body.game.user1Id === bot.config.userId ? json.body.body.game.user2Id : json.body.body.game.user1Id;
+                Reversi(bot, enemyUserId);
+            }
         }
     });
 }

@@ -1,6 +1,7 @@
 import got from 'got';
 import { Bot } from '../bot.js';
 import messages from '../messages.js';
+import { ReversiMatch } from '../modules/reversi/reversi.js';
 import { botVersion } from '../utils/version.js';
 import { CreatedNote, Note } from './note.js';
 
@@ -132,6 +133,10 @@ export interface Streaming {
         | {
               type: 'invited';
               body: { user: User };
+          }
+        | {
+              type: 'matched';
+              body: { game: ReversiMatch };
           }
     );
 }
