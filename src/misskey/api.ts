@@ -39,18 +39,6 @@ export interface File {
     isSensitive: boolean;
 }
 
-export interface Group {
-    id: string;
-    createdAt: Date;
-    name: string;
-    ownerId: string;
-    userIds: string[];
-}
-
-export interface ReversiInvitedRes {
-    user: User;
-}
-
 export default class API {
     constructor(private bot: Bot) {}
 

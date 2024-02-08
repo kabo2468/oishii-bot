@@ -46,20 +46,6 @@ interface EndedMes {
 
 type Mes = InitMes | CanceledMes | StartedMes | SetMes | EndedMes;
 
-interface Form {
-    id: string;
-    type: string;
-    label: string;
-    value: number | boolean;
-    items?: { label: string; value: number }[];
-}
-
-interface Map {
-    width: number;
-    height: number;
-    corner: number[];
-}
-
 class Back {
     private _game!: ReversiMatch;
     private _config!: Config;

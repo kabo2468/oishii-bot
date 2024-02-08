@@ -14,9 +14,6 @@ dependencies:
   memory-streams:
     specifier: ^0.1.3
     version: 0.1.3
-  misskey-reversi:
-    specifier: ^0.0.5
-    version: 0.0.5
   moji:
     specifier: ^0.5.1
     version: 0.5.1
@@ -1357,10 +1354,6 @@ packages:
     resolution: {integrity: sha512-MzWSV5nYVT7mVyWCwn2o7JH13w2TBRmmSqSRCKzTw+lmft9X4z+3wjvs06Tzijo5z4W/kahUCDpRXTF+ZrmF/w==}
     engines: {node: '>=16 || 14 >=14.17'}
     dev: true
-
-  /misskey-reversi@0.0.5:
-    resolution: {integrity: sha512-lALC8WxwQYU7wBUjbmcGc7b9AfNyzBqdoa8Q6sZfS8cfC+zEbi/Ln8m/fZKuM0qhnylBqTQiPQHHhBsSJxz/OQ==}
-    dev: false
 
   /moji@0.5.1:
     resolution: {integrity: sha1-CI7s0cIsjzGiQK3PnJXlTzPrVPs=}
