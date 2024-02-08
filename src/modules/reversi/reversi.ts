@@ -29,7 +29,6 @@ export default async function (bot: Bot, userId: string): Promise<void> {
     const genListener = (channelId: string) => {
         return function fn(data: ws.MessageEvent['data']) {
             const json = JSON.parse(data.toString()) as Res;
-            console.log('reversi.js:', json);
 
             if (json.body.id !== channelId) return;
 
