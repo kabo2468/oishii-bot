@@ -39,6 +39,8 @@ export default class extends Module {
             const user = thisYearUsers[i];
 
             const count = user.gave;
+            if (count === 0) continue;
+
             const presents = new Array(count)
                 .fill('')
                 .map(() => chooseOneFromArr(variables.food.foods).emoji)
