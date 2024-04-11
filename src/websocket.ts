@@ -60,7 +60,6 @@ export class ReconnectWS {
         if (!this.#ws) return;
         try {
             this.#ws.close(code, reason);
-            this.#connect();
         } catch (error) {}
     }
 
@@ -72,6 +71,7 @@ export class ReconnectWS {
     #addListener() {
         if (!this.#ws) return;
 
+        this.#ws.removeAllListeners();
         this.#ws.addEventListener('open', this.#handleOpen);
         this.#ws.addEventListener('close', this.#handleClose);
         this.#ws.addEventListener('message', this.#handleMessage);
