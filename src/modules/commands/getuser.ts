@@ -25,7 +25,7 @@ export default class extends Module {
         const count = (await bot.runQuery<'count'>({ text: 'SELECT count("name") FROM oishii_table WHERE "userId" = $1 AND "learned" = TRUE', values: [userId] })).rows[0].count;
         const pageText = `Pages: ${page + 1} / ${Math.ceil(Number(count) / 10)}`;
         const res = await bot.getUserFoods(userId, page);
-        if (res.rowCount && res.rowCount > 0) {
+        if (res.rows.length > 0) {
             const text = res.rows.map((row) => `${row.name}: ${row.good ? messages.food.good : messages.food.bad}`).join('\n');
             note.reply({ text: `${pageText}\n\`\`\`\n${text}\n\`\`\`` });
         } else {
