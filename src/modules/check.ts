@@ -32,7 +32,7 @@ export default class extends Module {
         const res = await bot.runQuery<'good'>(query);
         if (!res) return;
 
-        if (res.rowCount < 1) {
+        if (res.rowCount && res.rowCount < 1) {
             const noun = await this.isNoun(food, bot.config.mecab);
             if (noun) {
                 note.reply({ text: messages.food.idk });

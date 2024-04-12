@@ -23,7 +23,7 @@ export default class extends Module {
 
         const res = await bot.removeFoodFromUserId(user, learnedOnly);
         const count = res.rowCount;
-        if (count > 0) {
+        if (count && count > 0) {
             const deletedFoods = res.rows.map((row) => row.name);
             note.reply({ cw: messages.commands.delete.done(count), text: `\`\`\`\n${deletedFoods.join('\n')}\n\`\`\`` });
             this.log(`${count} food(s) deleted: ${deletedFoods.join(', ')}`);
