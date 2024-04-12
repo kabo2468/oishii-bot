@@ -21,8 +21,8 @@ export default class extends Module {
         const food = match[2].trim();
 
         const res = await bot.removeFood(food, false);
-        if (res.rowCount > 0) {
-            note.reply({ text: messages.commands.delete.done(res.rowCount) });
+        if (res.rows.length > 0) {
+            note.reply({ text: messages.commands.delete.done(res.rows.length) });
             this.log(food);
         } else {
             note.reply({ text: messages.commands.notFound });

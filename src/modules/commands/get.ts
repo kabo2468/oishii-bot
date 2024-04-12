@@ -21,7 +21,7 @@ export default class extends Module {
         const food = match[1].trim();
 
         const res = await bot.getFood(food);
-        if (res.rowCount > 0) {
+        if (res.rows.length > 0) {
             const row = res.rows[0];
             note.reply({ text: messages.commands.get.found(row) });
             this.log(JSON.stringify(row));

@@ -1,7 +1,6 @@
 import { fork } from 'child_process';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import ws from 'ws';
 import { Bot } from '../../bot.js';
 import { User } from '../../misskey/api.js';
 
@@ -27,7 +26,7 @@ export default async function (bot: Bot, userId: string): Promise<void> {
     log(`Invited. (userId: ${userId})`);
 
     const genListener = (channelId: string) => {
-        return function fn(data: ws.MessageEvent) {
+        return function fn(data: MessageEvent) {
             const json = JSON.parse(data.data.toString()) as Res;
 
             if (json.body.id !== channelId) return;
@@ -128,7 +127,9 @@ export interface ReversiMatch {
     endedAt: string | null;
     isStarted: boolean;
     isEnded: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     form1: any | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     form2: any | null;
     user1Ready: boolean;
     user2Ready: boolean;

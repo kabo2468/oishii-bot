@@ -191,6 +191,7 @@ export class Game {
 
             const found: number[] = []; // 挟めるかもしれない相手の石を入れておく配列
             let [x, y] = this.posToXy(initPos);
+            // eslint-disable-next-line no-constant-condition
             while (true) {
                 [x, y] = nextPos(x, y);
 

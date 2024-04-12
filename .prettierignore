@@ -1,5 +1,2 @@
-/built
-node_modules
 package.json
-package-lock.json
 tsconfig.json

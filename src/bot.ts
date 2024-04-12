@@ -1,11 +1,12 @@
 import iconv from 'iconv-lite';
 import ms from 'ms';
+import { WebSocket } from 'partysocket';
 import pg from 'pg';
+import ws from 'ws';
 import { Config } from './config.js';
 import messages from './messages.js';
 import API, { User } from './misskey/api.js';
 import NGWord from './ng-words.js';
-import { ReconnectWS } from './websocket.js';
 
 export interface Row {
     name: string;
@@ -25,7 +26,7 @@ type Res<T extends Keys = Keys> = Pick<Row, T>;
 export class Bot {
     public config: Config;
     public ngWords: NGWord;
-    public ws: ReconnectWS;
+    public ws: WebSocket;
     private db: pg.Pool;
     private rateLimit = 0;
     public api: API;
@@ -42,7 +43,9 @@ export class Bot {
         });
         this.db = psql;
 
-        this.ws = new ReconnectWS(`${config.wsUrl}/streaming?i=${config.apiKey}`);
+        this.ws = new WebSocket(`${config.wsUrl}/streaming?i=${config.apiKey}`, [], {
+            WebSocket: ws,
+        });
 
         this.log('Followings:', config.followings);
 
@@ -50,13 +53,19 @@ export class Bot {
 
         this.getAccount();
 
-        setInterval(() => {
-            this.rateLimit = 0;
-        }, ms(`${config.post.rateLimitSec}s`));
+        setInterval(
+            () => {
+                this.rateLimit = 0;
+            },
+            ms(`${config.post.rateLimitSec}s`),
+        );
 
-        setInterval(() => {
-            this.sayFood();
-        }, ms(`${config.post.autoPostInterval}m`));
+        setInterval(
+            () => {
+                this.sayFood();
+            },
+            ms(`${config.post.autoPostInterval}m`),
+        );
 
         setInterval(async () => {
             this.ws.reconnect();
@@ -83,7 +92,7 @@ export class Bot {
                     id,
                     params,
                 },
-            })
+            }),
         );
     }
 
@@ -94,7 +103,7 @@ export class Bot {
                 body: {
                     id,
                 },
-            })
+            }),
         );
     }
 
