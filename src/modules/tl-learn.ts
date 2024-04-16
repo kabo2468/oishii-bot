@@ -1,3 +1,4 @@
+import { extract as extractMfmNodes, toString as mfmNodesToString, parse as parseMfm } from 'mfm-js';
 import { Bot } from '../bot.js';
 import { Note } from '../misskey/note.js';
 import Module from '../module.js';
@@ -14,12 +15,29 @@ export default class extends Module {
         const text = note.text;
         this.log(new TextProcess(text).replaceNewLineToText().toString());
 
-        const nouns = await getNouns(text, bot.config.mecab);
-        if (nouns.length < 1) {
+        const mfmNodes = parseMfm(text);
+        const noMfmNodes = extractMfmNodes(mfmNodes, (n) => ['text', 'unicodeEmoji', 'emojiCode'].includes(n.type));
+        const textNodes = extractMfmNodes(noMfmNodes, (node) => node.type === 'text');
+        const emojiNodes = extractMfmNodes(noMfmNodes, (node) => node.type === 'unicodeEmoji' || node.type === 'emojiCode');
+
+        const textArr = textNodes.map((n) => (n.type === 'text' ? n.props.text.trim() : ''));
+        const textStr = textArr.join('').trim();
+
+        const emojisArr = emojiNodes.map((n) => {
+            if (n.type === 'unicodeEmoji') return n.props.emoji;
+            if (n.type === 'emojiCode') return `:${n.props.name}:`;
+            return '';
+        });
+
+        const noMfmText = mfmNodesToString(noMfmNodes);
+        this.log('No MFM Text:', new TextProcess(noMfmText).replaceNewLineToText().toString());
+
+        const foods = [...(await getNouns(textStr, bot.config.mecab)), ...emojisArr];
+        if (foods.length < 1) {
             this.log('Nouns not found.');
             return;
         }
-        const food = chooseOneFromArr(nouns);
+        const food = chooseOneFromArr(foods);
 
         const isExists = await bot.existsFood(food);
         if (isExists) {
