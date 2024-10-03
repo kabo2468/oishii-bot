@@ -70,7 +70,7 @@ export class Note {
     }
 
     findNGWord(ngWord: NGWord): string | undefined {
-        return this.tp.findNGWord(ngWord);
+        return ngWord.find(this._text);
     }
 
     reply({ text, visibility = this.note.visibility, cw }: { text: string; visibility?: Visibilities; cw?: string }): void {

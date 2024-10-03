@@ -1,5 +1,6 @@
 import fs from 'fs';
 import readline from 'readline';
+import { toHalfWidth } from './utils/to-half-width.js';
 import toHiragana from './utils/to-hiragana.js';
 
 export default class NGWord {
@@ -22,16 +23,20 @@ export default class NGWord {
         });
     }
 
+    find(str: string): string | undefined {
+        const text = toHiragana(toHalfWidth(str)).toLowerCase();
+        // NGワード避けする文字を消す
+        const removed = text.replaceAll(/[\s!#$%&*,-.=`+()'"/?\\^_|~:;、。ー×○●]/g, '').trim();
+        const excluded = this.excludeAllowedWord(removed);
+        return this.ngWords.find((ng) => excluded.indexOf(ng) !== -1);
+    }
+
     excludeAllowedWord(str: string): string {
         let text = toHiragana(str.toLowerCase());
         this.excludedWords.forEach((w) => {
             text = text.replace(w, '');
         });
         return text;
-    }
-
-    public get get(): string[] {
-        return this.ngWords;
     }
 
     addNGWord(str: string): boolean {

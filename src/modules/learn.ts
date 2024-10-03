@@ -19,6 +19,7 @@ export default class extends Module {
 
         const ng = note.findNGWord(bot.ngWords);
         if (ng) {
+            this.log('NG:', ng);
             note.reply({ text: messages.food.ngWord });
             return;
         }

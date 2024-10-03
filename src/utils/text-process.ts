@@ -1,5 +1,3 @@
-import NGWord from '../ng-words.js';
-
 export class TextProcess {
     constructor(private text: string) {}
 
@@ -20,15 +18,6 @@ export class TextProcess {
     removeMentionToMe(): this {
         this.text = this.text.replace(/@oishiibot(@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,})?\s/, '').trim();
         return this;
-    }
-
-    findNGWord(ngWord: NGWord): string | undefined {
-        const _t = ngWord
-            .excludeAllowedWord(this.text)
-            .replace(/[\s!#$%&*,-./?\\^_|~、。ー×○●]/g, '') //NGワード避けする文字を消す
-            .trim();
-        const ngWords = ngWord.get;
-        return ngWords.find((ng) => _t.indexOf(ng) !== -1);
     }
 
     omitText(length = 100): this {
