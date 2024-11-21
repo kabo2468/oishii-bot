@@ -8,7 +8,7 @@ export default class extends Module {
     Regex = /ぬるぽ|ヌルポ|nullpo/i;
     LogName = 'NLPO';
 
-    Run(bot: Bot, note: Note): void {
+    Run(_bot: Bot, note: Note): void {
         note.reaction();
         note.reply({ text: messages.commands.nullpo });
     }

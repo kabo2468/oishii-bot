@@ -8,7 +8,7 @@ export default class extends Module {
     Regex = /^\/ping$/i;
     LogName = 'PING';
 
-    Run(bot: Bot, note: Note): void {
+    Run(_bot: Bot, note: Note): void {
         note.reaction();
         const time = Date.now() - note.note.createdAt.getTime() - 1000;
         note.reply({ text: messages.commands.ping(time) });

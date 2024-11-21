@@ -191,15 +191,18 @@ export class Game {
 
             const found: number[] = []; // 挟めるかもしれない相手の石を入れておく配列
             let [x, y] = this.posToXy(initPos);
-            // eslint-disable-next-line no-constant-condition
             while (true) {
                 [x, y] = nextPos(x, y);
 
                 // 座標が指し示す位置がボード外に出たとき
-                if (this.opts.loopedBoard && this.xyToPos((x = ((x % this.mapWidth) + this.mapWidth) % this.mapWidth), (y = ((y % this.mapHeight) + this.mapHeight) % this.mapHeight)) === initPos) {
+                if (this.opts.loopedBoard) {
+                    x = ((x % this.mapWidth) + this.mapWidth) % this.mapWidth;
+                    y = ((y % this.mapHeight) + this.mapHeight) % this.mapHeight;
                     // 盤面の境界でループし、自分が石を置く位置に戻ってきたとき、挟めるようにしている (ref: Test4のマップ)
-                    return found;
-                } else if (x === -1 || y === -1 || x === this.mapWidth || y === this.mapHeight) return []; // 挟めないことが確定 (盤面外に到達)
+                    if (this.xyToPos(x, y) === initPos) return found;
+                }
+                // 挟めないことが確定 (盤面外に到達)
+                if (x === -1 || y === -1 || x === this.mapWidth || y === this.mapHeight) return [];
 
                 const pos = this.xyToPos(x, y);
                 if (this.mapDataGet(pos) === 'null') return []; // 挟めないことが確定 (配置不可能なマスに到達)

@@ -7,7 +7,7 @@ export default class extends Module {
     Regex = /かわいい|カワイイ|可愛い|kawaii/i;
     LogName = 'KWII';
 
-    Run(bot: Bot, note: Note): void {
+    Run(_bot: Bot, note: Note): void {
         note.reaction('❤️');
     }
 }

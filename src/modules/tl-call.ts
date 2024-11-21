@@ -7,7 +7,7 @@ export default class extends Module {
     Regex = /おいしい(Bot|ぼっと|ボット)/i;
     LogName = 'TLCL';
 
-    Run(bot: Bot, note: Note): void {
+    Run(_bot: Bot, note: Note): void {
         note.reaction('🙌');
         this.log('Called!');
     }

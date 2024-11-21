@@ -1,6 +1,6 @@
 import { Bot } from './bot.js';
 import { Streaming } from './misskey/api.js';
-import { isNote, Note } from './misskey/note.js';
+import { Note, isNote } from './misskey/note.js';
 import Module from './module.js';
 import CheckModule from './modules/check.js';
 import DeleteAllCommandModule from './modules/commands/delete-all.js';
@@ -41,7 +41,7 @@ const tlModules = {
     reaction: new TLReactionModule(),
     call: new TLCallModule(),
 };
-// prettier-ignore
+
 const modules: Module[] = [
     new CheckModule(),
     new SearchModule(),

@@ -87,7 +87,7 @@ export class Note {
     }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: type guard
 export function isNote(note: Record<string, any>): note is CreatedNote {
     return 'visibility' in note;
 }

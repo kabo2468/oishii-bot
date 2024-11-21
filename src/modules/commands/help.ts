@@ -8,7 +8,7 @@ export default class extends Module {
     Regex = /^\/help$/i;
     LogName = 'HELP';
 
-    Run(bot: Bot, note: Note): void {
+    Run(_bot: Bot, note: Note): void {
         note.reaction();
 
         const _t = messages.commands.help.join('\n');

@@ -46,9 +46,12 @@ export default class extends Module {
                 .map(() => chooseOneFromArr(variables.food.foods).emoji)
                 .join('');
 
-            setTimeout(() => {
-                bot.api.postText({ text: messages.food.whiteDay(user.username, presents), visibility: 'specified', visibleUserIds: [user.id] });
-            }, whiteDayTime + 1000 * i);
+            setTimeout(
+                () => {
+                    bot.api.postText({ text: messages.food.whiteDay(user.username, presents), visibility: 'specified', visibleUserIds: [user.id] });
+                },
+                whiteDayTime + 1000 * i,
+            );
         }
     }
 }

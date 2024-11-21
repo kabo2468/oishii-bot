@@ -8,7 +8,7 @@ export default class extends Module {
     Regex = /\s*お?(寿司|すし)を?(握|にぎ)(って|れ)/;
     LogName = 'SUSH';
 
-    Run(bot: Bot, note: Note): void {
+    Run(_bot: Bot, note: Note): void {
         note.reaction();
 
         // 1 ~ 10
