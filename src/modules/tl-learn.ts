@@ -4,7 +4,7 @@ import { Note } from '../misskey/note.js';
 import Module from '../module.js';
 import { chooseOneFromArr } from '../utils/cofa.js';
 import { getNouns } from '../utils/get-nouns.js';
-import { TextProcess } from '../utils/text-process.js';
+import { replaceNewLineToText } from '../utils/replace-nl-to-text.js';
 
 export default class extends Module {
     Name = 'TL Learn';
@@ -13,7 +13,7 @@ export default class extends Module {
 
     async Run(bot: Bot, note: Note): Promise<void> {
         const text = note.text;
-        this.log(new TextProcess(text).replaceNewLineToText().toString());
+        this.log(replaceNewLineToText(text));
 
         const mfmNodes = parseMfm(text);
         const noMfmNodes = extractMfmNodes(mfmNodes, (n) => ['text', 'unicodeEmoji', 'emojiCode'].includes(n.type));
@@ -30,7 +30,7 @@ export default class extends Module {
         });
 
         const noMfmText = mfmNodesToString(noMfmNodes);
-        this.log('No MFM Text:', new TextProcess(noMfmText).replaceNewLineToText().toString());
+        this.log('No MFM Text:', replaceNewLineToText(noMfmText));
 
         const foods = [...(await getNouns(textStr, bot.config.mecab)), ...emojisArr];
         if (foods.length < 1) {

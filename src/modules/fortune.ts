@@ -3,7 +3,7 @@ import { Bot } from '../bot.js';
 import messages from '../messages.js';
 import { Note } from '../misskey/note.js';
 import Module from '../module.js';
-import { TextProcess } from '../utils/text-process.js';
+import { replaceNewLineToText } from '../utils/replace-nl-to-text.js';
 
 export default class extends Module {
     Name = 'Fortune';
@@ -25,7 +25,7 @@ export default class extends Module {
         const good = res.rows[0].good;
 
         const msg = messages.fortune.text(food, good, rnd);
-        this.log(new TextProcess(msg).replaceNewLineToText().toString());
+        this.log(replaceNewLineToText(msg));
         note.reply({ text: msg, cw: messages.fortune.cw });
     }
 }

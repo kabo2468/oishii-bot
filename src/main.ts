@@ -33,7 +33,7 @@ import TLLearnModule from './modules/tl-learn.js';
 import TLPizzaModule from './modules/tl-pizza.js';
 import TLReactionModule from './modules/tl-reaction.js';
 import ValentineModule from './modules/valentine.js';
-import { TextProcess } from './utils/text-process.js';
+import { replaceNewLineToText } from './utils/replace-nl-to-text.js';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -176,7 +176,7 @@ export default function (bot: Bot): void {
             if (!isNote(json.body.body)) return;
             const note = new Note(bot, json.body.body);
             note.removeURLs().removeMentionToMe();
-            bot.log('Text:', new TextProcess(note.text).replaceNewLineToText().toString());
+            bot.log('Text:', replaceNewLineToText(note.text));
 
             const mod = modules.find((module) => module.Regex.test(note.text));
             if (mod) {
