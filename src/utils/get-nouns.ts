@@ -7,7 +7,9 @@ export async function getNouns(text: string, mecabConfig: MecabType): Promise<st
     const nouns = tokens.filter((token) => token.pos === '名詞');
     if (nouns.length < 1) return [];
 
-    const expected = nouns.filter((noun) => !/^[A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]$|^[ぁぃぅぇぉゕゖっゃゅょゎァィゥェォヵヶッャュョヮ]/.test(noun.surface));
+    const expected = nouns.filter(
+        (noun) => !/^[A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]$|^[ぁぃぅぇぉゕゖっゃゅょゎァィゥェォヵヶッャュョヮ]/.test(noun.surface),
+    );
     if (expected.length < 1) return [];
 
     const output = expected.map((word) => word.surface);

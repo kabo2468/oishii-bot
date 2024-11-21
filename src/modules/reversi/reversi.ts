@@ -127,10 +127,8 @@ export interface ReversiMatch {
     endedAt: string | null;
     isStarted: boolean;
     isEnded: boolean;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    form1: any | null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    form2: any | null;
+    form1: Record<string, unknown> | null;
+    form2: Record<string, unknown> | null;
     user1Ready: boolean;
     user2Ready: boolean;
     user1Id: string;

@@ -9,7 +9,7 @@ export default class extends Module {
     Regex = /チョコ(レート)?を?(あげる|くれ|ちょうだい|頂戴|ください)/;
     LogName = 'VLNT';
 
-    Run(bot: Bot, note: Note): void {
+    Run(_bot: Bot, note: Note): void {
         note.reaction();
 
         const now = new Date();

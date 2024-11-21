@@ -8,7 +8,7 @@ export default class extends Module {
     Regex = new RegExp(/^[@＠](ピザ|ぴざ)$/);
     LogName = 'TLPZ';
 
-    Run(bot: Bot, note: Note): void {
+    Run(_bot: Bot, note: Note): void {
         this.log('Run');
         note.reaction();
         if (note.note.replyId !== null) return;

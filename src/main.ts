@@ -1,6 +1,6 @@
 import { Bot } from './bot.js';
 import { Streaming } from './misskey/api.js';
-import { isNote, Note } from './misskey/note.js';
+import { Note, isNote } from './misskey/note.js';
 import Module from './module.js';
 import CheckModule from './modules/check.js';
 import DeleteAllCommandModule from './modules/commands/delete-all.js';
@@ -33,7 +33,7 @@ import TLLearnModule from './modules/tl-learn.js';
 import TLPizzaModule from './modules/tl-pizza.js';
 import TLReactionModule from './modules/tl-reaction.js';
 import ValentineModule from './modules/valentine.js';
-import { TextProcess } from './utils/text-process.js';
+import { replaceNewLineToText } from './utils/replace-nl-to-text.js';
 
 const tlModules = {
     pizza: new TLPizzaModule(),
@@ -41,7 +41,7 @@ const tlModules = {
     reaction: new TLReactionModule(),
     call: new TLCallModule(),
 };
-// prettier-ignore
+
 const modules: Module[] = [
     new CheckModule(),
     new SearchModule(),
@@ -176,7 +176,7 @@ export default function (bot: Bot): void {
             if (!isNote(json.body.body)) return;
             const note = new Note(bot, json.body.body);
             note.removeURLs().removeMentionToMe();
-            bot.log('Text:', new TextProcess(note.text).replaceNewLineToText().toString());
+            bot.log('Text:', replaceNewLineToText(note.text));
 
             const mod = modules.find((module) => module.Regex.test(note.text));
             if (mod) {
@@ -195,7 +195,10 @@ export default function (bot: Bot): void {
                 Reversi(bot, json.body.body.user.id);
             }
             if (type === 'matched') {
-                const enemyUserId = json.body.body.game.user1Id === bot.config.userId ? json.body.body.game.user2Id : json.body.body.game.user1Id;
+                const enemyUserId =
+                    json.body.body.game.user1Id === bot.config.userId
+                        ? json.body.body.game.user2Id
+                        : json.body.body.game.user1Id;
                 Reversi(bot, enemyUserId);
             }
         }
