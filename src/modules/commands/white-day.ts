@@ -48,7 +48,11 @@ export default class extends Module {
 
             setTimeout(
                 () => {
-                    bot.api.postText({ text: messages.food.whiteDay(user.username, presents), visibility: 'specified', visibleUserIds: [user.id] });
+                    bot.api.postText({
+                        text: messages.food.whiteDay(user.username, presents),
+                        visibility: 'specified',
+                        visibleUserIds: [user.id],
+                    });
                 },
                 whiteDayTime + 1000 * i,
             );

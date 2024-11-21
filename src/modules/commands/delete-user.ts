@@ -25,7 +25,10 @@ export default class extends Module {
         const count = res.rows.length;
         if (count && count > 0) {
             const deletedFoods = res.rows.map((row) => row.name);
-            note.reply({ cw: messages.commands.delete.done(count), text: `\`\`\`\n${deletedFoods.join('\n')}\n\`\`\`` });
+            note.reply({
+                cw: messages.commands.delete.done(count),
+                text: `\`\`\`\n${deletedFoods.join('\n')}\n\`\`\``,
+            });
             this.log(`${count} food(s) deleted: ${deletedFoods.join(', ')}`);
         } else {
             note.reply({ text: messages.commands.notFound });

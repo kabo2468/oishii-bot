@@ -110,9 +110,12 @@ class Back {
             loopedBoard: this._game.loopedBoard,
         });
 
-        this._maxTurn = this._engine.map.filter((p) => p === 'empty').length - this._engine.board.filter((x) => x != null).length;
+        this._maxTurn =
+            this._engine.map.filter((p) => p === 'empty').length - this._engine.board.filter((x) => x != null).length;
 
-        this._botColor = (this._game.user1Id == this._config.userId && this._game.black == 1) || (this._game.user2Id == this._config.userId && this._game.black == 2);
+        this._botColor =
+            (this._game.user1Id == this._config.userId && this._game.black == 1) ||
+            (this._game.user2Id == this._config.userId && this._game.black == 2);
 
         this._corners = [];
         this._engine.map.forEach((pix, i) => {

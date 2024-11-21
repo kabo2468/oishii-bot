@@ -14,7 +14,9 @@ export default class extends Module {
 
         const text: string[] = [];
 
-        const res = await bot.runQuery<'count'>({ text: 'SELECT "learned", count("learned") FROM oishii_table GROUP BY "learned"' });
+        const res = await bot.runQuery<'count'>({
+            text: 'SELECT "learned", count("learned") FROM oishii_table GROUP BY "learned"',
+        });
 
         // Node Version
         text.push(`Node.js: ${process.version}`);

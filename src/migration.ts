@@ -15,7 +15,8 @@ loadConfig()
             await client.query('BEGIN');
 
             log('CREATE TABLE');
-            const createTableQuery = 'CREATE TABLE IF NOT EXISTS oishii_table ( "name" text PRIMARY KEY, "good" boolean DEFAULT true NOT NULL, "learned" boolean DEFAULT false NOT NULL )';
+            const createTableQuery =
+                'CREATE TABLE IF NOT EXISTS oishii_table ( "name" text PRIMARY KEY, "good" boolean DEFAULT true NOT NULL, "learned" boolean DEFAULT false NOT NULL )';
             await client.query(createTableQuery).then((res) => console.log(res));
 
             log('ADD UserId & NoteId');

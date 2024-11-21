@@ -18,7 +18,10 @@ export default class extends Module {
         const mfmNodes = parseMfm(text);
         const noMfmNodes = extractMfmNodes(mfmNodes, (n) => ['text', 'unicodeEmoji', 'emojiCode'].includes(n.type));
         const textNodes = extractMfmNodes(noMfmNodes, (node) => node.type === 'text');
-        const emojiNodes = extractMfmNodes(noMfmNodes, (node) => node.type === 'unicodeEmoji' || node.type === 'emojiCode');
+        const emojiNodes = extractMfmNodes(
+            noMfmNodes,
+            (node) => node.type === 'unicodeEmoji' || node.type === 'emojiCode',
+        );
 
         const textArr = textNodes.map((n) => (n.type === 'text' ? n.props.text.trim() : ''));
         const textStr = textArr.join('').trim();

@@ -69,7 +69,9 @@ export class Bot {
 
         setInterval(async () => {
             this.ws.reconnect();
-            const newFollow: string = await this.api.call<{ followingCount: string }>('i').then((res) => res.body.followingCount);
+            const newFollow: string = await this.api
+                .call<{ followingCount: string }>('i')
+                .then((res) => res.body.followingCount);
             this.config.followings = Number(newFollow);
             this.log('Followings:', newFollow);
         }, ms('1h'));
@@ -107,7 +109,9 @@ export class Bot {
         );
     }
 
-    async runQuery<T extends Keys = Keys>(query: { text: string; values?: (Row[Keys] | number)[] }): Promise<pg.QueryResult<Res<T>>> {
+    async runQuery<T extends Keys = Keys>(query: { text: string; values?: (Row[Keys] | number)[] }): Promise<
+        pg.QueryResult<Res<T>>
+    > {
         return this.db.query<Res<T>>(query).catch((err) => {
             console.error(err);
             process.exit(1);
@@ -150,7 +154,14 @@ export class Bot {
         return this.runQuery<'name'>(query);
     }
 
-    async updateFood(food: string, good: boolean, learned = true, userId: string, noteId: string, updateDate: Date): Promise<void> {
+    async updateFood(
+        food: string,
+        good: boolean,
+        learned = true,
+        userId: string,
+        noteId: string,
+        updateDate: Date,
+    ): Promise<void> {
         const query = {
             text: 'UPDATE oishii_table SET "good"=$1, "learned"=$3, "userId"=$4, "noteId"=$5, "updated"=$6 WHERE LOWER("name") = LOWER($2)',
             values: [good, food, learned, userId, noteId, updateDate],
@@ -166,7 +177,10 @@ export class Bot {
         return this.runQuery(query);
     }
 
-    async getRandomFood({ good, learned }: { good?: boolean; learned?: boolean } = {}): Promise<pg.QueryResult<Res<'name' | 'good'>>> {
+    async getRandomFood({
+        good,
+        learned,
+    }: { good?: boolean; learned?: boolean } = {}): Promise<pg.QueryResult<Res<'name' | 'good'>>> {
         const options = [];
         if (good !== undefined) options.push(`"good"=${good}`);
         if (learned !== undefined) options.push(`"learned"=${learned}`);
