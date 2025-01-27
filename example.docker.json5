@@ -1,0 +1,17 @@
+{
+    url: 'https://misskey.io',
+    apiKey: '',
+    databaseUrl: 'postgresql://postgres:PASSWORD@db:5432/postgres',
+    dbSSL: false,
+    ownerUsernames: ['kabo'],
+    post: {
+        autoPostInterval: 60,
+        tlPostProbability: 0.4,
+        rateLimitSec: 60,
+        rateLimitPost: 5,
+    },
+    mecab: {
+        binPath: '/usr/bin/mecab',
+        dicPath: '/usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd',
+    },
+}

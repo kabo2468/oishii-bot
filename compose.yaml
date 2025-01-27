@@ -1,5 +1,6 @@
 services:
   bot:
+    image: ghcr.io/kabo2468/oishii-bot
     build:
       context: .
     volumes:
