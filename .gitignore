@@ -2,8 +2,8 @@ node_modules
 .vscode
 test
 built
-config.json5
+config.*
 mecab
 valentine.json
-
 .idea/*
+*.secret

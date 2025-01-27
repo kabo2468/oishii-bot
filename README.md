@@ -8,6 +8,8 @@ TLから言葉を学び、それをおいしいかまずいか決めて、投稿
 
 ## 使い方
 
+Docker を使う場合は、[Docker](#docker) を参照してください。
+
 ### Misskey で @oishiibot を作る
 
 この ID じゃないと動きません
@@ -97,3 +99,15 @@ npm start
 Xeltica さんの Citrine から参考にさせていただきました。
 
 <https://github.com/Xeltica/Citrine/blob/master/Resources/ngwords.txt>
+
+## Docker
+
+Dockerを使う場合は、以下の手順で起動できます。
+
+1. `example.docker.json5` を `config.json5` にコピーして編集する (上記の [config.json5](#config.json) を参照)
+2. `db_password.secret.example` のように `db_password.secret` にDBのパスワードを書く
+3. `docker compose up -d` で起動する
+
+デフォルトでは、既にビルドされたイメージを使うようになっています。
+
+ローカルのソースコードを使いたい場合は、`compose.yaml`内の`services.bot.image`をコメントアウトしてください。

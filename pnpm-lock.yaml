@@ -11,6 +11,9 @@ importers:
       got:
         specifier: ^14.4.4
         version: 14.4.4
+      iconv-lite:
+        specifier: ^0.6.3
+        version: 0.6.3
       json5:
         specifier: ^2.2.3
         version: 2.2.3
@@ -67,9 +70,6 @@ importers:
       '@types/ws':
         specifier: ^8.5.13
         version: 8.5.13
-      iconv-lite:
-        specifier: ^0.6.3
-        version: 0.6.3
       tsx:
         specifier: ^4.19.2
         version: 4.19.2
