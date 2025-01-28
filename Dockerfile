@@ -46,7 +46,7 @@ WORKDIR /app
 
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/built /app/built
-COPY config.json5 ngwords.txt package.json /app/
+COPY ngwords.txt package.json /app/
 
 RUN chown -R node:node /app
 USER node
