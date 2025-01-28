@@ -1,5 +1,8 @@
 FROM node:22-slim AS base
 
+ARG GIT_SHA="unknown"
+ENV GIT_SHA=$GIT_SHA
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 

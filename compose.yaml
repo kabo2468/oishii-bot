@@ -3,6 +3,8 @@ services:
     image: ghcr.io/kabo2468/oishii-bot
     build:
       context: .
+      args:
+        - GIT_SHA=unknown
     volumes:
       - ./config.json5:/app/config.json5:ro
       - ./valentine.json:/app/valentine.json:rw

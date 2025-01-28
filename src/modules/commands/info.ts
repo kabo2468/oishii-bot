@@ -30,14 +30,22 @@ export default class extends Module {
         text.push(recordText);
 
         // Commit Hash
-        const rev = readFileSync('.git/HEAD').toString();
-        const branchHash = readFileSync('.git/' + rev.substring(5).trim())
-            .toString()
-            .trim();
-        const hash = rev.indexOf(':') === -1 ? rev : branchHash;
-        const hashText = `Commit hash: ${hash.substring(0, 7)}`;
-        this.log(hashText);
-        text.push(hashText);
+        if (process.env.GIT_SHA) {
+            this.log('from process.env.GIT_SHA');
+            const hashText = `Commit hash: ${process.env.GIT_SHA.substring(0, 7)}`;
+            this.log(hashText);
+            text.push(hashText);
+        } else {
+            this.log('from .git');
+            const rev = readFileSync('.git/HEAD').toString();
+            const branchHash = readFileSync('.git/' + rev.substring(5).trim())
+                .toString()
+                .trim();
+            const hash = rev.indexOf(':') === -1 ? rev : branchHash;
+            const hashText = `Commit hash: ${hash.substring(0, 7)}`;
+            this.log(hashText);
+            text.push(hashText);
+        }
 
         // uptime
         const uptime = process.uptime();

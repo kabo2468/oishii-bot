@@ -111,3 +111,5 @@ Dockerを使う場合は、以下の手順で起動できます。
 デフォルトでは、既にビルドされたイメージを使うようになっています。
 
 ローカルのソースコードを使いたい場合は、`compose.yaml`内の`services.bot.image`をコメントアウトしてください。
+
+ビルドするときは、`docker compose build --build-arg GIT_SHA=$(git rev-parse HEAD)` を実行してください。
