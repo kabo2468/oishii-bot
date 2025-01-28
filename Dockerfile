@@ -26,13 +26,6 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
     && pnpm run build
 
 FROM base
-ENV NODE_ENV=production
-WORKDIR /app
-
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/built /app/built
-COPY config.json5 ngwords.txt package.json /app/
-
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # hadolint ignore=DL3008
 RUN apt-get update \
@@ -47,6 +40,13 @@ RUN apt-get update \
     && apt-get purge -y --auto-remove git make curl ca-certificates xz-utils file patch openssl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/built /app/built
+COPY config.json5 ngwords.txt package.json /app/
 
 RUN chown -R node:node /app
 USER node
