@@ -206,8 +206,12 @@ export class Bot {
         const learned = Math.random() < 0.2;
         const res = await this.getRandomFood({ learned });
 
-        const food = res.rows[0].name;
-        const good = res.rows[0].good;
+        const food = res.rows[0]?.name;
+        const good = res.rows[0]?.good;
+        if (!food || good === undefined) {
+            this.log('sayFood: not found');
+            return;
+        }
         this.log(`sayFood: ${food} (${good})`);
 
         const text = messages.food.say(food, good);

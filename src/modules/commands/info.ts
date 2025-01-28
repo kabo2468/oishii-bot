@@ -22,8 +22,8 @@ export default class extends Module {
         text.push(`Node.js: ${process.version}`);
 
         // Records
-        const fl = Number(res.rows[0].count);
-        const tl = Number(res.rows[1].count);
+        const fl = Number(res.rows[0]?.count) || 0;
+        const tl = Number(res.rows[1]?.count) || 0;
         const all = fl + tl;
         const recordText = `Records: ${all} (Learned: ${tl})`;
         this.log(recordText);

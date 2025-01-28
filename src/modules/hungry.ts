@@ -15,8 +15,8 @@ export default class extends Module {
 
         const res = await bot.getRandomFood({ good: _g });
 
-        const food = res.rows[0].name;
-        const good = res.rows[0].good;
+        const food = res.rows[0]?.name;
+        const good = res.rows[0]?.good;
         if (!food || good === undefined) {
             note.reply({ text: messages.food.idk });
             return;
