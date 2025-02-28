@@ -6,7 +6,7 @@ ENV GIT_SHA=$GIT_SHA
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-RUN corepack enable
+RUN npm install -g corepack@latest && corepack enable
 
 FROM base AS init
 COPY . /app
