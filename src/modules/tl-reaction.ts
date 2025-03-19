@@ -1,3 +1,4 @@
+import { extract as extractMfmNodes, parse as parseMfm } from 'mfm-js';
 import { Bot } from '../bot.js';
 import { Note } from '../misskey/note.js';
 import Module from '../module.js';
@@ -19,7 +20,18 @@ export default class extends Module {
 
         const foods = variables.food.foods;
 
-        const nouns = await getNouns(note.text, bot.config.mecab);
+        const nodes = parseMfm(note.text);
+        const textAndEmojiNodes = extractMfmNodes(nodes, (n) => n.type === 'text' || n.type === 'unicodeEmoji');
+        const text = textAndEmojiNodes
+            .map((n) => {
+                if (n.type === 'text') return n.props.text.trim();
+                if (n.type === 'unicodeEmoji') return n.props.emoji;
+                return '';
+            })
+            .join('')
+            .trim();
+
+        const nouns = await getNouns(text, bot.config.mecab);
         const foundFood = foods.filter((food) => food.keywords.some((keyword) => nouns.includes(keyword)));
 
         if (foundFood.length === 0) return;
