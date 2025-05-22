@@ -16,6 +16,7 @@ export interface User {
     isBot: boolean;
     emojis: string[];
     instance?: Instance;
+    roles: Role[];
 }
 
 export interface Instance {
@@ -37,6 +38,11 @@ export interface File {
     url: string;
     folderId: string;
     isSensitive: boolean;
+}
+
+export interface Role {
+    id: string;
+    name: string;
 }
 
 export default class API {

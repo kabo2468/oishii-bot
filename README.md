@@ -91,6 +91,10 @@ npm start
         // mecabの辞書ファイル
         dicPath: '',
     },
+    denyRoleIds: [
+        // ここにロールIDを追加すると、そのロールを持っているユーザーの投稿は無視される
+        'abcdefghij0123',
+    ],
 }
 ```
 

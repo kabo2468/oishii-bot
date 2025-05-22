@@ -14,4 +14,5 @@
         binPath: '/usr/bin/mecab',
         dicPath: '/usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd',
     },
+    denyRoleIds: [],
 }
