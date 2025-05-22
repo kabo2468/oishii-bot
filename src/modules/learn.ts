@@ -12,6 +12,12 @@ export default class extends Module {
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
 
+        const roles = note.note.user.roles;
+        if (bot.config.denyRoleIds.some((id) => roles.some((role) => role.id === id))) {
+            this.log('DENY:', roles.map((role) => role.name).join(', '));
+            return;
+        }
+
         if (note.note.visibility === 'specified') {
             this.log('SKIP(SPECIFIED):', note.note.id);
             return;

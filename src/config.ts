@@ -25,6 +25,7 @@ type JsonConfig = {
     ownerUsernames: string[];
     post: Post;
     mecab: MecabType;
+    denyRoleIds: string[];
 };
 
 export type Config = {
@@ -39,6 +40,7 @@ export type Config = {
     post: Post;
     followings: number;
     mecab: MecabType;
+    denyRoleIds: string[];
 };
 
 export default async function loadConfig(): Promise<Config> {
@@ -64,6 +66,7 @@ export default async function loadConfig(): Promise<Config> {
         mecab: {
             binPath: '',
         },
+        denyRoleIds: [],
     };
     for (const key of Object.keys(keys)) {
         const _v = jsonConfig[key];
@@ -125,5 +128,6 @@ export default async function loadConfig(): Promise<Config> {
         post: config.post,
         followings: Number(follows),
         mecab: config.mecab,
+        denyRoleIds: config.denyRoleIds,
     };
 }
