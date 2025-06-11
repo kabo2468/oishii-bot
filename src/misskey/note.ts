@@ -1,7 +1,7 @@
 import { MfmNode, extract, toString as mfmToString, parse } from 'mfm-js';
 import { Bot } from '../bot.js';
 import NGWord from '../ng-words.js';
-import { User } from './api.js';
+import { UserLite } from './api.js';
 
 export interface Reactions {
     [key: string]: number;
@@ -13,7 +13,7 @@ export interface CreatedNote {
     id: string;
     createdAt: Date;
     userId: string;
-    user: User;
+    user: UserLite;
     text?: string;
     cw: string | null;
     visibility: Visibilities;

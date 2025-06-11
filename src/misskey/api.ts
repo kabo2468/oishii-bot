@@ -5,17 +5,18 @@ import { ReversiMatch } from '../modules/reversi/reversi.js';
 import { botVersion } from '../utils/version.js';
 import { CreatedNote, Note } from './note.js';
 
-export interface User {
+export interface UserLite {
     id: string;
     name: string;
     username: string;
     host?: string;
-    avatarUrl: string;
-    avatarColor: string;
-    isCat: boolean;
-    isBot: boolean;
+    isCat?: boolean;
+    isBot?: boolean;
     emojis: string[];
     instance?: Instance;
+}
+
+export interface User extends UserLite {
     roles: Role[];
 }
 
@@ -122,11 +123,11 @@ export interface Streaming {
           }
         | {
               type: 'followed';
-              body: User;
+              body: UserLite;
           }
         | {
               type: 'invited';
-              body: { user: User };
+              body: { user: UserLite };
           }
         | {
               type: 'matched';

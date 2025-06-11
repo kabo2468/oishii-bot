@@ -1,5 +1,6 @@
 import { Bot } from '../bot.js';
 import messages from '../messages.js';
+import { User } from '../misskey/api.js';
 import { Note } from '../misskey/note.js';
 import Module from '../module.js';
 import variables from '../variables.js';
@@ -12,7 +13,9 @@ export default class extends Module {
     async Run(bot: Bot, note: Note): Promise<void> {
         note.reaction();
 
-        const roles = note.note.user.roles;
+        const user = await bot.api.call<User>('users/show', { userId: note.note.userId }).then((res) => res.body);
+
+        const roles = user.roles || [];
         if (bot.config.denyRoleIds.some((id) => roles.some((role) => role.id === id))) {
             this.log('DENY:', roles.map((role) => role.name).join(', '));
             return;
