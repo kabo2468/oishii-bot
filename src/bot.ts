@@ -5,7 +5,7 @@ import pg from 'pg';
 import ws from 'ws';
 import { Config } from './config.js';
 import messages from './messages.js';
-import API, { User } from './misskey/api.js';
+import API, { UserLite } from './misskey/api.js';
 import NGWord from './ng-words.js';
 
 export interface Row {
@@ -30,7 +30,7 @@ export class Bot {
     private db: pg.Pool;
     private rateLimit = 0;
     public api: API;
-    public account!: User;
+    public account!: UserLite;
     public encodeMode = false;
 
     constructor(config: Config, ngWords: NGWord) {
@@ -78,7 +78,7 @@ export class Bot {
     }
 
     private async getAccount() {
-        this.account = await this.api.call<User>('i').then((res) => res.body);
+        this.account = await this.api.call<UserLite>('i').then((res) => res.body);
     }
 
     log(text?: string, ...arg: unknown[]): void {

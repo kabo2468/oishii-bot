@@ -1,7 +1,7 @@
 import got from 'got';
 import { Config } from '../../config.js';
 import messages from '../../messages.js';
-import { User } from '../../misskey/api.js';
+import { UserLite } from '../../misskey/api.js';
 import { CreatedNote } from '../../misskey/note.js';
 import { chooseOneFromArr } from '../../utils/cofa.js';
 import { botVersion } from '../../utils/version.js';
@@ -51,7 +51,7 @@ class Back {
     private _config!: Config;
     private _engine!: Game;
     private _botColor!: Color;
-    private _inviter!: User;
+    private _inviter!: UserLite;
     private _startedNote?: CreatedNote;
     private _maxTurn!: number;
     private _currentTurn = 0;

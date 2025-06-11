@@ -2,7 +2,7 @@ import { fork } from 'child_process';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { Bot } from '../../bot.js';
-import { User } from '../../misskey/api.js';
+import { UserLite } from '../../misskey/api.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -133,10 +133,10 @@ export interface ReversiMatch {
     user2Ready: boolean;
     user1Id: string;
     user2Id: string;
-    user1: User;
-    user2: User;
+    user1: UserLite;
+    user2: UserLite;
     winnerId: string | null;
-    winner: User | null;
+    winner: UserLite | null;
     surrenderedUserId: string | null;
     timeoutUserId: string | null;
     black: 1 | 2;
