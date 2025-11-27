@@ -20,6 +20,7 @@ type JsonConfig = {
     [key: string]: string | string[] | boolean | number | Post | MecabType | pg.ClientConfig['ssl'];
     url: string;
     apiKey: string;
+    apiUrl: string;
     databaseUrl: string;
     dbSSL: pg.ClientConfig['ssl'];
     ownerUsernames: string[];
@@ -53,6 +54,7 @@ export default async function loadConfig(): Promise<Config> {
     const errors: string[] = [];
     const keys: JsonConfig = {
         apiKey: '',
+        apiUrl: '',
         databaseUrl: '',
         dbSSL: false,
         ownerUsernames: [''],
@@ -94,7 +96,7 @@ export default async function loadConfig(): Promise<Config> {
     const url = jsonConfig.url.endsWith('/') ? jsonConfig.url.slice(0, -1) : jsonConfig.url;
 
     const wsUrl = url.replace('http', 'ws');
-    const apiUrl = url + '/api';
+    const apiUrl = jsonConfig.apiUrl.endsWith('/') ? jsonConfig.apiUrl.slice(0, -1) : jsonConfig.apiUrl;
 
     const api = async (endpoint: string, data: Record<string, unknown>): Promise<Record<string, string>> => {
         return await got

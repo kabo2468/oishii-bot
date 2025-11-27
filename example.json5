@@ -1,6 +1,7 @@
 {
     url: 'https://misskey.io',
     apiKey: '',
+    apiUrl: 'https://misskey.io/api',
     databaseUrl: 'postgresql://USER:PASSWORD@HOST:PORT/DATABASE',
     dbSSL: false,
     ownerUsernames: ['kabo'],
