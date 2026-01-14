@@ -1,7 +1,7 @@
 # ============================================
 # Base stage: Node.js with pnpm enabled
 # ============================================
-FROM node:22-slim AS base
+FROM node:24-slim AS base
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -65,7 +65,7 @@ RUN apt-get update \
 # ============================================
 # Final stage: Minimal production image
 # ============================================
-FROM node:22-slim AS runner
+FROM node:24-slim AS runner
 
 ARG GIT_SHA="unknown"
 ENV GIT_SHA=$GIT_SHA
