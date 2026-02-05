@@ -20,6 +20,7 @@ export default {
             '/delall: その文字列が含まれているものを削除する。（オーナーのみ）',
             // '/chart: DBのレコード数をチャートにする。（オーナーのみ）',
             '/ng (a|b): NGワードを追加/削除する。（オーナーのみ）',
+            '/ng reload: NGワードを再読み込みする。（オーナーのみ）',
             '/setwhite: ホワイトデーの設定をする。（オーナーのみ）',
             '/get: DBから食べ物を取得する。（オーナーのみ）',
             '/getuser (userId) (p): 該当ユーザーが登録したものを見る（オーナーのみ）',
@@ -43,6 +44,10 @@ export default {
         ngWord: {
             add: (ng: boolean, ex: boolean): string => `追加しました。(NG: ${ng}, Exclude: ${ex})`,
             remove: (ng: boolean, ex: boolean): string => `削除しました。(NG: ${ng}, Exclude: ${ex})`,
+            reload: {
+                success: 'NGワードを再読み込みしました。',
+                error: 'NGワードの再読み込みに失敗しました。',
+            },
         },
         encode: (status: boolean): string => `EncodeMode を${status ? 'オン' : 'オフ'}にしました。`,
         get: {

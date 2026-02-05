@@ -27,6 +27,7 @@ type JsonConfig = {
     post: Post;
     mecab: MecabType;
     denyRoleIds: string[];
+    ngWordSources?: string[];
 };
 
 export type Config = {
@@ -42,6 +43,7 @@ export type Config = {
     followings: number;
     mecab: MecabType;
     denyRoleIds: string[];
+    ngWordSources?: string[];
 };
 
 export default async function loadConfig(): Promise<Config> {
@@ -131,5 +133,6 @@ export default async function loadConfig(): Promise<Config> {
         followings: Number(follows),
         mecab: config.mecab,
         denyRoleIds: config.denyRoleIds,
+        ngWordSources: config.ngWordSources,
     };
 }

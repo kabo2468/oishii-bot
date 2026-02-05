@@ -5,7 +5,7 @@ import Module from '../../module.js';
 
 export default class extends Module {
     Name = 'NG Word';
-    Regex = /^\/ng ([ar]) (.+)$/i;
+    Regex = /^\/ng\s+((?:a|r)\s+.+|reload)$/i;
     LogName = 'NGWD';
 
     async Run(bot: Bot, note: Note): Promise<void> {
@@ -16,10 +16,24 @@ export default class extends Module {
             return;
         }
 
-        const match = RegExp(this.Regex).exec(note.text);
+        const text = note.text.trim();
+        
+        // Check for reload command
+        if (/^\/ng\s+reload$/i.test(text)) {
+            try {
+                await bot.ngWords.reload();
+                note.reply({ text: messages.commands.ngWord.reload.success });
+            } catch (error) {
+                console.error('[NGWord Reload] Error:', error);
+                note.reply({ text: messages.commands.ngWord.reload.error });
+            }
+            return;
+        }
+
+        const match = /^\/ng\s+([ar])\s+(.+)$/i.exec(text);
         if (!match) return;
 
-        const add = match[1] === 'a';
+        const add = match[1].toLowerCase() === 'a';
         const word = match[2];
 
         if (add) {

@@ -1,27 +1,97 @@
 import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import type { Config } from './config.js';
 import { toHalfWidth } from './utils/to-half-width.js';
 import toHiragana from './utils/to-hiragana.js';
 
 export default class NGWord {
     private excludedWords: string[] = [];
     private ngWords: string[] = [];
+    private config?: Config;
 
-    constructor() {
-        console.log('NGWords Initializing...');
-        const file = readFileSync('ngwords.txt', { encoding: 'utf-8' });
-        const lines = file.split('\n');
-        for (const line of lines) {
-            const word = toHiragana(line.trim().toLowerCase());
-            if (word.startsWith('#')) continue;
-            if (word.startsWith('-')) {
-                if (/な/g.test(word)) this.excludedWords.push(word.substring(1).replace(/な/g, 'にゃ'));
-                this.excludedWords.push(word.substring(1));
+    constructor(config?: Config) {
+        this.config = config;
+        this.reload();
+    }
+
+    private parseLine(line: string): void {
+        const word = toHiragana(line.trim().toLowerCase());
+        if (!word || word.startsWith('#')) return;
+
+        if (word.startsWith('-')) {
+            const excludedWord = word.substring(1);
+            if (/な/g.test(excludedWord)) this.excludedWords.push(excludedWord.replace(/な/g, 'にゃ'));
+            this.excludedWords.push(excludedWord);
+        } else {
+            if (/な/g.test(word)) this.ngWords.push(word.replace(/な/g, 'にゃ'));
+            this.ngWords.push(word);
+        }
+    }
+
+    private async loadFromSource(source: string): Promise<void> {
+        try {
+            let content: string;
+
+            if (source.startsWith('http://') || source.startsWith('https://')) {
+                console.log(`[NGWords] Loading from URL: ${source}`);
+                const response = await fetch(source);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                content = await response.text();
             } else {
-                if (/な/g.test(word)) this.ngWords.push(word.replace(/な/g, 'にゃ'));
-                this.ngWords.push(word);
+                console.log(`[NGWords] Loading from file: ${source}`);
+                const filePath = resolve(source);
+                content = readFileSync(filePath, { encoding: 'utf-8' });
+            }
+
+            const lines = content.split('\n');
+            for (const line of lines) {
+                this.parseLine(line);
+            }
+            console.log(`[NGWords] Successfully loaded from: ${source}`);
+        } catch (error) {
+            console.error(`[NGWords] Failed to load from ${source}:`, error instanceof Error ? error.message : error);
+        }
+    }
+
+    async reload(): Promise<void> {
+        console.log('[NGWords] Initializing...');
+
+        // Clear existing words
+        this.excludedWords = [];
+        this.ngWords = [];
+
+        // Load default ngwords.txt
+        try {
+            const file = readFileSync('ngwords.txt', { encoding: 'utf-8' });
+            const lines = file.split('\n');
+            for (const line of lines) {
+                this.parseLine(line);
+            }
+            console.log('[NGWords] Default ngwords.txt loaded');
+        } catch (error) {
+            console.error(
+                '[NGWords] Failed to load default ngwords.txt:',
+                error instanceof Error ? error.message : error,
+            );
+        }
+
+        // Load additional sources from config
+        if (this.config?.ngWordSources && this.config.ngWordSources.length > 0) {
+            for (const source of this.config.ngWordSources) {
+                await this.loadFromSource(source);
             }
         }
-        console.log('NGWords initialized.', { ngWords: this.ngWords.length, excludedWords: this.excludedWords.length });
+
+        // Remove duplicates
+        this.ngWords = [...new Set(this.ngWords)];
+        this.excludedWords = [...new Set(this.excludedWords)];
+
+        console.log('[NGWords] Initialized.', {
+            ngWords: this.ngWords.length,
+            excludedWords: this.excludedWords.length,
+        });
     }
 
     find(str: string): string | undefined {
