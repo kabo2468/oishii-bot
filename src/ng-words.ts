@@ -97,7 +97,7 @@ export default class NGWord {
     find(str: string): string | undefined {
         const text = toHiragana(toHalfWidth(str)).toLowerCase();
         // NGワード避けする文字を消す
-        const removed = text.replaceAll(/[\s!#$%&*,-.=`+()'"/?\\^_|~:;、。ー×○●]/g, '').trim();
+        const removed = text.replaceAll(/[\s!#$%&*,-.=`+()'"/?\\^_|~:;、。×○●]/g, '').trim();
         const excluded = this.excludeAllowedWord(removed);
         return this.ngWords.find((ng) => excluded.indexOf(ng) !== -1);
     }
