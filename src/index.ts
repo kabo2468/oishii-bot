@@ -6,8 +6,9 @@ import NGWord from './ng-words.js';
 process.on('unhandledRejection', console.dir);
 
 loadConfig()
-    .then((config) => {
-        const _m = new Bot(config, new NGWord(config));
+    .then(async (config) => {
+        const ngWords = await NGWord.create(config);
+        const _m = new Bot(config, ngWords);
         main(_m);
     })
     .catch((err) => {

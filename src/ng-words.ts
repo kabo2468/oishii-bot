@@ -11,7 +11,12 @@ export default class NGWord {
 
     constructor(config?: Config) {
         this.config = config;
-        this.reload();
+    }
+
+    static async create(config?: Config): Promise<NGWord> {
+        const instance = new NGWord(config);
+        await instance.reload();
+        return instance;
     }
 
     private parseLine(line: string): void {
