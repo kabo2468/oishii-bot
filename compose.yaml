@@ -14,13 +14,13 @@ services:
     restart: always
 
   db:
-    image: postgres:alpine
+    image: postgres:18-alpine
     restart: always
     user: postgres
     secrets:
       - db-password
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
