@@ -1,15 +1,15 @@
-import { Bot } from '../bot.js';
+import type { Bot } from '../bot.js';
 import messages from '../messages.js';
-import { Note } from '../misskey/note.js';
+import type { Note } from '../misskey/note.js';
 import Module from '../module.js';
 
 export default class extends Module {
-    Name = 'Nullpo';
-    Regex = /ぬるぽ|ヌルポ|nullpo/i;
-    LogName = 'NLPO';
+  Name = 'Nullpo';
+  Regex = /ぬるぽ|ヌルポ|nullpo/i;
+  LogName = 'NLPO';
 
-    Run(_bot: Bot, note: Note): void {
-        note.reaction();
-        note.reply({ text: messages.commands.nullpo });
-    }
+  Run(_bot: Bot, note: Note): void {
+    note.reaction();
+    note.reply({ text: messages.commands.nullpo });
+  }
 }
