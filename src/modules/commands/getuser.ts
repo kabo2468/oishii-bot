@@ -22,16 +22,11 @@ export default class extends Module {
     const page = match[2] ? Number(match[2].trim()) - 1 : 0;
     this.log(`userId: ${userId}, Page: ${page + 1}`);
 
-    const count = (
-      await bot.runQuery<'count'>({
-        text: 'SELECT count("name") FROM oishii_table WHERE "userId" = $1 AND "learned" = TRUE',
-        values: [userId],
-      })
-    ).rows[0].count;
-    const pageText = `Pages: ${page + 1} / ${Math.ceil(Number(count) / 10)}`;
-    const res = await bot.getUserFoods(userId, page);
-    if (res.rows.length > 0) {
-      const text = res.rows
+    const count = await bot.getUserFoodCount(userId);
+    const pageText = `Pages: ${page + 1} / ${Math.ceil(count / 10)}`;
+    const rows = await bot.getUserFoods(userId, page);
+    if (rows.length > 0) {
+      const text = rows
         .map(
           (row) =>
             `${row.name}: ${row.good ? messages.food.good : messages.food.bad}`,

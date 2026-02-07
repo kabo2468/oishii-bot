@@ -21,10 +21,10 @@ export default class extends Module {
     const user = match[1].trim();
     const learnedOnly = match[2].trim() === 'true';
 
-    const res = await bot.removeFoodFromUserId(user, learnedOnly);
-    const count = res.rows.length;
+    const rows = await bot.removeFoodFromUserId(user, learnedOnly);
+    const count = rows.length;
     if (count && count > 0) {
-      const deletedFoods = res.rows.map((row) => row.name);
+      const deletedFoods = rows.map((row) => row.name);
       note.reply({
         cw: messages.commands.delete.done(count),
         text: `\`\`\`\n${deletedFoods.join('\n')}\n\`\`\``,

@@ -20,13 +20,12 @@ export default class extends Module {
     const good = new RegExp(variables.food.good).test(match[3]);
     const learned = !!match[1];
 
-    const res = await bot.getRandomFood({ good, learned });
-    const food = res.rows[0].name;
-    if (!food) {
+    const row = await bot.getRandomFood({ good, learned });
+    if (!row) {
       note.reply({ text: messages.food.idk });
       return;
     }
-    this.log(`${food} (${good})`);
-    note.reply({ text: messages.food.search(food, good) });
+    this.log(`${row.name} (${good})`);
+    note.reply({ text: messages.food.search(row.name, good) });
   }
 }

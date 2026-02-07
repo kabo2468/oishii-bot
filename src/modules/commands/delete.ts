@@ -20,9 +20,9 @@ export default class extends Module {
     if (!match) return;
     const food = match[2].trim();
 
-    const res = await bot.removeFood(food, false);
-    if (res.rows.length > 0) {
-      note.reply({ text: messages.commands.delete.done(res.rows.length) });
+    const rows = await bot.removeFood(food, false);
+    if (rows.length > 0) {
+      note.reply({ text: messages.commands.delete.done(rows.length) });
       this.log(food);
     } else {
       note.reply({ text: messages.commands.notFound });

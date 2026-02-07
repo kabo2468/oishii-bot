@@ -14,16 +14,17 @@ export default class extends Module {
 
     const text: string[] = [];
 
-    const res = await bot.runQuery<'count'>({
-      text: 'SELECT "learned", count("learned") FROM oishii_table GROUP BY "learned"',
-    });
+    const learnedCounts = await bot.getLearnedCounts();
 
     // Node Version
     text.push(`Node.js: ${process.version}`);
 
     // Records
-    const fl = Number(res.rows[0]?.count) || 0;
-    const tl = Number(res.rows[1]?.count) || 0;
+    const learnedMap = new Map(
+      learnedCounts.map((row) => [row.learned, row.count]),
+    );
+    const fl = learnedMap.get(false) ?? 0;
+    const tl = learnedMap.get(true) ?? 0;
     const all = fl + tl;
     const recordText = `Records: ${all} (Learned: ${tl})`;
     this.log(recordText);

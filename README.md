@@ -48,11 +48,9 @@ npm i
 npm run build
 ```
 
-### Table を作る
+### マイグレーション
 
-```shell
-npm run migration
-```
+起動時に自動実行されます。
 
 ### 終わり
 

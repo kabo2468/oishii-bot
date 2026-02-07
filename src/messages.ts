@@ -1,4 +1,4 @@
-import type { Row } from './bot.js';
+import type { OishiiRow } from './types/database.js';
 import { chooseOneFromArr } from './utils/cofa.js';
 
 const goodText = 'おいしい';
@@ -54,7 +54,7 @@ export default {
     encode: (status: boolean): string =>
       `EncodeMode を${status ? 'オン' : 'オフ'}にしました。`,
     get: {
-      found: (row: Partial<Row>): string => {
+      found: (row: Partial<OishiiRow>): string => {
         const map = {
           name: row.name,
           good: row.good,

@@ -20,10 +20,10 @@ export default class extends Module {
     if (!match) return;
     const food = match[1].trim();
 
-    const res = await bot.removeFood(food, true);
-    const count = res.rows.length;
+    const rows = await bot.removeFood(food, true);
+    const count = rows.length;
     if (count > 0) {
-      const deletedFoods = res.rows.map((row) => row.name);
+      const deletedFoods = rows.map((row) => row.name);
       note.reply({
         cw: messages.commands.delete.done(count),
         text: `\`\`\`\n${deletedFoods.join('\n')}\n\`\`\``,

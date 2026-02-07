@@ -27,14 +27,8 @@ export default class extends Module {
       return;
     }
 
-    const query = {
-      text: 'SELECT "good" FROM oishii_table WHERE LOWER("name") = LOWER($1)',
-      values: [food],
-    };
-    const res = await bot.runQuery<'good'>(query);
-    if (!res) return;
-
-    if (res.rows.length < 1) {
+    const row = await bot.getFood(food);
+    if (!row) {
       const noun = await this.isNoun(food, bot.config.mecab);
       if (noun) {
         note.reply({ text: messages.food.idk });
@@ -44,7 +38,7 @@ export default class extends Module {
       return;
     }
 
-    const isGood = res.rows[0].good;
+    const isGood = row.good;
     const goodText = isGood ? messages.food.good : messages.food.bad;
     note.reply({ text: goodText });
   }

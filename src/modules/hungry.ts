@@ -13,16 +13,13 @@ export default class extends Module {
 
     const _g = Math.random() < 0.4;
 
-    const res = await bot.getRandomFood({ good: _g });
-
-    const food = res.rows[0]?.name;
-    const good = res.rows[0]?.good;
-    if (!food || good === undefined) {
+    const row = await bot.getRandomFood({ good: _g });
+    if (!row) {
       note.reply({ text: messages.food.idk });
       return;
     }
-    this.log(`Food: ${food} (${good})`);
+    this.log(`Food: ${row.name} (${row.good})`);
 
-    note.reply({ text: messages.food.hungry(food, good) });
+    note.reply({ text: messages.food.hungry(row.name, row.good) });
   }
 }
