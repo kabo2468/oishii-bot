@@ -24,6 +24,7 @@ export function createDatabase(config: Config): Kysely<Database> {
         ssl: config.dbSSL,
       }),
     }),
+    log: ['query', 'error'],
   });
 }
 

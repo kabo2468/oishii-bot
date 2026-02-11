@@ -21,7 +21,7 @@ export default class extends Module {
 
     // Records
     const learnedMap = new Map(
-      learnedCounts.map((row) => [row.learned, row.count]),
+      learnedCounts.map((row) => [row.isUserTaught, row.count]),
     );
     const fl = learnedMap.get(false) ?? 0;
     const tl = learnedMap.get(true) ?? 0;

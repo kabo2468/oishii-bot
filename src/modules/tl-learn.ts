@@ -61,7 +61,13 @@ export default class extends Module {
       this.log(food, 'is skipped.');
     } else {
       const good = Math.random() < 0.8;
-      bot.addFood(food, good, false, note.note.userId, note.note.id);
+      await bot.addFood({
+        food,
+        good,
+        isUserTaught: false,
+        userId: note.note.userId,
+        noteId: note.note.id,
+      });
       this.log('INSERT:', `${food} (${good})`);
     }
   }

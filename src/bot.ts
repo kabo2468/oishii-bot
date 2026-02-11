@@ -7,10 +7,10 @@ import type { Config } from './config.js';
 import messages from './messages.js';
 import API, { type UserLite } from './misskey/api.js';
 import type NGWord from './ng-words.js';
-import type { Database, OishiiRow } from './types/database.js';
+import type { Database, FoodRow as FoodRecord } from './types/database.js';
 
-type FoodRow = Pick<OishiiRow, 'name' | 'good'>;
-type FoodNameRow = Pick<OishiiRow, 'name'>;
+type FoodRow = Pick<FoodRecord, 'name' | 'good'>;
+type FoodNameRow = Pick<FoodRecord, 'name'>;
 
 export class Bot {
   public config: Config;
@@ -102,103 +102,123 @@ export class Bot {
   }
 
   async existsFood(text: string): Promise<boolean> {
-    const row = await this.db
-      .selectFrom('oishii_table')
-      .select('name')
-      .where(sql`lower("name")`, '=', text.toLowerCase())
-      .limit(1)
-      .executeTakeFirst();
-    return !!row;
+    const { exists } = await this.db
+      .selectNoFrom(({ exists, selectFrom, lit }) =>
+        exists(
+          selectFrom('food')
+            .select(lit(1).as('_'))
+            .where(sql<string>`lower("name")`, '=', text.toLowerCase()),
+        ).as('exists'),
+      )
+      .executeTakeFirstOrThrow();
+    return !!exists;
   }
 
-  async addFood(
-    food: string,
-    good: boolean,
-    learned = false,
-    userId: string,
-    noteId: string,
-  ): Promise<void> {
+  async addFood({
+    food,
+    good,
+    isUserTaught,
+    userId,
+    noteId,
+  }: {
+    food: string;
+    good: boolean;
+    isUserTaught: boolean;
+    userId: string;
+    noteId: string;
+  }): Promise<void> {
     await this.db
-      .insertInto('oishii_table')
+      .insertInto('food')
       .values({
         name: food,
         good,
-        learned,
-        userId,
-        noteId,
+        is_user_taught: isUserTaught,
+        user_id: userId,
+        note_id: noteId,
       })
       .execute();
   }
 
   async removeFood(food: string, many: boolean): Promise<FoodNameRow[]> {
-    const query = this.db.deleteFrom('oishii_table');
+    const query = this.db.deleteFrom('food').returning('name');
     const rows = many
-      ? await query.where('name', 'ilike', food).returning('name').execute()
+      ? await query.where('name', 'ilike', food).execute()
       : await query
           .where(sql`lower("name")`, '=', food.toLowerCase())
-          .returning('name')
           .execute();
-
     return rows;
   }
 
   async removeFoodFromUserId(
     userId: string,
-    learnedOnly: boolean,
+    isUserTaughtOnly: boolean,
   ): Promise<FoodNameRow[]> {
-    let query = this.db.deleteFrom('oishii_table').where('userId', '=', userId);
-    if (learnedOnly) {
-      query = query.where('learned', '=', true);
+    let query = this.db
+      .deleteFrom('food')
+      .returning('name')
+      .where('user_id', '=', userId);
+    if (isUserTaughtOnly) {
+      query = query.where('is_user_taught', '=', true);
     }
-    return await query.returning('name').execute();
+    return await query.execute();
   }
 
-  async updateFood(
-    food: string,
-    good: boolean,
-    learned = true,
-    userId: string,
-    noteId: string,
-    updateDate: Date,
-  ): Promise<void> {
-    await this.db
-      .updateTable('oishii_table')
-      .set({
-        good,
-        learned,
-        userId,
-        noteId,
-        updated: updateDate,
-      })
-      .where(sql`lower("name")`, '=', food.toLowerCase())
-      .execute();
-  }
-
-  async getFood(name: string): Promise<OishiiRow | undefined> {
+  async getFood(name: string): Promise<FoodRecord | undefined> {
     return await this.db
-      .selectFrom('oishii_table')
+      .selectFrom('food')
       .selectAll()
       .where(sql`lower("name")`, '=', name.toLowerCase())
+      .orderBy('created_at', 'desc')
+      .limit(1)
       .executeTakeFirst();
   }
 
   async getRandomFood({
     good,
-    learned,
+    isUserTaught,
   }: {
     good?: boolean;
-    learned?: boolean;
+    isUserTaught?: boolean;
   } = {}): Promise<FoodRow | undefined> {
-    let query = this.db.selectFrom('oishii_table').select(['name', 'good']);
-    if (good !== undefined) query = query.where('good', '=', good);
-    if (learned !== undefined) query = query.where('learned', '=', learned);
+    const filters = [];
+    if (good !== undefined) filters.push(sql`good = ${good}`);
+    if (isUserTaught !== undefined)
+      filters.push(sql`is_user_taught = ${isUserTaught}`);
 
-    const row = await query.orderBy(sql`random()`).limit(1).executeTakeFirst();
+    const offsetWhere = filters.length
+      ? sql`WHERE ${sql.join(filters, sql` AND `)}`
+      : sql``;
+
+    let query = this.db
+      .with('records', (q) =>
+        q
+          .selectFrom('food')
+          .distinctOn('name')
+          .select(['name', 'good', 'is_user_taught'])
+          .orderBy('name')
+          .orderBy('created_at', 'desc'),
+      )
+      .selectFrom('records')
+      .select(['name', 'good'])
+      .limit(1)
+      .offset(
+        sql`floor(random() * (SELECT count(*) FROM records ${offsetWhere}))`,
+      );
+
+    if (good !== undefined) {
+      query = query.where('good', '=', good);
+    }
+    if (isUserTaught !== undefined) {
+      query = query.where('is_user_taught', '=', isUserTaught);
+    }
+
+    const row = await query.executeTakeFirst();
     if (!row) return undefined;
 
     const name = this.encodeMode
       ? iconv.decode(Buffer.from(row.name), 'Shift_JIS')
       : row.name;
+
     return {
       name,
       good: row.good,
@@ -208,8 +228,8 @@ export class Bot {
   async sayFood(): Promise<void> {
     if (this.rateLimit > this.config.post.rateLimitPost) return;
 
-    const learned = Math.random() < 0.2;
-    const row = await this.getRandomFood({ learned });
+    const isUserTaught = Math.random() < 0.2;
+    const row = await this.getRandomFood({ isUserTaught });
     if (!row) {
       this.log('sayFood: not found');
       return;
@@ -225,39 +245,41 @@ export class Bot {
   }
 
   async getUserFoods(userId: string, page?: number): Promise<FoodRow[]> {
-    const offset = Math.max(0, page ?? 0) * 10;
+    const RECORD_PER_PAGE = 10;
+    const offset = Math.max(0, page ?? 0) * RECORD_PER_PAGE;
     return await this.db
-      .selectFrom('oishii_table')
+      .selectFrom('food')
       .select(['name', 'good'])
-      .where('userId', '=', userId)
-      .where('learned', '=', true)
-      .orderBy('updated', 'desc')
-      .limit(10)
+      .where('user_id', '=', userId)
+      .where('is_user_taught', '=', true)
+      .orderBy('created_at', 'desc')
+      .orderBy('name')
+      .limit(RECORD_PER_PAGE)
       .offset(offset)
       .execute();
   }
 
   async getUserFoodCount(userId: string): Promise<number> {
     const row = await this.db
-      .selectFrom('oishii_table')
-      .select((eb) => eb.fn.count('name').as('count'))
-      .where('userId', '=', userId)
-      .where('learned', '=', true)
+      .selectFrom('food')
+      .select((eb) => eb.fn.countAll().as('count'))
+      .where('user_id', '=', userId)
+      .where('is_user_taught', '=', true)
       .executeTakeFirst();
     return Number(row?.count ?? 0);
   }
 
   async getLearnedCounts(): Promise<
-    Array<{ learned: boolean; count: number }>
+    { isUserTaught: boolean; count: number }[]
   > {
     const rows = await this.db
-      .selectFrom('oishii_table')
-      .select(['learned', (eb) => eb.fn.count('learned').as('count')])
-      .groupBy('learned')
+      .selectFrom('food')
+      .select(['is_user_taught', (eb) => eb.fn.countAll().as('count')])
+      .groupBy('is_user_taught')
       .execute();
 
     return rows.map((row) => ({
-      learned: row.learned,
+      isUserTaught: row.is_user_taught,
       count: Number(row.count ?? 0),
     }));
   }

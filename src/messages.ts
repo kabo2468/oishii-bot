@@ -1,4 +1,4 @@
-import type { OishiiRow } from './types/database.js';
+import type { FoodRow } from './types/database.js';
 import { chooseOneFromArr } from './utils/cofa.js';
 
 const goodText = 'おいしい';
@@ -54,15 +54,15 @@ export default {
     encode: (status: boolean): string =>
       `EncodeMode を${status ? 'オン' : 'オフ'}にしました。`,
     get: {
-      found: (row: Partial<OishiiRow>): string => {
+      found: (row: Partial<FoodRow>): string => {
         const map = {
+          id: row.id,
           name: row.name,
           good: row.good,
-          learned: row.learned,
-          userId: row.userId,
-          noteId: row.noteId,
-          created: row.created,
-          updated: row.updated,
+          isUserTaught: row.is_user_taught,
+          userId: row.user_id,
+          noteId: row.note_id,
+          createdAt: row.created_at,
         };
         const text = Object.entries(map)
           .map(([key, value]) => `${key}: "${value}"`)

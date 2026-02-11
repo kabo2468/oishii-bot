@@ -44,21 +44,14 @@ export default class extends Module {
     const food = match[1].trim();
     const good = new RegExp(variables.food.good).test(match[2]);
 
-    const isExists = await bot.existsFood(food);
-    if (isExists) {
-      await bot.updateFood(
-        food,
-        good,
-        true,
-        note.note.userId,
-        note.note.id,
-        note.note.createdAt,
-      );
-      this.log('UPDATE:', `${food} (${good})`);
-    } else {
-      await bot.addFood(food, good, true, note.note.userId, note.note.id);
-      this.log('INSERT:', `${food} (${good})`);
-    }
+    await bot.addFood({
+      food,
+      good,
+      isUserTaught: true,
+      userId: note.note.userId,
+      noteId: note.note.id,
+    });
+    this.log('INSERT:', `${food} (${good})`);
     note.reply({ text: messages.food.learn(food, match[2]) });
   }
 }
