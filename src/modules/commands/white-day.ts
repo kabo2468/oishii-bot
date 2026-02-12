@@ -1,11 +1,9 @@
-import { readFileSync } from 'node:fs';
 import type { Bot } from '../../bot.js';
 import messages from '../../messages.js';
 import type { Note } from '../../misskey/note.js';
 import Module from '../../module.js';
 import { chooseOneFromArr } from '../../utils/cofa.js';
 import variables from '../../variables.js';
-import type { Valentine } from '../valentine.js';
 
 export default class extends Module {
   Name = 'White Day';
@@ -33,15 +31,12 @@ export default class extends Module {
       this.log(`in ${whiteDayTime.toLocaleString()}ms`);
     }
 
-    const fileName = './valentine.json';
-    const file = readFileSync(fileName, { encoding: 'utf8' });
-    const json = JSON.parse(file) as Valentine;
+    const thisYearUsers = await bot.getValentineUsersByYear(now.getFullYear());
 
-    const thisYearUsers = json[now.getFullYear()];
     for (let i = 0; i < thisYearUsers.length; i++) {
       const user = thisYearUsers[i];
 
-      const count = user.gave;
+      const count = user.gave_to_bot;
       if (count === 0) continue;
 
       const presents = new Array(count)
@@ -52,9 +47,9 @@ export default class extends Module {
       setTimeout(
         () => {
           bot.api.postText({
-            text: messages.food.whiteDay(user.username, presents),
+            text: messages.food.whiteDay(user.acct, presents),
             visibility: 'specified',
-            visibleUserIds: [user.id],
+            visibleUserIds: [user.user_id],
           });
         },
         whiteDayTime + 1000 * i,

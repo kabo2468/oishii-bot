@@ -7,7 +7,11 @@ import type { Config } from './config.js';
 import messages from './messages.js';
 import API, { type UserLite } from './misskey/api.js';
 import type NGWord from './ng-words.js';
-import type { Database, FoodRow as FoodRecord } from './types/database.js';
+import type {
+  Database,
+  FoodRow as FoodRecord,
+  ValentineRow,
+} from './types/database.js';
 
 type FoodRow = Pick<FoodRecord, 'name' | 'good'>;
 type FoodNameRow = Pick<FoodRecord, 'name'>;
@@ -289,5 +293,63 @@ export class Bot {
       throw new RangeError('seed must be between -1.0 and 1.0');
     }
     await sql`SELECT setseed(${seed})`.execute(this.db);
+  }
+
+  async getValentineUser(
+    userId: string,
+    year: number,
+  ): Promise<ValentineRow | undefined> {
+    return await this.db
+      .selectFrom('valentine')
+      .selectAll()
+      .where('user_id', '=', userId)
+      .where('year', '=', year)
+      .executeTakeFirst();
+  }
+
+  async upsertValentineUser({
+    userId,
+    year,
+    acct,
+    gaveToBotIncrement,
+    receivedFromBotIncrement,
+  }: {
+    userId: string;
+    year: number;
+    acct: string;
+    gaveToBotIncrement: number;
+    receivedFromBotIncrement: number;
+  }): Promise<ValentineRow | undefined> {
+    return await this.db
+      .insertInto('valentine')
+      .values({
+        user_id: userId,
+        year,
+        acct,
+        gave_to_bot: gaveToBotIncrement,
+        received_from_bot: receivedFromBotIncrement,
+      })
+      .onConflict((oc) =>
+        oc.columns(['user_id', 'year']).doUpdateSet((eb) => ({
+          acct,
+          gave_to_bot: eb('valentine.gave_to_bot', '+', gaveToBotIncrement),
+          received_from_bot: eb(
+            'valentine.received_from_bot',
+            '+',
+            receivedFromBotIncrement,
+          ),
+          updated_at: sql`CURRENT_TIMESTAMP`,
+        })),
+      )
+      .returningAll()
+      .executeTakeFirst();
+  }
+
+  async getValentineUsersByYear(year: number): Promise<ValentineRow[]> {
+    return await this.db
+      .selectFrom('valentine')
+      .selectAll()
+      .where('year', '=', year)
+      .execute();
   }
 }

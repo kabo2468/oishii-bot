@@ -7,7 +7,6 @@ services:
         - GIT_SHA=unknown
     volumes:
       - ./config.json5:/app/config.json5:ro
-      - ./valentine.json:/app/valentine.json:rw
     depends_on:
       db:
         condition: service_healthy
