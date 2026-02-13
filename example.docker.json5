@@ -16,4 +16,8 @@
         dicPath: '/usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd',
     },
     denyRoleIds: [],
+    // NGワードの追加ソース（オプション）
+    // ローカルファイルパス（相対/絶対）またはHTTP(S) URLを指定
+    // 除外ワード（-プレフィックス）でデフォルトのNGワードを無効化可能
+    // ngWordSources: ['./custom-ngwords.txt', 'https://example.com/ngwords.txt'],
 }

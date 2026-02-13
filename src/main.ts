@@ -1,11 +1,11 @@
-import { Bot } from './bot.js';
-import { Streaming } from './misskey/api.js';
-import { Note, isNote } from './misskey/note.js';
-import Module from './module.js';
+import type { Bot } from './bot.js';
+import type { Streaming } from './misskey/api.js';
+import { isNote, Note } from './misskey/note.js';
+import type Module from './module.js';
 import CheckModule from './modules/check.js';
+import DeleteCommandModule from './modules/commands/delete.js';
 import DeleteAllCommandModule from './modules/commands/delete-all.js';
 import DeleteUserCommandModule from './modules/commands/delete-user.js';
-import DeleteCommandModule from './modules/commands/delete.js';
 import EncodeCommandModule from './modules/commands/encode.js';
 import FollowCommandModule from './modules/commands/follow.js';
 import GetCommandModule from './modules/commands/get.js';
@@ -36,171 +36,171 @@ import ValentineModule from './modules/valentine.js';
 import { replaceNewLineToText } from './utils/replace-nl-to-text.js';
 
 const tlModules = {
-    pizza: new TLPizzaModule(),
-    learn: new TLLearnModule(),
-    reaction: new TLReactionModule(),
-    call: new TLCallModule(),
+  pizza: new TLPizzaModule(),
+  learn: new TLLearnModule(),
+  reaction: new TLReactionModule(),
+  call: new TLCallModule(),
 };
 
 const modules: Module[] = [
-    new CheckModule(),
-    new SearchModule(),
-    new LearnModule(),
-    new HungryModule(),
-    new FoodModule(),
-    new SushiModule(),
-    new KawaiiModule(),
-    new FortuneModule(),
-    new NullpoModule(),
-    new ReversiModule(),
-    new ValentineModule(),
-    new FollowCommandModule(),
-    new UnfollowCommandModule(),
-    new HelpCommandModule(),
-    new PingCommandModule(),
-    new SayCommandModule(),
-    new InfoCommandModule(),
-    new DeleteCommandModule(),
-    new DeleteAllCommandModule(),
-    new DeleteUserCommandModule(),
-    new NGWordCommandModule(),
-    new EncodeCommandModule(),
-    new GetCommandModule(),
-    new WhiteDayCommandModule(),
-    new LearnedCommandModule(),
-    new GetUserCommandModule(),
+  new CheckModule(),
+  new SearchModule(),
+  new LearnModule(),
+  new HungryModule(),
+  new FoodModule(),
+  new SushiModule(),
+  new KawaiiModule(),
+  new FortuneModule(),
+  new NullpoModule(),
+  new ReversiModule(),
+  new ValentineModule(),
+  new FollowCommandModule(),
+  new UnfollowCommandModule(),
+  new HelpCommandModule(),
+  new PingCommandModule(),
+  new SayCommandModule(),
+  new InfoCommandModule(),
+  new DeleteCommandModule(),
+  new DeleteAllCommandModule(),
+  new DeleteUserCommandModule(),
+  new NGWordCommandModule(),
+  new EncodeCommandModule(),
+  new GetCommandModule(),
+  new WhiteDayCommandModule(),
+  new LearnedCommandModule(),
+  new GetUserCommandModule(),
 ];
 
 let tlCount = 0;
 
 export default function (bot: Bot): void {
-    const channels = [
-        {
-            channel: 'homeTimeline',
-            id: 'streamingTLId',
-        },
-        {
-            channel: 'main',
-            id: 'streamingMainId',
-        },
-        {
-            channel: 'reversi',
-            id: 'streamingReversiId',
-        },
-    ];
+  const channels = [
+    {
+      channel: 'homeTimeline',
+      id: 'streamingTLId',
+    },
+    {
+      channel: 'main',
+      id: 'streamingMainId',
+    },
+    {
+      channel: 'reversi',
+      id: 'streamingReversiId',
+    },
+  ];
 
-    bot.ws.addEventListener('open', function () {
-        channels.forEach((channel) => {
-            bot.connectChannel(channel.channel, channel.id);
-        });
-        bot.log('Connected!');
+  bot.ws.addEventListener('open', () => {
+    channels.forEach((channel) => {
+      bot.connectChannel(channel.channel, channel.id);
     });
-    bot.ws.addEventListener('close', function () {
-        bot.log('Disconnected.');
-    });
-    bot.ws.addEventListener('error', function (err) {
-        bot.log('Error:', err.message);
-    });
+    bot.log('Connected!');
+  });
+  bot.ws.addEventListener('close', () => {
+    bot.log('Disconnected.');
+  });
+  bot.ws.addEventListener('error', (err) => {
+    bot.log('Error:', err.message);
+  });
 
-    bot.ws.addEventListener('message', function (data) {
-        const json = JSON.parse(data.data.toString()) as Streaming;
+  bot.ws.addEventListener('message', (data) => {
+    const json = JSON.parse(data.data.toString()) as Streaming;
 
-        if (json.body.id === 'streamingTLId') {
-            if (!isNote(json.body.body)) return;
-            const note = new Note(bot, json.body.body);
+    if (json.body.id === 'streamingTLId') {
+      if (!isNote(json.body.body)) return;
+      const note = new Note(bot, json.body.body);
 
-            if (note.note.userId === bot.config.userId) return;
-            if (!note.text) return;
-            if (note.note.cw !== null) return;
-            if (/@oishiibot/.test(note.text)) return;
-            if (note.note.visibility === 'specified') return;
-            if (note.note.replyId) return;
+      if (note.note.userId === bot.config.userId) return;
+      if (!note.text) return;
+      if (note.note.cw !== null) return;
+      if (/@oishiibot/.test(note.text)) return;
+      if (note.note.visibility === 'specified') return;
+      if (note.note.replyId) return;
 
-            note.removeURLs().removeMentions();
+      note.removeURLs().removeMentions();
 
-            const ng = note.findNGWord(bot.ngWords);
-            if (ng) {
-                bot.log('SKIP(NG WORD):', ng);
-                return;
-            }
+      const ng = note.findNGWord(bot.ngWords);
+      if (ng) {
+        bot.log('SKIP(NG WORD):', ng);
+        return;
+      }
 
-            if (tlModules.pizza.Regex.test(note.text)) {
-                tlModules.pizza.Run(bot, note);
-                return;
-            }
-            if (tlModules.call.Regex.test(note.text)) {
-                tlModules.call.Run(bot, note);
-                return;
-            }
-            void tlModules.learn.Run(bot, note);
-            void tlModules.reaction.Run(bot, note);
+      if (tlModules.pizza.Regex.test(note.text)) {
+        tlModules.pizza.Run(bot, note);
+        return;
+      }
+      if (tlModules.call.Regex.test(note.text)) {
+        tlModules.call.Run(bot, note);
+        return;
+      }
+      void tlModules.learn.Run(bot, note);
+      void tlModules.reaction.Run(bot, note);
 
-            tlCount++;
-            if (tlCount > bot.config.followings / 3) {
-                if (Math.random() < bot.config.post.tlPostProbability) {
-                    bot.sayFood();
-                    tlCount = 0;
-                }
-            }
+      tlCount++;
+      if (tlCount > bot.config.followings / 3) {
+        if (Math.random() < bot.config.post.tlPostProbability) {
+          bot.sayFood();
+          tlCount = 0;
         }
+      }
+    }
 
-        if (json.body.id === 'streamingMainId') {
-            const type = json.body.type;
-            const allowTypes = ['mention', 'followed'];
-            if (!allowTypes.includes(type)) return;
+    if (json.body.id === 'streamingMainId') {
+      const type = json.body.type;
+      const allowTypes = ['mention', 'followed'];
+      if (!allowTypes.includes(type)) return;
 
-            if ('user' in json.body.body && json.body.body.user.isBot) return;
+      if ('user' in json.body.body && json.body.body.user.isBot) return;
 
-            if (type === 'followed') {
-                const user: {
-                    id: string;
-                    username: string;
-                    host: string;
-                } = JSON.parse(data.data.toString()).body.body;
+      if (type === 'followed') {
+        const user = json.body.body as {
+          id: string;
+          username: string;
+          host: string | null;
+        };
 
-                (async () => {
-                    const done = await bot.api
-                        .call('following/create', {
-                            userId: user.id,
-                        })
-                        .then((res) => res.ok)
-                        .catch((err) => console.error(err));
+        (async () => {
+          const done = await bot.api
+            .call('following/create', {
+              userId: user.id,
+            })
+            .then((res) => res.ok)
+            .catch((err) => console.error(err));
 
-                    const logPrefix = done ? 'Followed' : 'Failed to follow';
-                    const host = user.host ? `@${user.host}` : '';
-                    bot.log(`${logPrefix} @${user.username}${host} (ID: ${user.id})`);
-                })();
-                return;
-            }
+          const logPrefix = done ? 'Followed' : 'Failed to follow';
+          const host = user.host ? `@${user.host}` : '';
+          bot.log(`${logPrefix} @${user.username}${host} (ID: ${user.id})`);
+        })();
+        return;
+      }
 
-            if (!isNote(json.body.body)) return;
-            const note = new Note(bot, json.body.body);
-            note.removeURLs().removeMentionToMe();
-            bot.log('Text:', replaceNewLineToText(note.text));
+      if (!isNote(json.body.body)) return;
+      const note = new Note(bot, json.body.body);
+      note.removeURLs().removeMentionToMe();
+      bot.log('Text:', replaceNewLineToText(note.text));
 
-            const mod = modules.find((module) => module.Regex.test(note.text));
-            if (mod) {
-                bot.log('Module:', mod.Name);
-                setTimeout(() => {
-                    mod.Run(bot, note);
-                }, 1000);
-                return;
-            }
-            note.reaction();
-        }
+      const mod = modules.find((module) => module.Regex.test(note.text));
+      if (mod) {
+        bot.log('Module:', mod.Name);
+        setTimeout(() => {
+          mod.Run(bot, note);
+        }, 1000);
+        return;
+      }
+      note.reaction();
+    }
 
-        if (json.body.id === 'streamingReversiId') {
-            const type = json.body.type;
-            if (type === 'invited') {
-                Reversi(bot, json.body.body.user.id);
-            }
-            if (type === 'matched') {
-                const enemyUserId =
-                    json.body.body.game.user1Id === bot.config.userId
-                        ? json.body.body.game.user2Id
-                        : json.body.body.game.user1Id;
-                Reversi(bot, enemyUserId);
-            }
-        }
-    });
+    if (json.body.id === 'streamingReversiId') {
+      const type = json.body.type;
+      if (type === 'invited') {
+        Reversi(bot, json.body.body.user.id);
+      }
+      if (type === 'matched') {
+        const enemyUserId =
+          json.body.body.game.user1Id === bot.config.userId
+            ? json.body.body.game.user2Id
+            : json.body.body.game.user1Id;
+        Reversi(bot, enemyUserId);
+      }
+    }
+  });
 }

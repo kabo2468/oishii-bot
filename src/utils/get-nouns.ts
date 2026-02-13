@@ -1,17 +1,23 @@
-import { MecabType } from '../config.js';
+import type { MecabType } from '../config.js';
 import { mecab } from './mecab.js';
 
-export async function getNouns(text: string, mecabConfig: MecabType): Promise<string[]> {
-    const tokens = await mecab(text, mecabConfig.binPath, mecabConfig.dicPath);
+export async function getNouns(
+  text: string,
+  mecabConfig: MecabType,
+): Promise<string[]> {
+  const tokens = await mecab(text, mecabConfig.binPath, mecabConfig.dicPath);
 
-    const nouns = tokens.filter((token) => token.pos === '名詞');
-    if (nouns.length < 1) return [];
+  const nouns = tokens.filter((token) => token.pos === '名詞');
+  if (nouns.length < 1) return [];
 
-    const expected = nouns.filter(
-        (noun) => !/^[A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]$|^[ぁぃぅぇぉゕゖっゃゅょゎァィゥェォヵヶッャュョヮ]/.test(noun.surface),
-    );
-    if (expected.length < 1) return [];
+  const expected = nouns.filter(
+    (noun) =>
+      !/^[A-Za-zぁ-ゔァ-ヴｦ-ﾟ\d]$|^[ぁぃぅぇぉゕゖっゃゅょゎァィゥェォヵヶッャュョヮ]/.test(
+        noun.surface,
+      ),
+  );
+  if (expected.length < 1) return [];
 
-    const output = expected.map((word) => word.surface);
-    return output;
+  const output = expected.map((word) => word.surface);
+  return output;
 }

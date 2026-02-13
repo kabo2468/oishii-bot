@@ -1,99 +1,72 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { Bot } from '../bot.js';
+import type { Bot } from '../bot.js';
 import messages from '../messages.js';
-import { Note } from '../misskey/note.js';
+import type { Note } from '../misskey/note.js';
 import Module from '../module.js';
 
 export default class extends Module {
-    Name = 'Valentine';
-    Regex = /チョコ(レート)?を?(あげる|くれ|ちょうだい|頂戴|ください)/;
-    LogName = 'VLNT';
+  Name = 'Valentine';
+  Regex = /チョコ(レート)?を?(あげる|くれ|ちょうだい|頂戴|ください)/;
+  LogName = 'VLNT';
 
-    Run(_bot: Bot, note: Note): void {
-        note.reaction();
+  async Run(bot: Bot, note: Note): Promise<void> {
+    note.reaction();
 
-        const now = new Date();
-        if (now.getMonth() !== 1 || now.getDate() !== 14) {
-            note.reply({ text: messages.food.valentine.notToday });
-            return;
-        }
-
-        const match = RegExp(this.Regex).exec(note.text);
-        if (!match) return;
-
-        const fileName = './valentine.json';
-        if (!existsSync(fileName)) {
-            const newJson: Valentine = {};
-            newJson[now.getFullYear()] = [];
-            writeFileSync(fileName, JSON.stringify(newJson));
-        }
-        const file = readFileSync(fileName, { encoding: 'utf8' });
-        const json = JSON.parse(file) as Valentine;
-
-        const thisYearUsers = json[now.getFullYear()];
-        const user = thisYearUsers.find((user) => user.id === note.note.userId);
-        const isGive = match[2] === 'あげる';
-
-        this.log(note.screenId, isGive ? 'gives' : 'receives');
-
-        const num = Math.floor(Math.random() * 3) + 1;
-
-        if (user) {
-            // already exists
-            if (isGive) {
-                // user give
-                if (user.gave < 1) {
-                    // user first give
-                    note.reply({ text: messages.food.valentine.receive.thx });
-                } else {
-                    //user more give
-                    note.reply({ text: messages.food.valentine.receive.again });
-                }
-                user.gave++;
-            } else {
-                // user receive
-                if (user.received < 1) {
-                    // user first receive
-                    note.reply({ text: messages.food.valentine.give.first(num) });
-                } else {
-                    // user more receive
-                    note.reply({ text: messages.food.valentine.give.again(num) });
-                }
-                user.received++;
-            }
-            this.log(`Give: ${user.gave}, Receive: ${user.received}`);
-        } else {
-            // not yet
-            const addUser: User = {
-                username: note.screenId,
-                id: note.note.userId,
-                gave: 0,
-                received: 0,
-            };
-            if (isGive) {
-                // user first give
-                note.reply({ text: messages.food.valentine.receive.thx });
-                addUser.gave++;
-            } else {
-                // user first receive
-                note.reply({ text: messages.food.valentine.give.first(num) });
-                addUser.received++;
-            }
-            thisYearUsers.push(addUser);
-            this.log('First time.');
-        }
-
-        writeFileSync(fileName, JSON.stringify(json));
+    const now = new Date();
+    if (now.getMonth() !== 1 || now.getDate() !== 14) {
+      note.reply({ text: messages.food.valentine.notToday });
+      return;
     }
-}
 
-export interface Valentine {
-    [k: number]: User[];
-}
+    const match = RegExp(this.Regex).exec(note.text);
+    if (!match) return;
 
-interface User {
-    username: string;
-    id: string;
-    received: number;
-    gave: number;
+    const year = now.getFullYear();
+    const userId = note.note.userId;
+    const acct = note.screenId;
+    const isUserGives = match[2] === 'あげる';
+
+    this.log(acct, isUserGives ? 'gives' : 'receives');
+
+    const user = await bot.getValentineUser(userId, year);
+    const num = Math.floor(Math.random() * 3) + 1;
+
+    if (user) {
+      if (isUserGives) {
+        if (user.gave_to_bot < 1) {
+          await note.reply({ text: messages.food.valentine.receive.thx });
+        } else {
+          await note.reply({ text: messages.food.valentine.receive.again });
+        }
+      } else {
+        if (user.received_from_bot < 1) {
+          await note.reply({ text: messages.food.valentine.give.first(num) });
+        } else {
+          await note.reply({ text: messages.food.valentine.give.again(num) });
+        }
+      }
+    } else {
+      if (isUserGives) {
+        await note.reply({ text: messages.food.valentine.receive.thx });
+      } else {
+        await note.reply({ text: messages.food.valentine.give.first(num) });
+      }
+    }
+
+    try {
+      const updated = await bot.upsertValentineUser({
+        userId,
+        year,
+        acct,
+        gaveToBotIncrement: isUserGives ? 1 : 0,
+        receivedFromBotIncrement: isUserGives ? 0 : 1,
+      });
+      if (updated) {
+        this.log(
+          `GaveToBot: ${updated.gave_to_bot}, ReceivedFromBot: ${updated.received_from_bot}`,
+        );
+      }
+    } catch (error) {
+      this.log(`Failed to upsert valentine user: ${error}`);
+    }
+  }
 }

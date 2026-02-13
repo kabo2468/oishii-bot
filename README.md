@@ -48,11 +48,9 @@ npm i
 npm run build
 ```
 
-### Table を作る
+### マイグレーション
 
-```shell
-npm run migration
-```
+起動時に自動実行されます。
 
 ### 終わり
 
@@ -95,6 +93,13 @@ npm start
         // ここにロールIDを追加すると、そのロールを持っているユーザーの投稿は無視される
         'abcdefghij0123',
     ],
+    // (オプション) 追加のNGワードソース
+    // ローカルファイルパス（相対/絶対）またはHTTP(S) URLを指定
+    // 除外ワード（-プレフィックス）でデフォルトのNGワードを無効化可能
+    ngWordSources: [
+        './custom-ngwords.txt',
+        // 'https://example.com/ngwords.txt',
+    ],
 }
 ```
 
@@ -103,6 +108,19 @@ npm start
 Xeltica さんの Citrine から参考にさせていただきました。
 
 <https://github.com/Xeltica/Citrine/blob/master/Resources/ngwords.txt>
+
+### 外部ソースからのNGワード拡張
+
+`config.json5` の `ngWordSources` に追加のNGワードファイルやURLを指定できます。
+
+- `ngwords.txt` の形式に従ってください（1行に1ワード、`-` プレフィックスで除外ワード）
+- ローカルファイルパス（相対パス/絶対パス）または HTTP(S) URL が使用可能
+  - URLの場合、プレーンテキストでアクセスできる必要があります
+- デフォルトの `ngwords.txt` に追加される形で読み込まれます
+- デフォルトのNGワードを上書きすることができます（例: `-ばか` で「ばか」を除外）
+- `/ng reload` コマンドで全ソースを再読み込みできます（オーナーのみ）
+
+Docker 環境では、ローカルファイルパスはVolumeでマウントする必要があります。
 
 ## Docker
 

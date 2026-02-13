@@ -53,8 +53,8 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # hadolint ignore=DL3008
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        mecab libmecab-dev mecab-ipadic-utf8 \
-        git make curl ca-certificates xz-utils file patch openssl \
+    mecab libmecab-dev mecab-ipadic-utf8 \
+    git make curl ca-certificates xz-utils file patch openssl \
     && git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git /mecab-ipadic-neologd \
     && cd /mecab-ipadic-neologd \
     && curl https://patch-diff.githubusercontent.com/raw/neologd/mecab-ipadic-neologd/pull/91.patch | git apply -v \
@@ -107,4 +107,4 @@ USER node
 # Use ENTRYPOINT for the main command, CMD for default arguments
 # This allows overriding arguments while keeping the base command
 ENTRYPOINT ["pnpm"]
-CMD ["migrateandstart"]
+CMD ["start"]

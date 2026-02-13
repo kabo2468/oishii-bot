@@ -1,59 +1,60 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import ms from 'ms';
-import { Bot } from '../../bot.js';
-import { Note } from '../../misskey/note.js';
+import type { Bot } from '../../bot.js';
+import type { Note } from '../../misskey/note.js';
 import Module from '../../module.js';
 
 export default class extends Module {
-    Name = 'Info';
-    Regex = /^\/info$/i;
-    LogName = 'INFO';
+  Name = 'Info';
+  Regex = /^\/info$/i;
+  LogName = 'INFO';
 
-    async Run(bot: Bot, note: Note): Promise<void> {
-        note.reaction();
+  async Run(bot: Bot, note: Note): Promise<void> {
+    note.reaction();
 
-        const text: string[] = [];
+    const text: string[] = [];
 
-        const res = await bot.runQuery<'count'>({
-            text: 'SELECT "learned", count("learned") FROM oishii_table GROUP BY "learned"',
-        });
+    const learnedCounts = await bot.getLearnedCounts();
 
-        // Node Version
-        text.push(`Node.js: ${process.version}`);
+    // Node Version
+    text.push(`Node.js: ${process.version}`);
 
-        // Records
-        const fl = Number(res.rows[0]?.count) || 0;
-        const tl = Number(res.rows[1]?.count) || 0;
-        const all = fl + tl;
-        const recordText = `Records: ${all} (Learned: ${tl})`;
-        this.log(recordText);
-        text.push(recordText);
+    // Records
+    const learnedMap = new Map(
+      learnedCounts.map((row) => [row.isUserTaught, row.count]),
+    );
+    const fl = learnedMap.get(false) ?? 0;
+    const tl = learnedMap.get(true) ?? 0;
+    const all = fl + tl;
+    const recordText = `Records: ${all} (Learned: ${tl})`;
+    this.log(recordText);
+    text.push(recordText);
 
-        // Commit Hash
-        if (process.env.GIT_SHA) {
-            this.log('from process.env.GIT_SHA');
-            const hashText = `Commit hash: ${process.env.GIT_SHA.substring(0, 7)}`;
-            this.log(hashText);
-            text.push(hashText);
-        } else {
-            this.log('from .git');
-            const rev = readFileSync('.git/HEAD').toString();
-            const branchHash = readFileSync('.git/' + rev.substring(5).trim())
-                .toString()
-                .trim();
-            const hash = rev.indexOf(':') === -1 ? rev : branchHash;
-            const hashText = `Commit hash: ${hash.substring(0, 7)}`;
-            this.log(hashText);
-            text.push(hashText);
-        }
-
-        // uptime
-        const uptime = process.uptime();
-        const time = ms(uptime * 1000);
-        const uptimeText = `Uptime: ${time}`;
-        this.log(uptimeText);
-        text.push(uptimeText);
-
-        note.reply({ text: text.join('\n') });
+    // Commit Hash
+    if (process.env.GIT_SHA) {
+      this.log('from process.env.GIT_SHA');
+      const hashText = `Commit hash: ${process.env.GIT_SHA.substring(0, 7)}`;
+      this.log(hashText);
+      text.push(hashText);
+    } else {
+      this.log('from .git');
+      const rev = readFileSync('.git/HEAD').toString();
+      const branchHash = readFileSync(`.git/${rev.substring(5).trim()}`)
+        .toString()
+        .trim();
+      const hash = rev.indexOf(':') === -1 ? rev : branchHash;
+      const hashText = `Commit hash: ${hash.substring(0, 7)}`;
+      this.log(hashText);
+      text.push(hashText);
     }
+
+    // uptime
+    const uptime = process.uptime();
+    const time = ms(uptime * 1000);
+    const uptimeText = `Uptime: ${time}`;
+    this.log(uptimeText);
+    text.push(uptimeText);
+
+    note.reply({ text: text.join('\n') });
+  }
 }

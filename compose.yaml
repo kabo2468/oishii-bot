@@ -7,20 +7,19 @@ services:
         - GIT_SHA=unknown
     volumes:
       - ./config.json5:/app/config.json5:ro
-      - ./valentine.json:/app/valentine.json:rw
     depends_on:
       db:
         condition: service_healthy
     restart: always
 
   db:
-    image: postgres:alpine
+    image: postgres:18-alpine
     restart: always
     user: postgres
     secrets:
       - db-password
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password

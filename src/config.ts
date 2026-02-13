@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import got from 'got';
 import JSON5 from 'json5';
-import pg from 'pg';
+import type { ClientConfig } from 'pg';
 
 type Post = {
     [key: string]: number;
@@ -17,16 +17,17 @@ export type MecabType = {
 };
 
 type JsonConfig = {
-    [key: string]: string | string[] | boolean | number | Post | MecabType | pg.ClientConfig['ssl'];
+    [key: string]: string | string[] | boolean | number | Post | MecabType | ClientConfig['ssl'];
     url: string;
     apiKey: string;
     apiUrl: string;
     databaseUrl: string;
-    dbSSL: pg.ClientConfig['ssl'];
+    dbSSL: ClientConfig['ssl'];
     ownerUsernames: string[];
     post: Post;
     mecab: MecabType;
     denyRoleIds: string[];
+    ngWordSources?: string[];
 };
 
 export type Config = {
@@ -42,6 +43,7 @@ export type Config = {
     followings: number;
     mecab: MecabType;
     denyRoleIds: string[];
+    ngWordSources?: string[];
 };
 
 export default async function loadConfig(): Promise<Config> {
@@ -131,5 +133,6 @@ export default async function loadConfig(): Promise<Config> {
         followings: Number(follows),
         mecab: config.mecab,
         denyRoleIds: config.denyRoleIds,
+        ngWordSources: config.ngWordSources,
     };
 }
