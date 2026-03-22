@@ -23,22 +23,22 @@
     "got": "^14.6.6",
     "iconv-lite": "^0.7.2",
     "json5": "^2.2.3",
-    "kysely": "^0.28.0",
+    "kysely": "^0.28.14",
     "memory-streams": "^0.1.3",
     "mfm-js": "^0.25.0",
     "moji": "^0.5.1",
     "ms": "^2.1.3",
-    "partysocket": "^1.1.11",
-    "pg": "^8.18.0",
+    "partysocket": "^1.1.16",
+    "pg": "^8.20.0",
     "seedrandom": "^3.0.5",
-    "ws": "^8.19.0"
+    "ws": "^8.20.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.14",
+    "@biomejs/biome": "2.4.8",
     "@types/moji": "^0.5.3",
     "@types/ms": "^2.1.0",
     "@types/node": "^24.10.11",
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.20.0",
     "@types/seedrandom": "^3.0.8",
     "@types/ws": "^8.18.1",
     "tsx": "^4.21.0",
@@ -48,7 +48,7 @@
     "bufferutil": "^4.1.0",
     "utf-8-validate": "^6.0.6"
   },
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@10.32.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@biomejs/biome",
