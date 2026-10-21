@@ -1,5 +1,5 @@
-import got from 'got';
 import type { Bot } from '../bot.js';
+import type { Config } from '../config.js';
 import messages from '../messages.js';
 import type { ReversiMatch } from '../modules/reversi/reversi.js';
 import { botVersion } from '../utils/version.js';
@@ -46,26 +46,37 @@ export interface Role {
   name: string;
 }
 
+export async function callAPI<T>(
+  config: Pick<Config, 'apiUrl' | 'apiKey'>,
+  endpoint: string,
+  body?: Record<string, unknown>,
+) {
+  const response = await fetch(`${config.apiUrl}/${endpoint}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      ...body,
+      i: config.apiKey,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
+    },
+  });
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(`Misskey API ${endpoint}: HTTP ${response.status}`);
+  }
+  return { body: (text ? JSON.parse(text) : '') as T, ok: response.ok };
+}
+
 export default class API {
   constructor(private bot: Bot) {}
 
   async call<T>(endpoint: string, body?: Record<string, unknown>) {
-    const postBody = {
-      ...body,
-      i: this.bot.config.apiKey,
-    };
-    return got
-      .post<T>(`${this.bot.config.apiUrl}/${endpoint}`, {
-        json: postBody,
-        headers: {
-          'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
-        },
-        responseType: 'json',
-      })
-      .catch((err) => {
-        console.error(err);
-        throw err;
-      });
+    return callAPI<T>(this.bot.config, endpoint, body).catch((err) => {
+      console.error(err);
+      throw err;
+    });
   }
 
   async postText({

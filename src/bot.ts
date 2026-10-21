@@ -206,7 +206,7 @@ export class Bot {
       .select(['name', 'good'])
       .limit(1)
       .offset(
-        sql`floor(random() * (SELECT count(*) FROM records ${offsetWhere}))`,
+        sql<number>`floor(random() * (SELECT count(*) FROM records ${offsetWhere}))`,
       );
 
     if (good !== undefined) {

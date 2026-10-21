@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
-import got from 'got';
 import JSON5 from 'json5';
 import type { ClientConfig } from 'pg';
+import { callAPI } from './misskey/api.js';
 
 type Post = {
     [key: string]: number;
@@ -101,14 +101,9 @@ export default async function loadConfig(): Promise<Config> {
     const apiUrl = jsonConfig.apiUrl.endsWith('/') ? jsonConfig.apiUrl.slice(0, -1) : jsonConfig.apiUrl;
 
     const api = async (endpoint: string, data: Record<string, unknown>): Promise<Record<string, string>> => {
-        return await got
-            .post(`${apiUrl}/${endpoint}`, {
-                json: {
-                    i: jsonConfig.apiKey,
-                    ...data,
-                },
-            })
-            .json<Record<string, string>>();
+        return (await callAPI<Record<string, string>>(
+            { apiUrl, apiKey: jsonConfig.apiKey }, endpoint, data,
+        )).body;
     };
 
     const [userId, follows] = await api('i', {}).then((json) => [json.id, json.followingCount]);

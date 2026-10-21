@@ -1,12 +1,13 @@
 # ============================================
 # Base stage: Node.js with pnpm enabled
 # ============================================
-FROM node:24-slim AS base
+FROM node:26.12.1-trixie-slim AS base
 
 ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+ENV PATH="$PNPM_HOME/bin:$PATH"
 
-RUN npm install -g corepack@latest && corepack enable
+COPY --from=ghcr.io/pnpm/pnpm:12.14.0 /opt/pnpm /opt/pnpm
+RUN ln -s /opt/pnpm/pnpm /usr/local/bin/pnpm
 
 WORKDIR /app
 
@@ -22,7 +23,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy only package files first for better caching
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # ============================================
 # Production dependencies stage
@@ -46,7 +47,7 @@ RUN pnpm run build
 # ============================================
 # MeCab dictionary stage: Build neologd dictionary
 # ============================================
-FROM debian:bookworm-slim AS mecab-builder
+FROM debian:trixie-slim AS mecab-builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -65,15 +66,11 @@ RUN apt-get update \
 # ============================================
 # Final stage: Minimal production image
 # ============================================
-FROM node:24-slim AS runner
+FROM base AS runner
 
 ARG GIT_SHA="unknown"
 ENV GIT_SHA=$GIT_SHA
 ENV NODE_ENV=production
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
-RUN npm install -g corepack@latest && corepack enable
 
 # Install only runtime dependencies for MeCab
 # hadolint ignore=DL3008
@@ -97,7 +94,7 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/built ./built
 
 # Copy only necessary files
-COPY package.json ngwords.txt ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ngwords.txt ./
 
 # Set ownership and switch to non-root user
 RUN chown -R node:node /app

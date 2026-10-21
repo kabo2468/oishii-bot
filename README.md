@@ -14,11 +14,20 @@ Docker を使う場合は、[Docker](#docker) を参照してください。
 
 この ID じゃないと動きません
 
-### Node.js, npm, PostgreSQL をインストールする
+### Node.js, pnpm, PostgreSQL をインストールする
 
-Node.js のバージョンは v16 以上にしてください
+Node.js は v26.12.1 以降の v26 系を使用してください。Dockerではv26.12.1を使用しています。
+pnpmは`package.json`の`packageManager`で指定したバージョンを使用してください。
 
 OS によってインストール方法が異なるので、各自調べてください
+
+pnpmが未導入の場合は、Linux・macOS・WSLでは[公式のスタンドアロンインストーラー](https://pnpm.io/installation#using-a-standalone-script)で導入してください。npmは不要です。
+
+```shell
+curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=12.14.0 sh -
+```
+
+導入後は新しいターミナルを開き、`pnpm --version`が`12.14.0`になっていることを確認してください。
 
 ### MeCab をインストールする
 
@@ -44,8 +53,8 @@ nano config.json5
 ### ビルドする
 
 ```shell
-npm i
-npm run build
+pnpm install --frozen-lockfile
+pnpm run build
 ```
 
 ### マイグレーション
@@ -55,7 +64,7 @@ npm run build
 ### 終わり
 
 ```shell
-npm start
+pnpm start
 ```
 
 ## config.json5
