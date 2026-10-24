@@ -1,10 +1,8 @@
-import got from 'got';
 import type { Config } from '../../config.js';
 import messages from '../../messages.js';
-import type { UserLite } from '../../misskey/api.js';
+import { callAPI, type UserLite } from '../../misskey/api.js';
 import type { CreatedNote } from '../../misskey/note.js';
 import { chooseOneFromArr } from '../../utils/cofa.js';
-import { botVersion } from '../../utils/version.js';
 import { type Color, Game } from './engine.js';
 import type { ReversiMatch } from './reversi.js';
 
@@ -255,17 +253,11 @@ class Back {
       visibility: 'home',
       ...(renoteId ? { renoteId } : {}),
     };
-    return got
-      .post<{ createdNote: CreatedNote }>(
-        `${this._config.apiUrl}/notes/create`,
-        {
-          json: data,
-          headers: {
-            'User-Agent': `oishii-bot/${botVersion} (API / https://github.com/kabo2468/oishii-bot)`,
-          },
-          responseType: 'json',
-        },
-      )
+    return callAPI<{ createdNote: CreatedNote }>(
+      this._config,
+      'notes/create',
+      data,
+    )
       .then((res) => res.body.createdNote)
       .catch((err) => {
         console.error(err);
